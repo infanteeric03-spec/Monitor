@@ -484,6 +484,27 @@
   .quiz-opt-row.chosen-wrong .quiz-opt-letter{ background:var(--alarm); color:#2a0000; border-color:var(--alarm); }
   .quiz-answer-status{ margin-top:8px; font-size:12px; font-family:var(--font-num); color:var(--text-dim); }
 
+  /* ---- Preguntas de RCP (AHA / ERC) ---- */
+  .algo-seg{ display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; flex-shrink:0; }
+  .algo-seg button{
+    background:var(--field); color:var(--text-dim); border:none; font-size:12px; font-weight:700; letter-spacing:.04em;
+    padding:6px 12px; cursor:pointer; font-family:inherit;
+  }
+  .algo-seg button + button{ border-left:1px solid var(--line); }
+  .algo-seg button.on{ background:var(--ecg); color:#00150a; }
+  body.theme-light .algo-seg button.on{ color:#fff; }
+  .quiz-algo-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;
+    font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; }
+  .cpr-panel{ display:none; margin-top:12px; border:1px solid var(--alarm); border-radius:6px; padding:10px 12px;
+    background:var(--field); }
+  .cpr-panel.show{ display:block; }
+  .cpr-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+  .cpr-title{ font-size:13px; font-weight:700; color:var(--alarm); }
+  .cpr-ctx{ font-size:11.5px; color:var(--text-dim); font-family:var(--font-num); margin-bottom:8px; }
+  .cpr-ctx b{ color:var(--text); font-weight:600; }
+  #cprSelect{ width:100%; min-width:0; }
+  .cpr-panel .quiz-preview{ background:var(--panel); }
+
   /* ---- Superposición de pregunta (Monitor) ---- */
   #quizOverlay{
     position:fixed; inset:0; background:rgba(2,4,5,0.92); z-index:40;
@@ -718,6 +739,28 @@
                 <div class="case-bar"><div class="case-bar-fill" id="caseProgress"></div></div>
                 <div class="case-narrative" id="caseNarrative">Selecciona "Iniciar" para comenzar el caso.</div>
               </div>
+
+              <!-- Preguntas de RCP (aparece en los casos con parada cardiorrespiratoria) -->
+              <div class="cpr-panel" id="cprPanel">
+                <div class="cpr-head">
+                  <span class="cpr-title">🫀 Preguntas de RCP</span>
+                  <div class="algo-seg" role="group" aria-label="Algoritmo de RCP">
+                    <button type="button" data-algo="AHA" onclick="setCprAlgo('AHA')">AHA</button>
+                    <button type="button" data-algo="ERC" onclick="setCprAlgo('ERC')">ERC</button>
+                  </div>
+                </div>
+                <div class="cpr-ctx" id="cprCtx"></div>
+                <select id="cprSelect" onchange="previewQuestion(this.value,'cpr')"></select>
+                <div class="quiz-preview" id="cprPreview" style="display:none;">
+                  <div id="cprPreviewText"></div>
+                  <div id="cprPreviewOptions"></div>
+                  <div class="quiz-answer-status" id="cprAnswerStatus"></div>
+                </div>
+                <div class="casebtns" style="margin-top:8px;">
+                  <button class="casebtn primary" id="cprBtnSend" onclick="sendQuestion('cpr')" disabled>📨 Enviar al monitor</button>
+                  <button class="casebtn" id="cprBtnClear" onclick="clearQuestion('cpr')" disabled>✕ Retirar</button>
+                </div>
+              </div>
             </div>
 
             <div id="caseBuilder">
@@ -735,16 +778,23 @@
           </div>
 
           <div class="tab-pane" id="paneQuiz">
+            <div class="quiz-algo-row">
+              <span>Preguntas de RCP según</span>
+              <div class="algo-seg" role="group" aria-label="Algoritmo de RCP">
+                <button type="button" data-algo="AHA" onclick="setCprAlgo('AHA')">AHA</button>
+                <button type="button" data-algo="ERC" onclick="setCprAlgo('ERC')">ERC</button>
+              </div>
+            </div>
             <div class="quiz-row">
               <div style="flex:1; min-width:200px;">
                 <label style="font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; display:block; margin-bottom:4px;">Banco de preguntas</label>
-                <select id="quizSelect" onchange="previewQuestion(this.value)" style="width:100%;">
+                <select id="quizSelect" onchange="previewQuestion(this.value,'quiz')" style="width:100%; min-width:0;">
                   <option value="">— Elige una pregunta —</option>
                 </select>
               </div>
               <div class="casebtns">
-                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion()" disabled>📨 Enviar al monitor</button>
-                <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion()" disabled>✕ Retirar</button>
+                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled>📨 Enviar al monitor</button>
+                <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion('quiz')" disabled>✕ Retirar</button>
               </div>
             </div>
             <div class="quiz-preview" id="quizPreview" style="display:none;">
@@ -1184,59 +1234,184 @@ const QUESTION_BANK = [
   { id:'q12', q:'En la asistolia, ¿qué se debe hacer de inmediato?', options:['Desfibrilar sin demora','Confirmar el ritmo en otra derivación y continuar RCP + adrenalina','Administrar amiodarona en bolo','Realizar cardioversión sincronizada'], correct:1 }
 ];
 
-function populateQuizSelect(){
-  const sel = document.getElementById('quizSelect');
-  QUESTION_BANK.forEach(item=>{
-    const opt = document.createElement('option');
-    opt.value = item.id; opt.textContent = item.q;
-    sel.appendChild(opt);
-  });
-}
+/* ---------- Banco de preguntas de RCP (soporte vital avanzado del adulto) ----------
+   algo: 'both' (común a AHA y ERC), 'AHA' o 'ERC' (cuando las recomendaciones difieren).
+   ctx: fase de la parada en la que tiene sentido → 'general', 'shock' (FV/TVSP),
+   'noshock' (asistolia/AESP) o 'post' (tras la recuperación de la circulación espontánea). */
+const CPR_BANK = [
+  // Generales
+  { id:'rcp_g1', algo:'both', ctx:'general', q:'¿A qué frecuencia deben hacerse las compresiones torácicas en el adulto?', options:['60–80 por minuto','80–100 por minuto','100–120 por minuto','Más de 140 por minuto'], correct:2 },
+  { id:'rcp_g2', algo:'both', ctx:'general', q:'¿Qué profundidad deben tener las compresiones en el adulto?', options:['2–3 cm','3–4 cm','5–6 cm','Más de 7 cm'], correct:2 },
+  { id:'rcp_g3', algo:'both', ctx:'general', q:'Sin vía aérea avanzada, ¿cuál es la relación compresiones:ventilaciones?', options:['15:2','30:2','5:1','15:1'], correct:1 },
+  { id:'rcp_g4', algo:'both', ctx:'general', q:'Con el paciente intubado (vía aérea avanzada), ¿cómo se ventila durante la RCP?', options:['30:2, parando las compresiones para ventilar','Compresiones continuas y unas 10 ventilaciones por minuto','Compresiones continuas y 30 ventilaciones por minuto','No se ventila, solo compresiones'], correct:1 },
+  { id:'rcp_g5', algo:'both', ctx:'general', q:'¿Cada cuánto tiempo se analiza el ritmo durante la RCP?', options:['Cada 30 segundos','Cada minuto','Cada 2 minutos','Cada 5 minutos'], correct:2 },
+  { id:'rcp_g6', algo:'both', ctx:'general', q:'¿Qué dosis de adrenalina se administra en la parada del adulto?', options:['0,1 mg IV','0,5 mg IV','1 mg IV/IO','5 mg IV'], correct:2 },
+  { id:'rcp_g7', algo:'both', ctx:'general', q:'Una vez iniciada, ¿cada cuánto se repite la adrenalina?', options:['Cada minuto','Cada 3–5 minutos','Cada 10 minutos','Solo se administra una dosis'], correct:1 },
+  { id:'rcp_g8', algo:'both', ctx:'general', q:'Si no se consigue una vía venosa, ¿cuál es la alternativa recomendada?', options:['Intramuscular','Endotraqueal','Intraósea','Subcutánea'], correct:2 },
+  { id:'rcp_g9', algo:'both', ctx:'general', q:'¿Cuál de estas NO es una de las causas reversibles (4H y 4T)?', options:['Hipoxia','Neumotórax a tensión','Taponamiento cardiaco','Hiperglucemia'], correct:3 },
+  { id:'rcp_g10', algo:'both', ctx:'general', q:'Durante la RCP, una subida brusca y mantenida del EtCO₂ en la capnografía sugiere:', options:['Que el tubo está en el esófago','Recuperación de la circulación espontánea','Que las compresiones son demasiado rápidas','Hiperventilación'], correct:1 },
 
-let currentQuiz = null; // pregunta seleccionada/enviada por el Instructor
+  // Ritmo desfibrilable (FV / TV sin pulso)
+  { id:'rcp_s1', algo:'both', ctx:'shock', q:'FV/TV sin pulso en el monitor. ¿Qué haces primero?', options:['Administrar amiodarona','Desfibrilar cuanto antes y reanudar las compresiones','Intubar antes de desfibrilar','Comprobar el pulso durante 30 segundos'], correct:1 },
+  { id:'rcp_s2', algo:'both', ctx:'shock', q:'Justo después de una descarga, ¿qué se hace?', options:['Comprobar el pulso','Analizar de nuevo el ritmo','Reanudar las compresiones inmediatamente durante 2 minutos','Administrar otra descarga'], correct:2 },
+  { id:'rcp_s3_aha', algo:'AHA', ctx:'shock', q:'Según la AHA, en ritmo desfibrilable, ¿cuándo se da la primera adrenalina?', options:['Antes de la 1.ª descarga','Tras la 1.ª descarga','Tras la 2.ª descarga','Tras la 5.ª descarga'], correct:2 },
+  { id:'rcp_s3_erc', algo:'ERC', ctx:'shock', q:'Según el ERC, en ritmo desfibrilable, ¿cuándo se da la primera adrenalina?', options:['Antes de la 1.ª descarga','Tras la 1.ª descarga','Tras la 3.ª descarga','Tras la 5.ª descarga'], correct:2 },
+  { id:'rcp_s4_aha', algo:'AHA', ctx:'shock', q:'Según la AHA, en FV/TVSP refractaria, ¿qué antiarrítmico se da y cuándo?', options:['Amiodarona 150 mg tras la 1.ª descarga','Amiodarona 300 mg (o lidocaína) tras la 3.ª descarga','Adenosina 6 mg tras la 2.ª descarga','Atropina 1 mg tras la 3.ª descarga'], correct:1 },
+  { id:'rcp_s4_erc', algo:'ERC', ctx:'shock', q:'Según el ERC, ¿cuál es la pauta de amiodarona en FV/TVSP refractaria?', options:['300 mg tras la 3.ª descarga y 150 mg tras la 5.ª','150 mg tras la 1.ª y otros 150 mg tras la 2.ª','5 mg/kg tras cada descarga','300 mg antes de la 1.ª descarga'], correct:0 },
+  { id:'rcp_s5_aha', algo:'AHA', ctx:'shock', q:'Según la AHA, ¿cuál es la segunda dosis de amiodarona?', options:['50 mg','150 mg','300 mg','450 mg'], correct:1 },
+  { id:'rcp_s6_aha', algo:'AHA', ctx:'shock', q:'Según la AHA, ¿qué energía se usa con un desfibrilador bifásico?', options:['Siempre 50 J','La recomendada por el fabricante (120–200 J); si se desconoce, la máxima','Siempre 360 J','La mínima del aparato'], correct:1 },
+  { id:'rcp_s6_erc', algo:'ERC', ctx:'shock', q:'Según el ERC, la primera descarga bifásica debe ser de al menos:', options:['50 J','100 J','150 J','360 J'], correct:2 },
+  { id:'rcp_s7_erc', algo:'ERC', ctx:'shock', q:'Según el ERC, ante una FV presenciada y monitorizada con el desfibrilador a mano (p. ej., en hemodinámica):', options:['Se hacen 2 minutos de RCP antes de desfibrilar','Se pueden dar hasta 3 descargas seguidas antes de empezar las compresiones','Se administra adrenalina antes de la primera descarga','No se desfibrila hasta tener una vía aérea avanzada'], correct:1 },
+
+  // Ritmo no desfibrilable (asistolia / AESP)
+  { id:'rcp_n1', algo:'both', ctx:'noshock', q:'Asistolia o AESP en el monitor. ¿Se desfibrila?', options:['Sí, a la máxima energía','Sí, pero solo una vez','No: RCP y adrenalina lo antes posible','No: solo ventilar'], correct:2 },
+  { id:'rcp_n2_aha', algo:'AHA', ctx:'noshock', q:'Según la AHA, en ritmo no desfibrilable, ¿cuándo se da la primera adrenalina?', options:['Tan pronto como sea posible','Tras 3 ciclos de RCP','Tras la 2.ª descarga','Solo si hay hipotensión'], correct:0 },
+  { id:'rcp_n2_erc', algo:'ERC', ctx:'noshock', q:'Según el ERC, en ritmo no desfibrilable, ¿cuándo se da la primera adrenalina?', options:['En cuanto se consiga acceso IV/IO','Tras 10 minutos de RCP','Tras la 3.ª descarga','Nunca en asistolia'], correct:0 },
+  { id:'rcp_n3', algo:'both', ctx:'noshock', q:'En la AESP, además de una RCP de calidad, ¿qué es prioritario?', options:['Desfibrilar','Buscar y tratar las causas reversibles (4H y 4T)','Administrar atropina','Esperar a que aparezca una FV'], correct:1 },
+  { id:'rcp_n4', algo:'both', ctx:'noshock', q:'Antes de dar por buena una asistolia en el monitor conviene:', options:['Desfibrilar por si acaso','Comprobar electrodos, ganancia y otra derivación','Retirar el monitor','Administrar amiodarona'], correct:1 },
+  { id:'rcp_n5', algo:'both', ctx:'noshock', q:'¿Está recomendada la atropina de rutina en asistolia/AESP?', options:['Sí, 1 mg cada 3–5 minutos','Sí, 3 mg en dosis única','No','Solo en la AESP'], correct:2 },
+
+  // Tras la recuperación de la circulación espontánea (RCE)
+  { id:'rcp_p1_aha', algo:'AHA', ctx:'post', q:'Según la AHA, tras la RCE, ¿qué SpO₂ objetivo se busca?', options:['85–88 %','92–98 %','100 % siempre','Cualquiera por encima del 80 %'], correct:1 },
+  { id:'rcp_p1_erc', algo:'ERC', ctx:'post', q:'Según el ERC, tras la RCE, ¿qué SpO₂ objetivo se busca?', options:['85–88 %','94–98 %','100 % siempre','Cualquiera por encima del 80 %'], correct:1 },
+  { id:'rcp_p2', algo:'both', ctx:'post', q:'Tras la RCE, ¿qué presión arterial media se recomienda como mínimo?', options:['PAM ≥ 40 mmHg','PAM ≥ 65 mmHg','PAM ≥ 110 mmHg','No hay objetivo'], correct:1 },
+  { id:'rcp_p3', algo:'both', ctx:'post', q:'Tras la RCE, en un paciente que no despierta, respecto a la temperatura:', options:['Calentar activamente por encima de 38 °C','Control activo de la temperatura, evitando la fiebre','No hace falta vigilarla','Enfriar por debajo de 30 °C'], correct:1 },
+  { id:'rcp_p4', algo:'both', ctx:'post', q:'Tras la RCE, ¿qué prueba debe hacerse de forma precoz?', options:['ECG de 12 derivaciones','Radiografía de cráneo','Ecografía abdominal','Ninguna'], correct:0 }
+];
+const ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
+const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
+
+let cprAlgo = 'AHA';
+try{ const v = localStorage.getItem('monitor-cpr-algo'); if(v==='AHA'||v==='ERC') cprAlgo = v; }catch(e){}
+
+// Las dos zonas de preguntas (pestaña "Preguntas" y panel de RCP del caso) comparten la lógica
+const QUIZ_UI = {
+  quiz:{ sel:'quizSelect', send:'btnSendQuiz', clear:'btnClearQuiz', box:'quizPreview', text:'quizPreviewText', opts:'quizPreviewOptions', status:'quizAnswerStatus', row:'qOptRow' },
+  cpr: { sel:'cprSelect',  send:'cprBtnSend',  clear:'cprBtnClear',  box:'cprPreview',  text:'cprPreviewText',  opts:'cprPreviewOptions',  status:'cprAnswerStatus',  row:'cprOptRow' }
+};
+const quizShown = { quiz:null, cpr:null }; // pregunta previsualizada en cada zona
+let sentQuiz = null;      // { q, ui } pregunta que está ahora en el monitor
 let quizAnswered = false;
 
-function previewQuestion(id){
-  currentQuiz = QUESTION_BANK.find(x=>x.id===id) || null;
-  quizAnswered = false;
-  document.getElementById('btnSendQuiz').disabled = !currentQuiz;
-  const box = document.getElementById('quizPreview');
-  if(!currentQuiz){ box.style.display='none'; return; }
+function cprQuestionsFor(algo, ctxs){
+  return CPR_BANK.filter(x=>(x.algo==='both' || x.algo===algo) && (!ctxs || ctxs.includes(x.ctx)));
+}
+
+function fillOptions(sel, groups, keep){
+  sel.innerHTML = '<option value="">— Elige una pregunta —</option>';
+  groups.forEach(g=>{
+    if(!g.items.length) return;
+    const og = document.createElement('optgroup'); og.label = g.label;
+    g.items.forEach(item=>{ const o=document.createElement('option'); o.value=item.id; o.textContent=item.q; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+  if(keep && [...sel.options].some(o=>o.value===keep)) sel.value = keep;
+}
+
+function populateQuizSelect(){
+  const sel = document.getElementById('quizSelect');
+  const keep = sel.value;
+  const groups = [{ label:'Ritmos y bloqueos', items:QUESTION_BANK }];
+  ['general','shock','noshock','post'].forEach(c=>groups.push({ label:'RCP ('+cprAlgo+') · '+CPR_CTX_LABEL[c], items:cprQuestionsFor(cprAlgo,[c]) }));
+  fillOptions(sel, groups, keep);
+  if(keep && sel.value!==keep) previewQuestion('', 'quiz');
+}
+
+function setCprAlgo(algo){
+  cprAlgo = algo;
+  try{ localStorage.setItem('monitor-cpr-algo', algo); }catch(e){}
+  document.querySelectorAll('.algo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.algo===algo));
+  populateQuizSelect();
+  updateCprPanel(true);
+}
+
+function previewQuestion(id, uiKey){
+  uiKey = uiKey || 'quiz';
+  const ui = QUIZ_UI[uiKey];
+  const q = ALL_QUESTIONS.find(x=>x.id===id) || null;
+  quizShown[uiKey] = q;
+  document.getElementById(ui.send).disabled = !q;
+  const box = document.getElementById(ui.box);
+  if(!q){ box.style.display='none'; return; }
   box.style.display = 'block';
-  document.getElementById('quizPreviewText').textContent = currentQuiz.q;
+  document.getElementById(ui.text).textContent = q.q;
   const letters = ['A','B','C','D'];
-  document.getElementById('quizPreviewOptions').innerHTML = currentQuiz.options.map((op,i)=>
-    '<div class="quiz-opt-row'+(i===currentQuiz.correct?' correct':'')+'" id="qOptRow'+i+'"><span class="quiz-opt-letter">'+letters[i]+'</span><span>'+op+'</span></div>'
+  document.getElementById(ui.opts).innerHTML = q.options.map((op,i)=>
+    '<div class="quiz-opt-row'+(i===q.correct?' correct':'')+'" id="'+ui.row+i+'"><span class="quiz-opt-letter">'+letters[i]+'</span><span>'+escapeHtml(op)+'</span></div>'
   ).join('');
-  document.getElementById('quizAnswerStatus').textContent = 'Aún no se ha enviado al monitor.';
+  const isSent = sentQuiz && sentQuiz.q.id===q.id;
+  document.getElementById(ui.status).textContent = isSent ? 'Ya está en el monitor.' : 'Aún no se ha enviado al monitor.';
 }
 
-function sendQuestion(){
-  if(!currentQuiz || role!=='instructor' || !channel) return;
+function sendQuestion(uiKey){
+  uiKey = uiKey || 'quiz';
+  const q = quizShown[uiKey];
+  if(!q || role!=='instructor' || !channel) return;
   quizAnswered = false;
-  channel.send({ type:'broadcast', event:'question', payload:{ id:currentQuiz.id, q:currentQuiz.q, options:currentQuiz.options }});
-  document.getElementById('btnClearQuiz').disabled = false;
-  document.getElementById('quizAnswerStatus').textContent = 'Enviada al monitor. Esperando respuesta del alumno…';
+  sentQuiz = { q, ui:uiKey };
+  channel.send({ type:'broadcast', event:'question', payload:{ id:q.id, q:q.q, options:q.options }});
+  Object.keys(QUIZ_UI).forEach(k=>{ document.getElementById(QUIZ_UI[k].clear).disabled = false; });
+  document.getElementById(QUIZ_UI[uiKey].status).textContent = 'Enviada al monitor. Esperando respuesta del alumno…';
 }
 
-function clearQuestion(){
+function clearQuestion(uiKey){
   if(role!=='instructor' || !channel) return;
   channel.send({ type:'broadcast', event:'question_clear', payload:{} });
-  document.getElementById('btnClearQuiz').disabled = true;
-  if(currentQuiz) document.getElementById('quizAnswerStatus').textContent = 'Retirada del monitor.';
+  Object.keys(QUIZ_UI).forEach(k=>{ document.getElementById(QUIZ_UI[k].clear).disabled = true; });
+  if(sentQuiz && !quizAnswered && quizShown[sentQuiz.ui] && quizShown[sentQuiz.ui].id===sentQuiz.q.id){
+    document.getElementById(QUIZ_UI[sentQuiz.ui].status).textContent = 'Retirada del monitor.';
+  }
+  sentQuiz = null;
 }
 
 // El Instructor recibe la respuesta que ha elegido el alumno en el Monitor
 function onRemoteAnswer(payload){
-  if(!currentQuiz || payload.id!==currentQuiz.id || quizAnswered) return;
+  if(!sentQuiz || payload.id!==sentQuiz.q.id || quizAnswered) return;
   quizAnswered = true;
+  const q = sentQuiz.q, ui = QUIZ_UI[sentQuiz.ui];
+  if(!quizShown[sentQuiz.ui] || quizShown[sentQuiz.ui].id!==q.id) return;
   const letters = ['A','B','C','D'];
-  const row = document.getElementById('qOptRow'+payload.optionIndex);
-  if(row) row.classList.add(payload.optionIndex===currentQuiz.correct ? 'chosen-right' : 'chosen-wrong');
-  const status = document.getElementById('quizAnswerStatus');
-  status.textContent = payload.optionIndex===currentQuiz.correct
+  const row = document.getElementById(ui.row+payload.optionIndex);
+  if(row) row.classList.add(payload.optionIndex===q.correct ? 'chosen-right' : 'chosen-wrong');
+  document.getElementById(ui.status).textContent = payload.optionIndex===q.correct
     ? '✓ El alumno ha respondido '+letters[payload.optionIndex]+' — correcta.'
-    : '✗ El alumno ha respondido '+letters[payload.optionIndex]+' — la correcta era '+letters[currentQuiz.correct]+'.';
+    : '✗ El alumno ha respondido '+letters[payload.optionIndex]+' — la correcta era '+letters[q.correct]+'.';
+}
+
+/* ---- Panel de RCP dentro del caso clínico ----
+   Aparece si el caso tiene alguna fase de parada y propone primero las preguntas de la fase actual. */
+let cprPanelKey = null;
+function isArrestPhase(k){ return k.noPulse || k.rhythm==='vfib' || k.rhythm==='asystole'; }
+function cprContextNow(){
+  if(!scenario.active) return null;
+  const kfs = getCase(scenario.key).keyframes;
+  let idx = 0;
+  for(let i=0;i<kfs.length;i++){ if(kfs[i].t<=scenario.t) idx = i; }
+  const cur = kfs[idx];
+  if(isArrestPhase(cur)) return (cur.rhythm==='vfib' || cur.rhythm==='vtach') ? 'shock' : 'noshock';
+  return kfs.slice(0, idx).some(isArrestPhase) ? 'post' : 'pre';
+}
+function updateCprPanel(force){
+  const panel = document.getElementById('cprPanel');
+  if(!panel) return;
+  const c = scenario.active ? getCase(scenario.key) : null;
+  const caseHasArrest = !!(c && c.keyframes.some(isArrestPhase));
+  panel.classList.toggle('show', caseHasArrest);
+  if(!caseHasArrest){ cprPanelKey = null; return; }
+  const ctx = cprContextNow();
+  const key = scenario.key+'|'+ctx+'|'+cprAlgo;
+  if(key===cprPanelKey && !force) return;   // se llama en cada fotograma: solo se repinta si cambia algo
+  cprPanelKey = key;
+  const ctxText = { shock:'<b>PCR · ritmo desfibrilable</b> (FV/TVSP)', noshock:'<b>PCR · ritmo no desfibrilable</b> (asistolia/AESP)',
+                    post:'<b>Tras la RCE</b>', pre:'aún sin parada' }[ctx];
+  document.getElementById('cprCtx').innerHTML = 'Fase actual: '+ctxText+' · algoritmo <b>'+cprAlgo+'</b>';
+  const first = ctx==='pre' ? 'general' : ctx;
+  const order = [first].concat(['shock','noshock','post','general'].filter(x=>x!==first));
+  const groups = order.map((x,i)=>({ label:(i===0 && ctx!=='pre' ? '▶ Fase actual · ' : '')+CPR_CTX_LABEL[x], items:cprQuestionsFor(cprAlgo,[x]) }));
+  const sel = document.getElementById('cprSelect');
+  const keep = sel.value;
+  fillOptions(sel, groups, keep);
+  if(keep && sel.value!==keep) previewQuestion('', 'cpr');
 }
 
 // ---- Lado Monitor: mostrar la pregunta recibida y enviar la respuesta elegida ----
@@ -1697,6 +1872,7 @@ function stopScenario(){
   document.getElementById('btnStop').disabled = true;
   enableManualControls(true);
   updateCaseActionButtons();
+  updateCprPanel();
 }
 
 function applyScenarioAtTime(t){
@@ -1736,6 +1912,7 @@ function applyScenarioAtTime(t){
   document.getElementById('caseProgress').style.width = (100*clamp(t/totalT,0,1))+'%';
 
   if(t >= totalT){ scenario.playing = false; document.getElementById('btnPlay').textContent = '▶ Iniciar'; }
+  updateCprPanel();
 }
 
 /* ---------- Reloj ---------- */
@@ -2176,7 +2353,7 @@ function frame(ts){
 }
 
 setRhythm('nsr');
-populateQuizSelect();
+setCprAlgo(cprAlgo);
 requestAnimationFrame(frame);
 
 
