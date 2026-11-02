@@ -399,6 +399,8 @@
   }
   .role-card.selected{ border-color:var(--ecg); box-shadow:0 0 0 1px var(--ecg) inset; }
   .role-card .emoji{ font-size:26px; display:block; margin-bottom:6px; }
+  /* Iconos propios (consola del instructor / monitor de constantes) */
+  .role-card .role-icon svg{ width:46px; height:46px; display:block; margin:0 auto; }
   .role-card .name{ font-size:13px; font-weight:600; }
   .role-card .desc{ font-size:10.5px; color:var(--text-dim); margin-top:3px; line-height:1.4; }
   #gateRoomStep{ display:none; }
@@ -626,12 +628,111 @@
       <p>Elige cómo vas a usar este dispositivo. El Instructor controla el caso; el Monitor solo lo muestra, como un monitor real de paciente.</p>
       <div class="role-cards">
         <div class="role-card" id="cardRoleInstructor" onclick="selectRole('instructor')">
-          <span class="emoji">🎛️</span>
+          <span class="emoji role-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Consola del instructor">
+              <defs>
+                <linearGradient id="iTile" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#5aaef5"/>
+                  <stop offset="1" stop-color="#1d78d2"/>
+                </linearGradient>
+                <linearGradient id="iBezel" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#6cb8f7"/>
+                  <stop offset="1" stop-color="#2f88dc"/>
+                </linearGradient>
+                <linearGradient id="iScreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#0f2246"/>
+                  <stop offset="1" stop-color="#162c56"/>
+                </linearGradient>
+                <filter id="iGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="1.4" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <!-- carcasa (igual que el icono del monitor) -->
+              <rect x="4" y="4" width="112" height="112" rx="28" fill="url(#iTile)"/>
+              <rect x="13" y="15" width="94" height="88" rx="20" fill="url(#iBezel)"/>
+              <rect x="19" y="21" width="82" height="76" rx="13" fill="url(#iScreen)"/>
+            
+              <!-- deslizadores de constantes -->
+              <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="7.6" fill="#7fc0ff">
+                <text x="26" y="38.5">FC</text>
+                <text x="26" y="53.5">SpO₂</text>
+                <text x="26" y="68.5">FR</text>
+              </g>
+              <g stroke-linecap="round" stroke-width="4">
+                <line x1="51" y1="36" x2="93" y2="36" stroke="#2b4677"/>
+                <line x1="51" y1="36" x2="72" y2="36" stroke="#35ff6b"/>
+                <line x1="51" y1="51" x2="93" y2="51" stroke="#2b4677"/>
+                <line x1="51" y1="51" x2="85" y2="51" stroke="#21d4fd"/>
+                <line x1="51" y1="66" x2="93" y2="66" stroke="#2b4677"/>
+                <line x1="51" y1="66" x2="62" y2="66" stroke="#ffd400"/>
+              </g>
+              <g fill="#ffffff" filter="url(#iGlow)">
+                <circle cx="72" cy="36" r="4.6"/>
+                <circle cx="85" cy="51" r="4.6"/>
+                <circle cx="62" cy="66" r="4.6"/>
+              </g>
+            
+              <!-- interruptor "Sinc" y botón de enviar -->
+              <rect x="26" y="81" width="19" height="10" rx="5" fill="#35ff6b" opacity=".9"/>
+              <circle cx="40" cy="86" r="3.6" fill="#ffffff"/>
+              <text x="49" y="89" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="7.6" fill="#7fc0ff">Sinc</text>
+              <rect x="76" y="79" width="18" height="14" rx="4" fill="none" stroke="#35ff6b" stroke-width="1.6"/>
+              <path d="M80 86.4 L90.5 82 L87.2 90.6 L85.4 87.1 Z" fill="#ffffff"/>
+              <circle cx="93.5" cy="79.5" r="2.4" fill="#ff4d5e"/>
+            </svg>
+          </span>
           <div class="name">Instructor</div>
           <div class="desc">Controla ritmo, constantes y casos clínicos</div>
         </div>
         <div class="role-card" id="cardRoleMonitor" onclick="selectRole('monitor')">
-          <span class="emoji">🖥️</span>
+          <span class="emoji role-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Monitor de constantes">
+              <defs>
+                <linearGradient id="mTile" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#5aaef5"/>
+                  <stop offset="1" stop-color="#1d78d2"/>
+                </linearGradient>
+                <linearGradient id="mBezel" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#6cb8f7"/>
+                  <stop offset="1" stop-color="#2f88dc"/>
+                </linearGradient>
+                <linearGradient id="mScreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#0f2246"/>
+                  <stop offset="1" stop-color="#162c56"/>
+                </linearGradient>
+                <filter id="mGlow" x="-20%" y="-40%" width="140%" height="180%">
+                  <feGaussianBlur stdDeviation="1.6" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+                <radialGradient id="mHeartGlow">
+                  <stop offset="0" stop-color="#ff5a6a" stop-opacity=".55"/>
+                  <stop offset="1" stop-color="#ff5a6a" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- carcasa -->
+              <rect x="4" y="4" width="112" height="112" rx="28" fill="url(#mTile)"/>
+              <rect x="13" y="15" width="94" height="88" rx="20" fill="url(#mBezel)"/>
+              <!-- pantalla -->
+              <rect x="19" y="21" width="82" height="76" rx="13" fill="url(#mScreen)"/>
+              <!-- constantes -->
+              <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="7.6">
+                <text x="26" y="35"><tspan fill="#7fc0ff">FC </tspan><tspan fill="#ffffff">78</tspan></text>
+                <text x="26" y="44"><tspan fill="#7fc0ff">SpO₂ </tspan><tspan fill="#ffffff">98%</tspan></text>
+                <text x="94" y="35" text-anchor="end"><tspan fill="#7fc0ff">TA </tspan><tspan fill="#ffffff">120/80</tspan></text>
+              </g>
+              <!-- trazado de ECG: sale un poco de la pantalla, como en la idea original -->
+              <polyline filter="url(#mGlow)" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+                points="11,68 25,68 29,64 32,68 36,68 40,55 45,79 49,68 56,68 59,64 62,68 66,68 70,51 75,82 79,68 86,68 89,64 92,68 96,68 100,56 104,77 107,68 112,68"/>
+              <!-- punto del barrido -->
+              <circle cx="70" cy="51" r="5.5" fill="#ffffff" opacity=".18"/>
+              <circle cx="70" cy="51" r="2.6" fill="#ffffff"/>
+              <!-- corazón + ECG -->
+              <circle cx="31" cy="87" r="8" fill="url(#mHeartGlow)"/>
+              <path d="M31 92.5 C24.5 88 25 82.5 28.2 82.2 C29.8 82 30.8 83.2 31 84 C31.2 83.2 32.2 82 33.8 82.2 C37 82.5 37.5 88 31 92.5 Z" fill="#ff4d5e"/>
+              <text x="40" y="90.5" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="8.5" fill="#ff6b78">ECG</text>
+            </svg>
+          </span>
           <div class="name">Monitor</div>
           <div class="desc">Solo visualización, para el alumno</div>
         </div>
