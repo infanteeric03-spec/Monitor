@@ -97,15 +97,17 @@
     body.role-instructor .clock-sec,
     .btn-send-now .lbl{ display:none; }
     body.role-instructor .room-badge{ padding:4px 6px; }
-    /* Instructor en móvil: 1ª línea "SIMULADOR ……… ☀/☾", 2ª línea sala + hora a la izquierda y Sinc a la derecha */
-    body.role-instructor .header-row{ row-gap:8px; column-gap:8px; }
+    /* Instructor en móvil: todo en una sola línea → SIMULADOR · sala · hora · Sinc · (enviar) · ☀/☾
+       Se compactan tamaños y huecos, y si aun así faltara sitio se recorta el título en vez de saltar de línea */
+    body.role-instructor .header-row{ flex-wrap:nowrap; column-gap:5px; }
     body.role-instructor .header-right{ display:contents; }
-    body.role-instructor .header-row > h1{ order:0; }
-    body.role-instructor .header-row .themeToggle{ order:1; margin-left:auto; }
-    body.role-instructor .header-row::after{ content:''; order:2; flex-basis:100%; height:0; }
-    body.role-instructor .header-row .room-badge,
-    body.role-instructor .header-row .clock{ order:3; }
-    body.role-instructor .header-row .sync-toggle{ order:4; margin-left:auto; }
+    body.role-instructor .header-row > h1{ order:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.04em; flex-shrink:1; }
+    body.role-instructor .header-row .room-badge{ order:1; margin-left:auto; flex-shrink:0; font-size:10.5px; padding:3px 5px; gap:4px; }
+    body.role-instructor .header-row .clock{ order:2; flex-shrink:0; font-size:12px; }
+    body.role-instructor .header-row .sync-toggle{ order:3; flex-shrink:0; gap:4px; margin-left:3px; }
+    body.role-instructor .header-row .sync-label{ font-size:10.5px; }
+    body.role-instructor .header-row .btn-send-now{ padding:4px 6px; }
+    body.role-instructor .header-row .themeToggle{ order:4; flex-shrink:0; width:26px; height:24px; font-size:13px; }
     .btn-send-now{ padding:5px 8px; }
   }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
