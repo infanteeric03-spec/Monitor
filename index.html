@@ -526,6 +526,7 @@
     position:absolute; left:50%; translate:-50% 0; width:min(88vw, 460px); text-align:center;
     font-family:'Caveat', 'Segoe Print', 'Comic Sans MS', cursive; font-weight:700; font-size:27px; line-height:1.18;
     color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.7); transition:top .3s ease;
+    background:rgba(0,0,0,.45); border-radius:14px; padding:6px 12px;
   }
   .guide-text small{ display:block; font-size:21px; font-weight:600; opacity:.85; margin-top:6px; }
   .guide-bar{
@@ -538,9 +539,8 @@
   }
   .guide-btn.ghost{ border-color:transparent; color:rgba(255,255,255,.75); }
   .guide-btn:disabled{ visibility:hidden; }
-  .guide-dots{ display:flex; gap:7px; }
-  .guide-dots span{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35); }
-  .guide-dots span.on{ background:#fff; }
+  .guide-dots{ font-family:'Caveat', cursive; font-weight:700; font-size:20px; color:rgba(255,255,255,.75); white-space:nowrap; }
+  #guide.no-hand .guide-hand{ display:none !important; }
   .guide-close{
     position:absolute; top:max(14px, env(safe-area-inset-top)); left:14px; width:46px; height:46px; border-radius:50%;
     border:3px solid #fff; background:transparent; color:#fff; font-size:26px; line-height:1; cursor:pointer;
@@ -2182,9 +2182,25 @@ requestAnimationFrame(frame);
    Tour de pasos con la pantalla oscurecida, un "foco" sobre el elemento explicado y una mano
    dibujada que lo toca. Sale sola la primera vez en cada rol (se recuerda en este dispositivo)
    y se puede volver a ver con el botón "?" de la cabecera. */
+// Pasos que explican las partes del monitor (comunes a instructor y alumno). "hand:false" = solo
+// se ilumina la zona, sin la mano tocando, porque son elementos para mirar, no para pulsar.
+const GUIDE_MONITOR_PARTS = [
+  { sel:'.waves', hand:false, text:'Esta es la pantalla del monitor.', sub:'Muestra las curvas en tiempo real, de izquierda a derecha, como un monitor de verdad.' },
+  { sel:'.waves .trace-row:nth-child(1)', hand:false, text:'ECG: la actividad eléctrica del corazón.', sub:'Cada pico alto (QRS) es un latido. Arriba a la izquierda, la derivación; a la derecha, la hora.' },
+  { sel:'.waves .trace-row:nth-child(2)', hand:false, text:'SpO₂ · Pleti: la onda de pulso del pulsioxímetro.', sub:'Una onda por cada latido que llega al dedo. Sin pulso, se queda plana aunque el ECG siga.' },
+  { sel:'.waves .trace-row:nth-child(3)', hand:false, text:'Resp: la curva respiratoria.', sub:'Cada ondulación es una respiración. En apnea se aplana.' },
+  { sel:'#cardHr', hand:false, text:'FC: frecuencia cardiaca, en latidos por minuto.', sub:'Debajo aparece el ritmo que se está mostrando.' },
+  { sel:'#cardSpo2', hand:false, text:'SpO₂: saturación de oxígeno en sangre (%).', sub:'Por debajo de 90 % salta la alarma.' },
+  { sel:'#cardResp', hand:false, text:'FR: frecuencia respiratoria, en respiraciones por minuto.' },
+  { sel:'#cardTemp', hand:false, text:'Tª: temperatura corporal, en °C.' },
+  { sel:'#cardBp', hand:false, text:'TA (NIBP): tensión arterial no invasiva, sistólica / diastólica en mmHg.', sub:'TAM es la tensión arterial media.' },
+  { sel:'.vitals', hand:false, text:'Si una constante se sale de rango, su tarjeta parpadea en rojo.', sub:'Si el paciente pierde el pulso, parpadea la tarjeta de FC.' }
+];
 const GUIDE_STEPS = {
   instructor: [
-    { text:'¡Bienvenido al simulador!', sub:'Te enseñamos lo básico en unos pocos pasos.' },
+    { text:'¡Bienvenido al simulador!', sub:'Primero, las partes del monitor; después, cómo controlarlo.' },
+    ...GUIDE_MONITOR_PARTS,
+    { text:'Ahora, los controles del instructor.', sub:'Todo lo que cambies aquí lo verá el alumno en su monitor.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante…', sub:'…o escribe el valor directamente.' },
     { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
@@ -2195,8 +2211,8 @@ const GUIDE_STEPS = {
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
+    ...GUIDE_MONITOR_PARTS,
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.' },
-    { sel:'.vitals', text:'Aquí ves las constantes.', sub:'Parpadean en rojo cuando salta una alarma.' },
     { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
     { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
   ]
@@ -2213,8 +2229,7 @@ function startGuide(){
     return guideVisible(document.querySelector(st.sel));
   });
   guideIdx = 0;
-  const dots = document.getElementById('guideDots');
-  dots.innerHTML = guideSteps.map(()=>'<span></span>').join('');
+
   document.getElementById('guide').classList.add('open');
   guideShow();
 }
@@ -2237,7 +2252,7 @@ function guideShow(){
   if(!st) return;
   if(st.before) st.before();
   document.getElementById('guideText').innerHTML = escapeHtml(st.text) + (st.sub ? '<small>'+escapeHtml(st.sub)+'</small>' : '');
-  document.querySelectorAll('#guideDots span').forEach((d,i)=>d.classList.toggle('on', i===guideIdx));
+  document.getElementById('guideDots').textContent = (guideIdx+1)+' / '+guideSteps.length;
   document.getElementById('guidePrev').disabled = guideIdx===0;
   document.getElementById('guideNext').textContent = guideIdx===guideSteps.length-1 ? '¡Entendido!' : 'Siguiente ›';
   const el = st.sel ? document.querySelector(st.sel) : null;
@@ -2255,6 +2270,8 @@ function guideLayout(){
   const vw = window.innerWidth, vh = window.innerHeight;
   const txt = document.getElementById('guideText');
   guide.classList.toggle('has-target', !!el);
+  const showHand = !!el && st.hand !== false;
+  guide.classList.toggle('no-hand', !showHand);
   if(!el){
     txt.style.top = Math.max(80, vh*0.5 - txt.offsetHeight/2 - 30) + 'px';
     return;
@@ -2280,6 +2297,14 @@ function guideLayout(){
   hand.style.transform = 'scale('+(mirror?-1:1)+','+(above?-1:1)+')';
 
   // el texto va en la mitad libre de la pantalla
+  const th0 = txt.offsetHeight;
+  if(!showHand){
+    let top = r.bottom + 20;
+    if(top + th0 > vh - 90) top = r.top - 20 - th0;
+    if(top < 60) top = Math.max(60, Math.min(vh - 100 - th0, r.bottom + 20)); // elemento muy alto: el texto encima
+    txt.style.top = top+'px';
+    return;
+  }
   const handBottom = above ? r.top : ty + HH;
   const th = txt.offsetHeight;
   let top;
