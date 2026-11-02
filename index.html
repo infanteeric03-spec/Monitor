@@ -230,7 +230,15 @@
   }
   .info-card-close:hover{ color:#dfeef0; }
 
-  .case-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .case-row{ display:flex; flex-direction:column; align-items:stretch; gap:8px; }
+  .case-select-wrap select{ width:100%; min-width:0; }
+  /* Controles del caso en una rejilla fija: ⏮ | ▶ Iniciar (doble) | ⏭ | ⟲ | ✕, siempre alineados */
+  .case-player{ display:grid; grid-template-columns:1fr 2fr 1fr 1fr 1fr; gap:6px; max-width:560px; }
+  .case-player .casebtn{ width:100%; padding:8px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .case-player .lbl{ display:none; }
+  @media (min-width:761px){ .case-player .lbl{ display:inline; } }
+  .case-edit-btns{ margin-top:8px; display:none; }
+  .case-edit-btns.show{ display:flex; }
   .casebtns{ display:flex; gap:6px; flex-wrap:wrap; }
   .casebtn{
     background:#0f1a1c; border:1px solid var(--line); color:#cfeef1; font-size:12.5px;
@@ -255,30 +263,49 @@
     background:#0f1a1c; color:#dfeef0; border:1px solid var(--line); border-radius:4px;
     padding:7px 10px; font-size:13px; flex:1; min-width:180px;
   }
-  .kf-scroll{ max-height:260px; overflow-y:auto; padding-right:4px; }
+  .kf-title-input{ width:100%; }
+  .kf-scroll{ max-height:min(55vh, 440px); overflow-y:auto; overflow-x:hidden; padding-right:2px; }
   .kf-row{
-    border:1px solid var(--line); border-radius:6px; padding:8px 10px; margin-bottom:8px; background:#0f1a1c;
+    border:1px solid var(--line); border-radius:6px; margin-bottom:8px; background:#0f1a1c; min-width:0;
   }
-  .kf-row-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-  .kf-row-head b{ font-size:12px; color:var(--ecg); }
-  .kf-row-actions{ display:flex; gap:4px; }
+  .kf-row.invalid{ border-color:var(--alarm); }
+  /* Cabecera de cada fase: se pulsa para plegar/desplegar; muestra un resumen de la fase */
+  .kf-row-head{ display:flex; align-items:center; gap:8px; padding:7px 8px 7px 10px; cursor:pointer; }
+  .kf-row-head .kf-caret{ color:var(--text-dim); font-size:10px; width:10px; flex-shrink:0; transition:transform .15s; }
+  .kf-row.open .kf-caret{ transform:rotate(90deg); }
+  .kf-row-title{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .kf-row-title b{ font-size:12px; color:var(--ecg); }
+  .kf-sum{ font-size:10.5px; color:var(--text-dim); font-family:var(--font-num); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .kf-row-actions{ display:flex; gap:4px; flex-shrink:0; }
   .kf-mini-btn{
-    background:transparent; border:1px solid var(--line); color:var(--text-dim); font-size:11px;
-    padding:2px 7px; border-radius:4px; cursor:pointer; line-height:1.4;
+    background:transparent; border:1px solid var(--line); color:var(--text-dim); font-size:12px;
+    width:28px; height:26px; padding:0; border-radius:4px; cursor:pointer; line-height:1;
+    display:flex; align-items:center; justify-content:center;
   }
-  .kf-mini-btn:hover{ color:#dfeef0; border-color:#dfeef0; }
-  .kf-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:6px; }
-  .kf-field{ display:flex; flex-direction:column; gap:2px; }
-  .kf-field label{ font-size:9.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; }
+  .kf-mini-btn:hover:not(:disabled){ color:#dfeef0; border-color:#dfeef0; }
+  .kf-mini-btn:disabled{ opacity:.3; cursor:default; }
+  .kf-body{ display:none; padding:0 10px 10px 10px; }
+  .kf-row.open .kf-body{ display:block; }
+  /* Rejilla de 4 columnas iguales: Inicio + Ritmo (3 col) / FC SpO₂ FR Tª / TA sist. (2) + TA diast. (2) */
+  .kf-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-bottom:8px; }
+  .kf-field{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .kf-field.span2{ grid-column:span 2; }
+  .kf-field.span3{ grid-column:span 3; }
+  .kf-field label{ font-size:9.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .kf-field input, .kf-field select{
     background:#111f22; color:#dfeef0; border:1px solid var(--line); border-radius:4px;
-    padding:5px 6px; font-size:12px; width:100%;
+    padding:6px; font-size:13px; width:100%; min-width:0; height:32px;
   }
-  .kf-pulse-check{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); }
+  .kf-field input.err{ border-color:var(--alarm); color:var(--alarm); }
+  .kf-pulse-check{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim); margin-bottom:8px; cursor:pointer; }
+  .kf-pulse-check input{ width:16px; height:16px; margin:0; accent-color:var(--alarm); }
   .kf-narrative{
-    background:#111f22; color:#dfeef0; border:1px solid var(--line); border-radius:4px;
-    padding:6px 8px; font-size:12px; width:100%; resize:vertical; min-height:36px; font-family:inherit;
+    background:#111f22; color:#dfeef0; border:1px solid var(--line); border-radius:4px; display:block;
+    padding:6px 8px; font-size:12.5px; width:100%; resize:vertical; min-height:54px; font-family:inherit; line-height:1.4;
   }
+  /* Botonera inferior alineada: tres botones del mismo ancho */
+  .kf-actions{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; margin-top:4px; }
+  .kf-actions .casebtn{ width:100%; padding:9px 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .kf-status{ font-size:11.5px; color:var(--text-dim); margin-top:6px; min-height:14px; }
   .kf-status.err{ color:var(--alarm); }
   .kf-status.ok{ color:var(--ecg); }
@@ -534,7 +561,7 @@
           <div class="tab-pane" id="paneCase">
             <div id="caseNormalView">
               <div class="case-row">
-                <div>
+                <div class="case-select-wrap">
                   <label style="font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; display:block; margin-bottom:4px;">Caso clínico</label>
                   <select id="caseSelect" onchange="onCaseSelect(this.value)">
                     <option value="">— Ninguno (modo manual) —</option>
@@ -543,15 +570,15 @@
                     <option value="avb_progresivo">Bloqueo AV progresivo hasta BAV completo</option>
                   </select>
                 </div>
-                <div class="casebtns">
+                <div class="case-player">
                   <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior">⏮</button>
                   <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled>▶ Iniciar</button>
                   <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente">⏭</button>
-                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled>⟲ Reiniciar</button>
-                  <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled>✕ Salir del caso</button>
+                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso">⟲<span class="lbl"> Reiniciar</span></button>
+                  <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled title="Salir del caso (modo manual)">✕<span class="lbl"> Salir</span></button>
                 </div>
               </div>
-              <div class="casebtns" style="margin-top:8px;">
+              <div class="casebtns case-edit-btns">
                 <button class="casebtn" id="btnEditCase" onclick="editSelectedCase()" style="display:none;">✎ Editar</button>
                 <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;">🗑 Eliminar</button>
               </div>
@@ -567,9 +594,9 @@
                 <input type="text" class="kf-title-input" id="kfTitle" placeholder="Título del caso (ej. Shock séptico con deterioro progresivo)">
               </div>
               <div class="kf-scroll" id="builderRows"></div>
-              <div class="casebtns">
+              <div class="kf-actions">
                 <button class="casebtn" id="btnAddKf" onclick="addBuilderKeyframe()">+ Añadir fase</button>
-                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()">💾 Guardar caso</button>
+                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()">💾 Guardar</button>
                 <button class="casebtn" id="btnCancelCase" onclick="cancelCaseBuilder()">✕ Cancelar</button>
               </div>
               <div class="kf-status" id="kfStatus"></div>
@@ -1169,10 +1196,12 @@ function updateCaseActionButtons(){
   const show = scenario.active && isCustomCase(key);
   document.getElementById('btnEditCase').style.display = show ? 'inline-block' : 'none';
   document.getElementById('btnDeleteCase').style.display = show ? 'inline-block' : 'none';
+  document.querySelector('.case-edit-btns').classList.toggle('show', show);
 }
 
 /* ---- Creador/editor de casos (builder) ---- */
 let builderKfs = [];
+let builderOpen = new Set(); // fases desplegadas en el editor
 let builderEditingId = null; // uuid si se está editando un caso existente, null si es nuevo
 
 function openCaseBuilder(){
@@ -1183,6 +1212,7 @@ function openCaseBuilder(){
     { t:0, rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' },
     { t:30, rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' }
   ];
+  builderOpen = new Set([builderKfs[0]]);
   renderBuilderRows();
   document.getElementById('kfStatus').textContent = '';
   document.getElementById('kfStatus').className = 'kf-status';
@@ -1198,6 +1228,7 @@ function editSelectedCase(){
   builderEditingId = key;
   document.getElementById('kfTitle').value = c.title;
   builderKfs = c.keyframes.map(k=>({ ...k }));
+  builderOpen = new Set([builderKfs[0]]);
   renderBuilderRows();
   document.getElementById('kfStatus').textContent = '';
   document.getElementById('kfStatus').className = 'kf-status';
@@ -1211,68 +1242,132 @@ function cancelCaseBuilder(){
 }
 
 function addBuilderKeyframe(){
+  // la nueva fase parte de los valores de la última (+30 s): normalmente solo cambian un par de constantes
   const last = builderKfs[builderKfs.length-1];
-  builderKfs.push({ t:(last ? last.t+30 : 0), rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' });
+  const kf = last
+    ? { ...last, t: last.t + 30, label:'' }
+    : { t:0, rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' };
+  builderKfs.push(kf);
+  builderOpen = new Set([kf]); // se pliegan las demás para no perderse en la lista
   renderBuilderRows();
+  const rows = document.getElementById('builderRows');
+  const el = rows.lastElementChild;
+  if(el) rows.scrollTop = el.offsetTop - rows.offsetTop;
 }
 
 function removeBuilderKeyframe(idx){
   if(builderKfs.length<=2){ return; } // mínimo 2 fases
+  const kf = builderKfs[idx];
+  const hasText = kf.label && kf.label.trim();
+  if(hasText && !confirm('¿Eliminar la fase '+(idx+1)+'?')) return;
   builderKfs.splice(idx,1);
+  builderOpen.delete(kf);
   renderBuilderRows();
 }
 
 function moveBuilderKeyframe(idx, dir){
   const target = idx+dir;
   if(target<0 || target>=builderKfs.length) return;
-  const tmp = builderKfs[idx];
-  builderKfs[idx] = builderKfs[target];
-  builderKfs[target] = tmp;
+  // se intercambian también los tiempos, para que la cronología siga siendo creciente
+  const a = builderKfs[idx], b = builderKfs[target];
+  const ta = a.t; a.t = b.t; b.t = ta;
+  builderKfs[idx] = b;
+  builderKfs[target] = a;
   renderBuilderRows();
+}
+
+function toggleBuilderRow(idx){
+  const kf = builderKfs[idx];
+  if(builderOpen.has(kf)) builderOpen.delete(kf); else builderOpen.add(kf);
+  const row = document.getElementById('builderRows').children[idx];
+  if(row) row.classList.toggle('open', builderOpen.has(kf));
 }
 
 function updateBuilderField(idx, field, value){
   const row = builderKfs[idx];
   if(!row) return;
   if(field==='noPulse'){ row.noPulse = !!value; }
-  else if(field==='rhythm'){ row.rhythm = value; }
+  else if(field==='rhythm'){
+    row.rhythm = value;
+    // FV y asistolia nunca tienen pulso: se marca automáticamente
+    if(value==='vfib' || value==='asystole'){
+      row.noPulse = true;
+      const cb = document.getElementById('builderRows').children[idx]?.querySelector('.kf-pulse-check input');
+      if(cb) cb.checked = true;
+    }
+  }
   else if(field==='label'){ row.label = value; }
-  else if(field==='t' || field==='hr' || field==='rr'){ row[field] = parseInt(value)||0; }
-  else if(field==='sys' || field==='dia' || field==='spo2'){ row[field] = parseInt(value)||0; }
-  else if(field==='temp'){ row[field] = parseFloat(value)||0; }
+  else if(field==='temp'){ row[field] = parseFloat(String(value).replace(',','.'))||0; }
+  else { row[field] = parseInt(value)||0; }
+  refreshBuilderSummaries();
+}
+
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+const RHYTHM_SHORT = { nsr:'Sinusal', stach:'Taq. sinusal', sbrady:'Brad. sinusal', afib:'FA', aflutter:'Flutter',
+  avb1:'BAV 1º', wenckebach:'Mobitz I', mobitz2:'Mobitz II', avb3:'BAV 3º', brihh:'BRIHH', brdhh:'BRDHH',
+  pvcs:'EV', vtach:'TV', vfib:'FV', asystole:'Asistolia' };
+function rhythmShortName(v){ return RHYTHM_SHORT[v] || v; }
+
+// Actualiza el resumen de cada fase y marca en rojo los tiempos que no van en orden creciente,
+// sin volver a pintar los campos (así no se pierde el foco mientras se escribe en el móvil)
+function refreshBuilderSummaries(){
+  const rows = document.getElementById('builderRows').children;
+  builderKfs.forEach((kf, i)=>{
+    const row = rows[i];
+    if(!row) return;
+    const badT = i>0 && kf.t <= builderKfs[i-1].t;
+    row.classList.toggle('invalid', badT);
+    const tIn = row.querySelector('input[data-f="t"]');
+    if(tIn) tIn.classList.toggle('err', badT);
+    const sum = row.querySelector('.kf-sum');
+    if(sum){
+      sum.textContent = formatTime(kf.t)+' · '+rhythmShortName(kf.rhythm)
+        + (kf.noPulse ? ' · SIN PULSO' : ' · FC '+kf.hr+' · TA '+kf.sys+'/'+kf.dia);
+    }
+  });
 }
 
 function renderBuilderRows(){
   const wrap = document.getElementById('builderRows');
   wrap.innerHTML = '';
+  const n = builderKfs.length;
   builderKfs.forEach((kf, idx)=>{
     const row = document.createElement('div');
-    row.className = 'kf-row';
-    const rhythmOptsHtml = RHYTHM_OPTIONS.map(o=>`<option value="${o.v}" ${o.v===kf.rhythm?'selected':''}>${o.l}</option>`).join('');
+    row.className = 'kf-row' + (builderOpen.has(kf) ? ' open' : '');
+    const rhythmOptsHtml = RHYTHM_OPTIONS.map(o=>`<option value="${o.v}" ${o.v===kf.rhythm?'selected':''}>${escapeHtml(o.l)}</option>`).join('');
+    const num = (f, label, attrs, cls) =>
+      `<div class="kf-field ${cls||''}"><label>${label}</label><input type="number" inputmode="decimal" data-f="${f}" ${attrs} value="${escapeHtml(kf[f])}" onchange="updateBuilderField(${idx},'${f}',this.value)"></div>`;
     row.innerHTML = `
-      <div class="kf-row-head">
-        <b>Fase ${idx+1}</b>
-        <div class="kf-row-actions">
+      <div class="kf-row-head" onclick="toggleBuilderRow(${idx})">
+        <span class="kf-caret">▶</span>
+        <div class="kf-row-title"><b>Fase ${idx+1}</b><span class="kf-sum"></span></div>
+        <div class="kf-row-actions" onclick="event.stopPropagation()">
           <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},-1)" ${idx===0?'disabled':''} title="Subir">↑</button>
-          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},1)" ${idx===builderKfs.length-1?'disabled':''} title="Bajar">↓</button>
-          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${builderKfs.length<=2?'disabled':''} title="Eliminar fase">🗑</button>
+          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},1)" ${idx===n-1?'disabled':''} title="Bajar">↓</button>
+          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${n<=2?'disabled':''} title="Eliminar fase">🗑</button>
         </div>
       </div>
-      <div class="kf-grid">
-        <div class="kf-field"><label>Inicio (seg)</label><input type="number" min="0" value="${kf.t}" onchange="updateBuilderField(${idx},'t',this.value)"></div>
-        <div class="kf-field"><label>Ritmo</label><select onchange="updateBuilderField(${idx},'rhythm',this.value)">${rhythmOptsHtml}</select></div>
-        <div class="kf-field"><label>FC (lpm)</label><input type="number" min="0" max="260" value="${kf.hr}" onchange="updateBuilderField(${idx},'hr',this.value)"></div>
-        <div class="kf-field"><label>SpO₂ (%)</label><input type="number" min="0" max="100" value="${kf.spo2}" onchange="updateBuilderField(${idx},'spo2',this.value)"></div>
-        <div class="kf-field"><label>TA sistólica</label><input type="number" min="0" value="${kf.sys}" onchange="updateBuilderField(${idx},'sys',this.value)"></div>
-        <div class="kf-field"><label>TA diastólica</label><input type="number" min="0" value="${kf.dia}" onchange="updateBuilderField(${idx},'dia',this.value)"></div>
-        <div class="kf-field"><label>FR (rpm)</label><input type="number" min="0" max="60" value="${kf.rr}" onchange="updateBuilderField(${idx},'rr',this.value)"></div>
-        <div class="kf-field"><label>Temp (ºC)</label><input type="number" step="0.1" min="30" max="43" value="${kf.temp}" onchange="updateBuilderField(${idx},'temp',this.value)"></div>
+      <div class="kf-body">
+        <div class="kf-grid">
+          ${num('t','Inicio (s)','min="0" step="5"')}
+          <div class="kf-field span3"><label>Ritmo</label><select onchange="updateBuilderField(${idx},'rhythm',this.value)">${rhythmOptsHtml}</select></div>
+          ${num('hr','FC (lpm)','min="0" max="260"')}
+          ${num('spo2','SpO₂ (%)','min="0" max="100"')}
+          ${num('rr','FR (rpm)','min="0" max="60"')}
+          ${num('temp','Tª (°C)','step="0.1" min="30" max="43"')}
+          ${num('sys','TA sistólica','min="0" max="300"','span2')}
+          ${num('dia','TA diastólica','min="0" max="200"','span2')}
+        </div>
+        <label class="kf-pulse-check"><input type="checkbox" ${kf.noPulse?'checked':''} onchange="updateBuilderField(${idx},'noPulse',this.checked)"> Sin pulso en esta fase (AESP / PCR)</label>
+        <textarea class="kf-narrative" rows="3" placeholder="Texto que verá el instructor durante esta fase..." oninput="updateBuilderField(${idx},'label',this.value)">${escapeHtml(kf.label)}</textarea>
       </div>
-      <label class="kf-pulse-check"><input type="checkbox" ${kf.noPulse?'checked':''} onchange="updateBuilderField(${idx},'noPulse',this.checked)"> Sin pulso en esta fase (AESP)</label>
-      <textarea class="kf-narrative" rows="2" placeholder="Texto que verá el instructor durante esta fase..." onchange="updateBuilderField(${idx},'label',this.value)">${kf.label||''}</textarea>
     `;
     wrap.appendChild(row);
   });
+  refreshBuilderSummaries();
 }
 
 async function saveCaseBuilder(){
@@ -1290,7 +1385,8 @@ async function saveCaseBuilder(){
   }
   for(let i=1;i<builderKfs.length;i++){
     if(builderKfs[i].t <= builderKfs[i-1].t){
-      statusEl.textContent = 'El tiempo de inicio de cada fase debe ser mayor que el de la fase anterior.';
+      statusEl.textContent = 'Fase '+(i+1)+': su inicio debe ser posterior al de la fase '+i+'.';
+      builderOpen.add(builderKfs[i]); renderBuilderRows();
       statusEl.className = 'kf-status err';
       return;
     }
