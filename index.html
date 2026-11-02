@@ -97,6 +97,15 @@
     body.role-instructor .clock-sec,
     .btn-send-now .lbl{ display:none; }
     body.role-instructor .room-badge{ padding:4px 6px; }
+    /* Instructor en móvil: 1ª línea "SIMULADOR ……… ☀/☾", 2ª línea sala + hora a la izquierda y Sinc a la derecha */
+    body.role-instructor .header-row{ row-gap:8px; column-gap:8px; }
+    body.role-instructor .header-right{ display:contents; }
+    body.role-instructor .header-row > h1{ order:0; }
+    body.role-instructor .header-row .themeToggle{ order:1; margin-left:auto; }
+    body.role-instructor .header-row::after{ content:''; order:2; flex-basis:100%; height:0; }
+    body.role-instructor .header-row .room-badge,
+    body.role-instructor .header-row .clock{ order:3; }
+    body.role-instructor .header-row .sync-toggle{ order:4; margin-left:auto; }
     .btn-send-now{ padding:5px 8px; }
   }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
