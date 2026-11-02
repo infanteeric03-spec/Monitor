@@ -2684,6 +2684,13 @@ const GUIDE_STEPS = {
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante…', sub:'…o escribe el valor directamente.' },
     { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
+    // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
+    { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
+      sub:'Ábrela para enviar al alumno preguntas de la fase en curso: FV/TVSP, asistolia/AESP o tras la RCE.', before:()=>switchTab('case') },
+    { sel:'.quiz-algo-row .algo-seg', text:'Elige el algoritmo de RCP: AHA o ERC.',
+      sub:'Las preguntas en las que las guías difieren se adaptan al que elijas.', before:()=>switchTab('quiz') },
+    { sel:'#btnQuizMore', text:'Pulsa + para crear, editar o eliminar preguntas.',
+      sub:'Se guardan en la nube y las ven todos los instructores.', before:()=>switchTab('quiz') },
     { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con 📨.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
     { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
@@ -2701,12 +2708,24 @@ let guideSteps = [], guideIdx = 0;
 
 function guideVisible(el){ return el && el.getClientRects().length > 0; }
 
+// Elemento al que apunta un paso: el principal si se ve; si no, el alternativo
+function guideTarget(st){
+  if(!st || !st.sel) return null;
+  const el = document.querySelector(st.sel);
+  if(guideVisible(el)) return el;
+  const alt = st.alt ? document.querySelector(st.alt) : null;
+  return guideVisible(alt) ? alt : null;
+}
+
+let guidePrevTab = null;
 function startGuide(){
   const list = GUIDE_STEPS[role==='monitor' ? 'monitor' : 'instructor'];
+  const activeBtn = document.querySelector('.tab-btn.active');
+  guidePrevTab = activeBtn ? ({ tabBtnRhythm:'rhythm', tabBtnCase:'case', tabBtnQuiz:'quiz' })[activeBtn.id] : null;
   guideSteps = list.filter(st=>{
     if(!st.sel) return true;
     if(st.before) st.before();
-    return guideVisible(document.querySelector(st.sel));
+    return !!guideTarget(st);
   });
   guideIdx = 0;
 
@@ -2716,6 +2735,7 @@ function startGuide(){
 
 function closeGuide(){
   document.getElementById('guide').classList.remove('open');
+  if(guidePrevTab && role==='instructor') switchTab(guidePrevTab); // deja la consola como estaba
   try{ localStorage.setItem('monitor-guide-seen-'+(role||'x'), '1'); }catch(e){}
 }
 
@@ -2735,7 +2755,7 @@ function guideShow(){
   document.getElementById('guideDots').textContent = (guideIdx+1)+' / '+guideSteps.length;
   document.getElementById('guidePrev').disabled = guideIdx===0;
   document.getElementById('guideNext').textContent = guideIdx===guideSteps.length-1 ? '¡Entendido!' : 'Siguiente ›';
-  const el = st.sel ? document.querySelector(st.sel) : null;
+  const el = guideTarget(st);
   if(el){
     el.scrollIntoView({ block:'center', inline:'nearest', behavior:'instant' });
   }
@@ -2746,7 +2766,7 @@ function guideLayout(){
   const guide = document.getElementById('guide');
   if(!guide.classList.contains('open')) return;
   const st = guideSteps[guideIdx];
-  const el = st && st.sel ? document.querySelector(st.sel) : null;
+  const el = guideTarget(st);
   const vw = window.innerWidth, vh = window.innerHeight;
   const txt = document.getElementById('guideText');
   guide.classList.toggle('has-target', !!el);
