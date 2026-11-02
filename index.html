@@ -86,8 +86,19 @@
     padding:2px 4px 10px 4px; border-bottom:1px solid var(--line);
     margin-bottom:10px;
   }
-  .header-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
-  .header-row + .header-row{ margin-top:8px; }
+  .header-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .header-right{ display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-left:auto; }
+  .sync-label.off{ opacity:.6; }
+  /* En móvil, la cabecera del instructor cabe en una sola línea: sala sin "Instructor ·",
+     reloj sin segundos y "Enviar" solo con su icono */
+  @media (max-width:760px){
+    .header-right{ gap:6px; }
+    body.role-instructor .badge-role,
+    body.role-instructor .clock-sec,
+    .btn-send-now .lbl{ display:none; }
+    body.role-instructor .room-badge{ padding:4px 6px; }
+    .btn-send-now{ padding:5px 8px; }
+  }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
   header .clock{ font-family:var(--font-num); font-size:13px; color:var(--text-dim);}
 
@@ -521,21 +532,19 @@
   <header>
     <div class="header-row">
       <h1>Simulador<span class="title-role"> · Monitor</span></h1>
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="header-right">
         <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText">sin conectar</span></span>
         <div class="clock" id="clock">--:--:--</div>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">☀</button>
-      </div>
-    </div>
-    <div class="header-row instructor-only">
-      <div class="sync-toggle">
-        <span class="sync-label" id="syncLabel">Sincronizado</span>
-        <div class="sync-switch on" id="syncSwitch" onclick="toggleSync()" title="Sincronizar cambios en directo con el monitor">
-          <div class="knob"></div>
+        <div class="sync-toggle instructor-only">
+          <span class="sync-label" id="syncLabel">Sinc</span>
+          <div class="sync-switch on" id="syncSwitch" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo">
+            <div class="knob"></div>
+          </div>
+          <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()">
+            <span id="btnSendNowLabel">📨<span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
+          </button>
         </div>
-        <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()">
-          <span id="btnSendNowLabel">📨 Enviar</span><span class="pending-dot"></span>
-        </button>
       </div>
     </div>
   </header>
@@ -852,7 +861,7 @@ function connectRoom(){
   channel.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       document.body.classList.add(role==='monitor' ? 'role-monitor' : 'role-instructor');
-      document.getElementById('roomBadgeText').textContent = role==='instructor' ? ('Instructor · Sala '+roomCode) : ('Sala '+roomCode);
+      document.getElementById('roomBadgeText').innerHTML = (role==='instructor' ? '<span class="badge-role">Instructor · </span>' : '') + 'Sala '+escapeHtml(roomCode);
       document.getElementById('roomDot').classList.add('on');
       document.getElementById('gate').style.display = 'none';
       document.getElementById('appWrap').style.display = 'block';
@@ -966,6 +975,11 @@ function currentStateSnapshot(){
            rr: state.rr, temp: state.temp, pulsePresent: state.pulsePresent };
 }
 
+// El texto del botón va en un <span class="lbl"> que se oculta en móvil (queda solo el icono)
+function setSendLabel(icon, text){
+  document.getElementById('btnSendNowLabel').innerHTML = icon + '<span class="lbl"> ' + text + '</span>';
+}
+
 function resetSendButton(){
   sendBtnTimers.forEach(t=>clearTimeout(t));
   sendBtnTimers = [];
@@ -974,14 +988,17 @@ function resetSendButton(){
   if(!btn) return;
   btn.disabled = false;
   btn.classList.remove('sending','sent','has-pending');
-  document.getElementById('btnSendNowLabel').textContent = '📨 Enviar';
+  setSendLabel('📨','Enviar');
 }
 
 function toggleSync(){
   if(role!=='instructor') return;
   syncEnabled = !syncEnabled;
   document.getElementById('syncSwitch').classList.toggle('on', syncEnabled);
-  document.getElementById('syncLabel').textContent = syncEnabled ? 'Sincronizado' : 'No sincronizado';
+  document.getElementById('syncLabel').classList.toggle('off', !syncEnabled);
+  document.getElementById('syncSwitch').title = syncEnabled
+    ? 'Sincronizado: los cambios llegan al monitor en directo'
+    : 'No sincronizado: los cambios se envían al pulsar "Enviar"';
   const btn = document.getElementById('btnSendNow');
   if(syncEnabled){
     // al reactivar la sincronización, empujamos de inmediato el estado actual al monitor
@@ -1006,18 +1023,18 @@ function sendNow(){
   btn.disabled = true;
   btn.classList.remove('has-pending');
   btn.classList.add('sending');
-  label.textContent = 'Enviando…';
+  setSendLabel('⏳','Enviando…');
 
   sendBtnTimers.push(setTimeout(()=>{
     broadcastState();
     btn.classList.remove('sending');
     btn.classList.add('sent');
-    label.textContent = '✓ Enviado';
+    setSendLabel('✓','Enviado');
 
     sendBtnTimers.push(setTimeout(()=>{
       btn.classList.remove('sent');
       btn.disabled = false;
-      label.textContent = '📨 Enviar';
+      setSendLabel('📨','Enviar');
       sendBtnBusy = false;
       updateSendPending(); // por si ya hay un cambio nuevo esperando mientras se mostraba "Enviado"
     }, 900));
@@ -1626,7 +1643,8 @@ function applyScenarioAtTime(t){
 /* ---------- Reloj ---------- */
 function tickClock(){
   const d = new Date();
-  document.getElementById('clock').textContent = d.toLocaleTimeString('es-ES');
+  const p = n=>String(n).padStart(2,'0');
+  document.getElementById('clock').innerHTML = p(d.getHours())+':'+p(d.getMinutes())+'<span class="clock-sec">:'+p(d.getSeconds())+'</span>';
 }
 setInterval(tickClock, 1000); tickClock();
 
