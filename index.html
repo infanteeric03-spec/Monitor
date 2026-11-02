@@ -1597,6 +1597,13 @@ async function saveQuestion(){
   if(options.some(o=>!o)) return qeError('Rellena las cuatro respuestas.');
   if(!checked) return qeError('Marca cuál es la respuesta correcta.');
   if(!supa) return qeError('No hay conexión con la base de datos.');
+  if(qeEditing){
+    const shared = '\n\nEl cambio se guarda en la nube y lo verán todos los instructores.';
+    const msg = qeEditing.origin==='custom'
+      ? '¿Guardar los cambios en esta pregunta?'+shared
+      : '¿Guardar los cambios en esta pregunta predefinida?\n\nPodrás volver a la versión original con "↺ Original".'+shared;
+    if(!confirm(msg)) return;
+  }
   const bank = document.getElementById('qeBank').value;
   const row = {
     q:text, options, correct:parseInt(checked.value), bank,
@@ -1646,7 +1653,9 @@ async function revertQuestion(){
 async function deleteSelectedQuestion(){
   const q = quizShown.quiz;
   if(!q || role!=='instructor' || !supa) return;
-  if(!confirm('¿Eliminar esta pregunta?\n\n"'+q.q+'"'+(q.origin==='custom' ? '' : '\n\nEs una pregunta predefinida: podrás volver a mostrarla más adelante.'))) return;
+  if(!confirm('¿Eliminar esta pregunta?\n\n"'+q.q+'"'+(q.origin==='custom'
+      ? '\n\nEs una pregunta creada por un instructor: se borrará para todos y no se podrá recuperar.'
+      : '\n\nEs una pregunta predefinida: podrás volver a mostrarla más adelante.'))) return;
   let error;
   if(q.origin==='custom'){
     ({ error } = await supa.from('quiz_questions').delete().eq('id', q.rowId));
