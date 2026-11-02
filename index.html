@@ -513,7 +513,15 @@
   .cpr-panel .quiz-preview{ background:var(--panel); }
 
   /* ---- Edición de preguntas ---- */
-  .quiz-edit-bar{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; margin-top:10px; }
+  .quiz-label-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .quiz-label-row label{ font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; }
+  .quiz-more-btn{ width:26px; height:24px; font-size:17px; font-weight:600; }
+  .quiz-more-btn span{ display:inline-block; transition:transform .15s; line-height:1; }
+  .quiz-more-btn.open{ color:var(--ecg); border-color:var(--ecg); }
+  .quiz-more-btn.open span{ transform:rotate(45deg); }
+  /* Las opciones de edición quedan ocultas hasta pulsar "+" junto a "Banco de preguntas" */
+  .quiz-edit-bar{ display:none; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; margin-top:10px; }
+  .quiz-edit-bar.open{ display:grid; }
   .quiz-edit-bar .casebtn{ width:100%; padding:8px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .quiz-restore-link{ background:none; border:none; color:var(--text-dim); font-size:11.5px; text-decoration:underline;
     cursor:pointer; padding:8px 0 0 0; font-family:inherit; }
@@ -822,7 +830,10 @@
             </div>
             <div class="quiz-row">
               <div style="flex:1; min-width:200px;">
-                <label style="font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; display:block; margin-bottom:4px;">Banco de preguntas</label>
+                <div class="quiz-label-row">
+                  <label for="quizSelect">Banco de preguntas</label>
+                  <button type="button" class="theme-btn quiz-more-btn" id="btnQuizMore" onclick="toggleQuizEditBar()" title="Crear, editar o eliminar preguntas" aria-expanded="false"><span>+</span></button>
+                </div>
                 <select id="quizSelect" onchange="previewQuestion(this.value,'quiz')" style="width:100%; min-width:0;">
                   <option value="">— Elige una pregunta —</option>
                 </select>
@@ -837,7 +848,7 @@
               <div id="quizPreviewOptions"></div>
               <div class="quiz-answer-status" id="quizAnswerStatus">Aún no se ha enviado al monitor.</div>
             </div>
-            <div class="quiz-edit-bar">
+            <div class="quiz-edit-bar" id="quizEditBar">
               <button class="casebtn" id="btnNewQ" onclick="openQuestionEditor(null)">+ Nueva pregunta</button>
               <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled>✎ Editar</button>
               <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled>🗑 Eliminar</button>
@@ -1490,10 +1501,7 @@ function rebuildQuestionBanks(){
   QUESTION_BANK = apply(BASE_QUESTION_BANK, 'general').concat(custom.filter(x=>x.bank==='general'));
   CPR_BANK = apply(BASE_CPR_BANK, 'rcp').concat(custom.filter(x=>x.bank==='rcp'));
   ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
-  const hidden = questionRows.filter(r=>r.base_id && r.deleted).length;
-  const link = document.getElementById('btnRestoreHidden');
-  link.style.display = hidden ? 'inline-block' : 'none';
-  link.textContent = '↺ Volver a mostrar '+hidden+' pregunta'+(hidden===1?'':'s')+' predefinida'+(hidden===1?'':'s')+' eliminada'+(hidden===1?'':'s');
+  rebuildRestoreLink();
   populateQuizSelect();
   updateCprPanel(true);
   // refresca la vista previa por si la pregunta mostrada ha cambiado
@@ -1501,6 +1509,14 @@ function rebuildQuestionBanks(){
     const cur = quizShown[k];
     if(cur) previewQuestion(ALL_QUESTIONS.some(x=>x.id===cur.id) ? cur.id : '', k);
   });
+}
+
+function rebuildRestoreLink(){
+  const hidden = questionRows.filter(r=>r.base_id && r.deleted).length;
+  const open = document.getElementById('quizEditBar').classList.contains('open');
+  const link = document.getElementById('btnRestoreHidden');
+  link.style.display = (hidden && open) ? 'inline-block' : 'none';
+  link.textContent = '↺ Volver a mostrar '+hidden+' pregunta'+(hidden===1?'':'s')+' predefinida'+(hidden===1?'':'s')+' eliminada'+(hidden===1?'':'s');
 }
 
 async function loadCustomQuestions(){
@@ -1511,6 +1527,15 @@ async function loadCustomQuestions(){
     questionRows = data || [];
     rebuildQuestionBanks();
   }catch(e){ console.error('Error al cargar preguntas:', e); }
+}
+
+function toggleQuizEditBar(){
+  const open = document.getElementById('quizEditBar').classList.toggle('open');
+  const b = document.getElementById('btnQuizMore');
+  b.classList.toggle('open', open);
+  b.setAttribute('aria-expanded', open);
+  b.title = open ? 'Ocultar opciones de edición' : 'Crear, editar o eliminar preguntas';
+  rebuildRestoreLink();
 }
 
 function refreshQeFields(){
