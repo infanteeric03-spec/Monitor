@@ -512,6 +512,28 @@
   #cprSelect{ width:100%; min-width:0; }
   .cpr-panel .quiz-preview{ background:var(--panel); }
 
+  /* ---- Edición de preguntas ---- */
+  .quiz-edit-bar{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; margin-top:10px; }
+  .quiz-edit-bar .casebtn{ width:100%; padding:8px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .quiz-restore-link{ background:none; border:none; color:var(--text-dim); font-size:11.5px; text-decoration:underline;
+    cursor:pointer; padding:8px 0 0 0; font-family:inherit; }
+  .q-tag{ font-size:10px; font-family:var(--font-num); color:var(--text-dim); border:1px solid var(--line); border-radius:3px;
+    padding:1px 5px; margin-left:6px; vertical-align:middle; }
+  #quizEditor{ display:none; }
+  .qe-title{ font-size:13px; font-weight:700; color:var(--ecg); margin-bottom:8px; }
+  .qe-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; margin-bottom:8px; }
+  .qe-grid.no-rcp .qe-rcp{ visibility:hidden; }
+  .qe-opts-label{ font-size:9.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; margin:8px 0 4px; }
+  .qe-opts-label span{ text-transform:none; letter-spacing:0; }
+  .qe-opt{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .qe-opt input[type=radio]{ width:18px; height:18px; margin:0; accent-color:var(--ecg); flex-shrink:0; }
+  .qe-opt .quiz-opt-letter{ flex-shrink:0; }
+  .qe-opt input[type=text]{
+    flex:1; min-width:0; background:var(--field2); color:var(--text); border:1px solid var(--line); border-radius:4px;
+    padding:6px 8px; font-size:13px; height:32px;
+  }
+  .qe-opt.is-correct input[type=text]{ border-color:var(--ecg); }
+
   /* ---- Superposición de pregunta (Monitor) ---- */
   #quizOverlay{
     position:fixed; inset:0; background:rgba(2,4,5,0.92); z-index:40;
@@ -790,6 +812,7 @@
           </div>
 
           <div class="tab-pane" id="paneQuiz">
+           <div id="quizNormalView">
             <div class="quiz-algo-row">
               <span>Preguntas de RCP según</span>
               <div class="algo-seg" role="group" aria-label="Algoritmo de RCP">
@@ -814,6 +837,48 @@
               <div id="quizPreviewOptions"></div>
               <div class="quiz-answer-status" id="quizAnswerStatus">Aún no se ha enviado al monitor.</div>
             </div>
+            <div class="quiz-edit-bar">
+              <button class="casebtn" id="btnNewQ" onclick="openQuestionEditor(null)">+ Nueva pregunta</button>
+              <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled>✎ Editar</button>
+              <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled>🗑 Eliminar</button>
+            </div>
+            <button type="button" class="quiz-restore-link" id="btnRestoreHidden" onclick="restoreHiddenQuestions()" style="display:none;"></button>
+           </div>
+
+           <!-- Editor de preguntas (nuevas o modificadas; se guardan en la nube) -->
+           <div id="quizEditor">
+            <div class="qe-title" id="qeTitle">Nueva pregunta</div>
+            <div class="qe-grid">
+              <div class="kf-field"><label>Banco</label>
+                <select id="qeBank" onchange="refreshQeFields()">
+                  <option value="general">Ritmos y bloqueos</option>
+                  <option value="rcp">RCP</option>
+                </select></div>
+              <div class="kf-field qe-rcp"><label>Algoritmo</label>
+                <select id="qeAlgo">
+                  <option value="both">AHA y ERC</option>
+                  <option value="AHA">Solo AHA</option>
+                  <option value="ERC">Solo ERC</option>
+                </select></div>
+              <div class="kf-field qe-rcp"><label>Fase</label>
+                <select id="qeCtx">
+                  <option value="general">Generales</option>
+                  <option value="shock">Desfibrilable (FV/TVSP)</option>
+                  <option value="noshock">No desfibrilable (asistolia/AESP)</option>
+                  <option value="post">Tras la RCE</option>
+                </select></div>
+            </div>
+            <div class="kf-field"><label>Pregunta</label>
+              <textarea id="qeText" class="kf-narrative" rows="2" placeholder="Escribe el enunciado…"></textarea></div>
+            <div class="qe-opts-label">Respuestas <span>· marca la correcta</span></div>
+            <div id="qeOptions"></div>
+            <div class="kf-actions">
+              <button class="casebtn" id="qeRevert" onclick="revertQuestion()">↺ Original</button>
+              <button class="casebtn primary" onclick="saveQuestion()">💾 Guardar</button>
+              <button class="casebtn" onclick="closeQuestionEditor()">✕ Cancelar</button>
+            </div>
+            <div class="kf-status" id="qeStatus"></div>
+           </div>
           </div>
 
         </div>
@@ -1031,6 +1096,7 @@ function connectRoom(){
         // primer aviso inmediato + late-joiners: late arrivals reciben el siguiente latido del heartbeat
         broadcastState();
         loadCustomCases();
+        loadCustomQuestions();
       }
     } else if(status==='CHANNEL_ERROR' || status==='TIMED_OUT'){
       document.getElementById('gateStatus').textContent = 'No se pudo conectar. Revisa la conexión e inténtalo de nuevo.';
@@ -1231,7 +1297,7 @@ function applyRemoteState(p){
 }
 
 /* ---------- Banco de preguntas (tipo test, 4 opciones) ---------- */
-const QUESTION_BANK = [
+const BASE_QUESTION_BANK = [
   { id:'q1', q:'¿Qué caracteriza al bloqueo AV de primer grado?', options:['PR prolongado y fijo, todas las P conducen','PR que se alarga hasta que una P no conduce','Algunas P no conducen sin previo aviso','Disociación completa entre P y QRS'], correct:0 },
   { id:'q2', q:'En el BAV de 2º grado Mobitz I (Wenckebach), ¿qué ocurre con el PR?', options:['Se mantiene siempre constante','Se acorta progresivamente hasta bloquearse','Se alarga progresivamente hasta que una P se bloquea','No existe onda P en este ritmo'], correct:2 },
   { id:'q3', q:'¿Cuál es el hallazgo clave que distingue el Mobitz II del Mobitz I?', options:['El PR es siempre largo desde el principio','El PR es constante y el bloqueo aparece sin aviso previo','No hay ondas P visibles','El QRS siempre es estrecho'], correct:1 },
@@ -1250,7 +1316,7 @@ const QUESTION_BANK = [
    algo: 'both' (común a AHA y ERC), 'AHA' o 'ERC' (cuando las recomendaciones difieren).
    ctx: fase de la parada en la que tiene sentido → 'general', 'shock' (FV/TVSP),
    'noshock' (asistolia/AESP) o 'post' (tras la recuperación de la circulación espontánea). */
-const CPR_BANK = [
+const BASE_CPR_BANK = [
   // Generales
   { id:'rcp_g1', algo:'both', ctx:'general', q:'¿A qué frecuencia deben hacerse las compresiones torácicas en el adulto?', options:['60–80 por minuto','80–100 por minuto','100–120 por minuto','Más de 140 por minuto'], correct:2 },
   { id:'rcp_g2', algo:'both', ctx:'general', q:'¿Qué profundidad deben tener las compresiones en el adulto?', options:['2–3 cm','3–4 cm','5–6 cm','Más de 7 cm'], correct:2 },
@@ -1290,7 +1356,10 @@ const CPR_BANK = [
   { id:'rcp_p3', algo:'both', ctx:'post', q:'Tras la RCE, en un paciente que no despierta, respecto a la temperatura:', options:['Calentar activamente por encima de 38 °C','Control activo de la temperatura, evitando la fiebre','No hace falta vigilarla','Enfriar por debajo de 30 °C'], correct:1 },
   { id:'rcp_p4', algo:'both', ctx:'post', q:'Tras la RCE, ¿qué prueba debe hacerse de forma precoz?', options:['ECG de 12 derivaciones','Radiografía de cráneo','Ecografía abdominal','Ninguna'], correct:0 }
 ];
-const ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
+// Bancos efectivos = predefinidas (con los cambios guardados por los instructores) + preguntas nuevas
+let QUESTION_BANK = BASE_QUESTION_BANK.map(x=>({ ...x, bank:'general', origin:'base' }));
+let CPR_BANK = BASE_CPR_BANK.map(x=>({ ...x, bank:'rcp', origin:'base' }));
+let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 let cprAlgo = 'AHA';
@@ -1314,7 +1383,11 @@ function fillOptions(sel, groups, keep){
   groups.forEach(g=>{
     if(!g.items.length) return;
     const og = document.createElement('optgroup'); og.label = g.label;
-    g.items.forEach(item=>{ const o=document.createElement('option'); o.value=item.id; o.textContent=item.q; og.appendChild(o); });
+    g.items.forEach(item=>{
+      const o=document.createElement('option'); o.value=item.id;
+      o.textContent = (item.origin==='custom' ? '★ ' : item.origin==='edited' ? '✎ ' : '') + item.q;
+      og.appendChild(o);
+    });
     sel.appendChild(og);
   });
   if(keep && [...sel.options].some(o=>o.value===keep)) sel.value = keep;
@@ -1343,6 +1416,10 @@ function previewQuestion(id, uiKey){
   const q = ALL_QUESTIONS.find(x=>x.id===id) || null;
   quizShown[uiKey] = q;
   document.getElementById(ui.send).disabled = !q;
+  if(uiKey==='quiz'){
+    document.getElementById('btnEditQ').disabled = !q;
+    document.getElementById('btnDelQ').disabled = !q;
+  }
   const box = document.getElementById(ui.box);
   if(!q){ box.style.display='none'; return; }
   box.style.display = 'block';
@@ -1388,6 +1465,185 @@ function onRemoteAnswer(payload){
   document.getElementById(ui.status).textContent = payload.optionIndex===q.correct
     ? '✓ El alumno ha respondido '+letters[payload.optionIndex]+' — correcta.'
     : '✗ El alumno ha respondido '+letters[payload.optionIndex]+' — la correcta era '+letters[q.correct]+'.';
+}
+
+/* ---------- Edición de preguntas por el instructor ----------
+   Se guardan en la nube (tabla quiz_questions de Supabase), así cualquier instructor las ve:
+   · fila con base_id  → modifica (o, con deleted=true, oculta) una pregunta predefinida
+   · fila sin base_id  → pregunta nueva creada por un instructor */
+let questionRows = [];      // filas tal cual vienen de Supabase
+let qeEditing = null;       // pregunta que se está editando (null = nueva)
+
+function rebuildQuestionBanks(){
+  const byBase = {};
+  questionRows.forEach(r=>{ if(r.base_id) byBase[r.base_id] = r; });
+  const apply = (base, bank)=>base.map(x=>{
+    const r = byBase[x.id];
+    if(!r) return { ...x, bank, origin:'base' };
+    if(r.deleted) return null;
+    return { ...x, q:r.q, options:r.options, correct:r.correct, algo:r.algo || x.algo, ctx:r.ctx || x.ctx, bank, origin:'edited', rowId:r.id };
+  }).filter(Boolean);
+  const custom = questionRows.filter(r=>!r.base_id && !r.deleted).map(r=>({
+    id:'u_'+r.id, rowId:r.id, q:r.q, options:r.options, correct:r.correct,
+    algo:r.algo || 'both', ctx:r.ctx || 'general', bank:r.bank==='rcp' ? 'rcp' : 'general', origin:'custom'
+  }));
+  QUESTION_BANK = apply(BASE_QUESTION_BANK, 'general').concat(custom.filter(x=>x.bank==='general'));
+  CPR_BANK = apply(BASE_CPR_BANK, 'rcp').concat(custom.filter(x=>x.bank==='rcp'));
+  ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
+  const hidden = questionRows.filter(r=>r.base_id && r.deleted).length;
+  const link = document.getElementById('btnRestoreHidden');
+  link.style.display = hidden ? 'inline-block' : 'none';
+  link.textContent = '↺ Volver a mostrar '+hidden+' pregunta'+(hidden===1?'':'s')+' predefinida'+(hidden===1?'':'s')+' eliminada'+(hidden===1?'':'s');
+  populateQuizSelect();
+  updateCprPanel(true);
+  // refresca la vista previa por si la pregunta mostrada ha cambiado
+  ['quiz','cpr'].forEach(k=>{
+    const cur = quizShown[k];
+    if(cur) previewQuestion(ALL_QUESTIONS.some(x=>x.id===cur.id) ? cur.id : '', k);
+  });
+}
+
+async function loadCustomQuestions(){
+  if(!supa) return;
+  try{
+    const { data, error } = await supa.from('quiz_questions').select('*').order('created_at', { ascending:true });
+    if(error){ console.error('No se pudieron cargar las preguntas guardadas:', error); return; }
+    questionRows = data || [];
+    rebuildQuestionBanks();
+  }catch(e){ console.error('Error al cargar preguntas:', e); }
+}
+
+function refreshQeFields(){
+  const isRcp = document.getElementById('qeBank').value==='rcp';
+  document.querySelector('.qe-grid').classList.toggle('no-rcp', !isRcp);
+}
+
+function renderQeOptions(options, correct){
+  const letters = ['A','B','C','D'];
+  document.getElementById('qeOptions').innerHTML = letters.map((L,i)=>
+    '<label class="qe-opt'+(i===correct?' is-correct':'')+'">'
+    + '<input type="radio" name="qeCorrect" value="'+i+'"'+(i===correct?' checked':'')+' onchange="markQeCorrect('+i+')">'
+    + '<span class="quiz-opt-letter">'+L+'</span>'
+    + '<input type="text" id="qeOpt'+i+'" value="'+escapeHtml(options[i]||'')+'" placeholder="Respuesta '+L+'">'
+    + '</label>'
+  ).join('');
+}
+function markQeCorrect(i){
+  document.querySelectorAll('#qeOptions .qe-opt').forEach((el,j)=>el.classList.toggle('is-correct', j===i));
+}
+
+function openQuestionEditor(q){
+  if(role!=='instructor') return;
+  qeEditing = q || null;
+  const isNew = !q;
+  document.getElementById('qeTitle').textContent = isNew ? 'Nueva pregunta'
+    : (q.origin==='custom' ? 'Editar pregunta' : 'Editar pregunta predefinida');
+  const bank = q ? q.bank : (cprPanelOpenDefaultBank());
+  document.getElementById('qeBank').value = bank;
+  document.getElementById('qeBank').disabled = !!(q && q.origin!=='custom'); // las predefinidas no cambian de banco
+  document.getElementById('qeAlgo').value = q ? (q.algo || 'both') : 'both';
+  document.getElementById('qeCtx').value = q ? (q.ctx || 'general') : 'general';
+  document.getElementById('qeText').value = q ? q.q : '';
+  renderQeOptions(q ? q.options : ['','','',''], q ? q.correct : -1);
+  document.getElementById('qeRevert').style.visibility = (q && q.origin==='edited') ? 'visible' : 'hidden';
+  document.getElementById('qeStatus').textContent = '';
+  document.getElementById('qeStatus').className = 'kf-status';
+  refreshQeFields();
+  document.getElementById('quizNormalView').style.display = 'none';
+  document.getElementById('quizEditor').style.display = 'block';
+}
+function cprPanelOpenDefaultBank(){ return 'general'; }
+
+function closeQuestionEditor(){
+  document.getElementById('quizEditor').style.display = 'none';
+  document.getElementById('quizNormalView').style.display = 'block';
+}
+
+function qeError(msg){
+  const st = document.getElementById('qeStatus');
+  st.textContent = msg; st.className = 'kf-status err';
+}
+
+async function saveQuestion(){
+  const text = document.getElementById('qeText').value.trim();
+  const options = [0,1,2,3].map(i=>document.getElementById('qeOpt'+i).value.trim());
+  const checked = document.querySelector('#qeOptions input[name=qeCorrect]:checked');
+  if(!text) return qeError('Escribe el enunciado de la pregunta.');
+  if(options.some(o=>!o)) return qeError('Rellena las cuatro respuestas.');
+  if(!checked) return qeError('Marca cuál es la respuesta correcta.');
+  if(!supa) return qeError('No hay conexión con la base de datos.');
+  const bank = document.getElementById('qeBank').value;
+  const row = {
+    q:text, options, correct:parseInt(checked.value), bank,
+    algo: bank==='rcp' ? document.getElementById('qeAlgo').value : 'both',
+    ctx:  bank==='rcp' ? document.getElementById('qeCtx').value : 'general',
+    deleted:false, updated_at:new Date().toISOString()
+  };
+  const st = document.getElementById('qeStatus');
+  st.textContent = 'Guardando…'; st.className = 'kf-status';
+  try{
+    let res, newId = null;
+    if(qeEditing && qeEditing.origin==='custom'){
+      res = await supa.from('quiz_questions').update(row).eq('id', qeEditing.rowId);
+      newId = qeEditing.id;
+    } else if(qeEditing){ // predefinida (original o ya modificada): se guarda como cambio sobre ella
+      const baseId = qeEditing.id;
+      res = await supa.from('quiz_questions').upsert({ ...row, base_id:baseId }, { onConflict:'base_id' });
+      newId = baseId;
+    } else {
+      res = await supa.from('quiz_questions').insert(row).select('id').single();
+      if(res.data) newId = 'u_'+res.data.id;
+    }
+    if(res.error) return qeError('Error al guardar: '+res.error.message);
+    // si es solo de un algoritmo distinto del elegido, se cambia a ese algoritmo para que se vea
+    if(row.bank==='rcp' && row.algo!=='both' && row.algo!==cprAlgo) cprAlgo = row.algo;
+    await loadCustomQuestions();
+    setCprAlgo(cprAlgo);
+    closeQuestionEditor();
+    if(newId){
+      const sel = document.getElementById('quizSelect');
+      sel.value = newId; previewQuestion(sel.value===newId ? newId : '', 'quiz');
+    }
+  }catch(e){ qeError('Error al guardar: '+e.message); }
+}
+
+async function revertQuestion(){
+  if(!qeEditing || qeEditing.origin!=='edited' || !supa) return;
+  if(!confirm('¿Descartar los cambios y volver a la versión original de esta pregunta?')) return;
+  const { error } = await supa.from('quiz_questions').delete().eq('base_id', qeEditing.id);
+  if(error) return qeError('No se pudo restaurar: '+error.message);
+  const id = qeEditing.id;
+  await loadCustomQuestions();
+  closeQuestionEditor();
+  document.getElementById('quizSelect').value = id; previewQuestion(id, 'quiz');
+}
+
+async function deleteSelectedQuestion(){
+  const q = quizShown.quiz;
+  if(!q || role!=='instructor' || !supa) return;
+  if(!confirm('¿Eliminar esta pregunta?\n\n"'+q.q+'"'+(q.origin==='custom' ? '' : '\n\nEs una pregunta predefinida: podrás volver a mostrarla más adelante.'))) return;
+  let error;
+  if(q.origin==='custom'){
+    ({ error } = await supa.from('quiz_questions').delete().eq('id', q.rowId));
+  } else {
+    const base = BASE_QUESTION_BANK.concat(BASE_CPR_BANK).find(x=>x.id===q.id) || q;
+    ({ error } = await supa.from('quiz_questions').upsert({
+      base_id:q.id, bank:q.bank, algo:q.algo || 'both', ctx:q.ctx || 'general',
+      q:base.q, options:base.options, correct:base.correct, deleted:true, updated_at:new Date().toISOString()
+    }, { onConflict:'base_id' }));
+  }
+  if(error){ alert('No se pudo eliminar: '+error.message); return; }
+  document.getElementById('quizSelect').value = '';
+  previewQuestion('', 'quiz');
+  await loadCustomQuestions();
+}
+
+async function restoreHiddenQuestions(){
+  if(!supa) return;
+  if(!confirm('¿Volver a mostrar las preguntas predefinidas que se eliminaron?')) return;
+  const { error } = await supa.from('quiz_questions').delete().eq('deleted', true).not('base_id', 'is', null);
+  if(error){ alert('No se pudo restaurar: '+error.message); return; }
+  await loadCustomQuestions();
 }
 
 /* ---- Panel de RCP dentro del caso clínico ----
