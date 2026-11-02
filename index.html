@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitor de Constantes — Simulador</title>
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -107,7 +110,8 @@
     body.role-instructor .header-row .sync-toggle{ order:3; flex-shrink:0; gap:4px; margin-left:3px; }
     body.role-instructor .header-row .sync-label{ font-size:10.5px; }
     body.role-instructor .header-row .btn-send-now{ padding:4px 6px; }
-    body.role-instructor .header-row .themeToggle{ order:4; flex-shrink:0; width:26px; height:24px; font-size:13px; }
+    body.role-instructor .header-row .helpBtn{ order:4; flex-shrink:0; width:26px; height:24px; font-size:13px; }
+    body.role-instructor .header-row .themeToggle{ order:5; flex-shrink:0; width:26px; height:24px; font-size:13px; }
     .btn-send-now{ padding:5px 8px; }
   }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
@@ -494,6 +498,52 @@
   .quiz-btn:disabled{ opacity:.55; }
   .quiz-btn .quiz-opt-letter{ width:24px; height:24px; font-size:12px; }
   .quiz-sent{ text-align:center; color:var(--text-dim); font-size:12.5px; margin-top:10px; font-family:var(--font-num); }
+
+  /* ---------- Guía de uso (tour con mano dibujada) ---------- */
+  #guide{ position:fixed; inset:0; z-index:100; display:none; overflow:hidden; }
+  #guide.open{ display:block; }
+  .guide-shade{ position:absolute; inset:0; background:rgba(0,0,0,.78); }
+  #guide.has-target .guide-shade{ background:transparent; }
+  .guide-spot{
+    position:absolute; border-radius:10px; pointer-events:none; display:none;
+    box-shadow:0 0 0 9999px rgba(0,0,0,.78), 0 0 0 2px rgba(255,255,255,.85), 0 0 18px 4px rgba(255,255,255,.25);
+    transition:left .3s ease, top .3s ease, width .3s ease, height .3s ease;
+  }
+  #guide.has-target .guide-spot{ display:block; }
+  .guide-hand{ position:absolute; width:84px; height:118px; pointer-events:none; display:none;
+    transition:left .3s ease, top .3s ease; }
+  #guide.has-target .guide-hand{ display:block; }
+  .guide-hand svg{ width:100%; height:100%; overflow:visible; animation:guideTap 1.4s ease-in-out infinite; }
+  .guide-hand .ripple{ fill:none; stroke:#ffd6d6; stroke-width:3; opacity:0; transform-box:fill-box; transform-origin:center;
+    animation:guideRipple 1.4s ease-out infinite; }
+  .guide-hand .ripple.r2{ animation-delay:.18s; }
+  .guide-hand .ripple.r3{ animation-delay:.36s; }
+  @keyframes guideTap{ 0%,100%{ translate:0 7px; } 45%,55%{ translate:0 0; } }
+  @keyframes guideRipple{ 0%,40%{ opacity:0; scale:.4; } 55%{ opacity:.9; } 100%{ opacity:0; scale:1.25; } }
+  .guide-text{
+    position:absolute; left:50%; translate:-50% 0; width:min(88vw, 460px); text-align:center;
+    font-family:'Caveat', 'Segoe Print', 'Comic Sans MS', cursive; font-weight:700; font-size:27px; line-height:1.18;
+    color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.7); transition:top .3s ease;
+  }
+  .guide-text small{ display:block; font-size:21px; font-weight:600; opacity:.85; margin-top:6px; }
+  .guide-bar{
+    position:absolute; left:0; right:0; bottom:max(18px, env(safe-area-inset-bottom)); display:flex; align-items:center;
+    justify-content:space-between; gap:10px; padding:0 18px; max-width:560px; margin:0 auto;
+  }
+  .guide-btn{
+    background:transparent; border:2px solid rgba(255,255,255,.85); color:#fff; border-radius:22px;
+    font-family:'Caveat', cursive; font-weight:700; font-size:21px; padding:4px 16px; cursor:pointer; min-width:96px;
+  }
+  .guide-btn.ghost{ border-color:transparent; color:rgba(255,255,255,.75); }
+  .guide-btn:disabled{ visibility:hidden; }
+  .guide-dots{ display:flex; gap:7px; }
+  .guide-dots span{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35); }
+  .guide-dots span.on{ background:#fff; }
+  .guide-close{
+    position:absolute; top:max(14px, env(safe-area-inset-top)); left:14px; width:46px; height:46px; border-radius:50%;
+    border:3px solid #fff; background:transparent; color:#fff; font-size:26px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:0;
+  }
 </style>
 </head>
 <body>
@@ -546,6 +596,7 @@
       <div class="header-right">
         <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText">sin conectar</span></span>
         <div class="clock" id="clock">--:--:--</div>
+        <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">☀</button>
         <div class="sync-toggle instructor-only">
           <span class="sync-label" id="syncLabel">Sinc</span>
@@ -765,6 +816,36 @@
 
   <p class="note">Simulador educativo con fines de práctica clínica/formación. Las formas de onda son aproximaciones esquemáticas, no señales fisiológicas reales, y no deben usarse para diagnóstico ni interpretación clínica real.</p>
 
+
+<div id="guide" role="dialog" aria-modal="true" aria-label="Guía de uso">
+  <div class="guide-shade"></div>
+  <div class="guide-spot" id="guideSpot"></div>
+  <div class="guide-hand" id="guideHand">
+    <!-- Mano propia dibujada a trazo: índice extendido tocando (la yema está en 38,6) -->
+    <svg viewBox="0 0 100 140" aria-hidden="true">
+      <circle class="ripple"    cx="38" cy="8" r="14"/>
+      <circle class="ripple r2" cx="38" cy="8" r="24"/>
+      <circle class="ripple r3" cx="38" cy="8" r="34"/>
+      <g fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 76 L30 17 Q30 6 38 6 Q46 6 46 17 L46 54"/>
+        <path d="M46 52 Q46 45 53.5 45 Q61 45 61 53 L61 58"/>
+        <path d="M61 56 Q61 50 68 50 Q75 50 75 58 L75 63"/>
+        <path d="M75 61 Q75 56 81 56 Q88 57 88 65 L88 90 Q88 116 68 128 L67 140"/>
+        <path d="M30 76 Q22 64 15 69 Q8 74 13 85 Q24 106 37 121 L37 140"/>
+        <path d="M34 15 Q38 12 42 15" stroke-width="2.6" opacity=".8"/>
+        <path d="M30 96 Q40 92 48 98" stroke-width="2.6" opacity=".55"/>
+      </g>
+    </svg>
+  </div>
+  <div class="guide-text" id="guideText"></div>
+  <button type="button" class="guide-close" onclick="closeGuide()" aria-label="Cerrar guía">✕</button>
+  <div class="guide-bar">
+    <button type="button" class="guide-btn ghost" id="guidePrev" onclick="guideGo(-1)">‹ Atrás</button>
+    <div class="guide-dots" id="guideDots"></div>
+    <button type="button" class="guide-btn" id="guideNext" onclick="guideGo(1)">Siguiente ›</button>
+  </div>
+</div>
+
 <div id="quizOverlay">
   <div class="quiz-card">
     <div class="qtext" id="quizCardText"></div>
@@ -878,6 +959,7 @@ function connectRoom(){
       document.getElementById('appWrap').style.display = 'block';
       // los canvas se crearon con el panel oculto (ancho/alto 0): hay que remedirlos ahora que se ve
       requestAnimationFrame(()=>{ ecgSweep.resize(); spo2Sweep.resize(); respSweep.resize(); });
+      if(!connectRoom._guided){ connectRoom._guided = true; maybeAutoGuide(); }
       if(role==='instructor'){
         // primer aviso inmediato + late-joiners: late arrivals reciben el siguiente latido del heartbeat
         broadcastState();
@@ -2092,6 +2174,133 @@ setRhythm('nsr');
 populateQuizSelect();
 requestAnimationFrame(frame);
 
+
+
+/* ---------- Guía de uso ----------
+   Tour de pasos con la pantalla oscurecida, un "foco" sobre el elemento explicado y una mano
+   dibujada que lo toca. Sale sola la primera vez en cada rol (se recuerda en este dispositivo)
+   y se puede volver a ver con el botón "?" de la cabecera. */
+const GUIDE_STEPS = {
+  instructor: [
+    { text:'¡Bienvenido al simulador!', sub:'Te enseñamos lo básico en unos pocos pasos.' },
+    { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
+    { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante…', sub:'…o escribe el valor directamente.' },
+    { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
+    { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con 📨.' },
+    { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
+    { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
+    { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
+  ],
+  monitor: [
+    { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
+    { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.' },
+    { sel:'.vitals', text:'Aquí ves las constantes.', sub:'Parpadean en rojo cuando salta una alarma.' },
+    { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
+    { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
+  ]
+};
+let guideSteps = [], guideIdx = 0;
+
+function guideVisible(el){ return el && el.getClientRects().length > 0; }
+
+function startGuide(){
+  const list = GUIDE_STEPS[role==='monitor' ? 'monitor' : 'instructor'];
+  guideSteps = list.filter(st=>{
+    if(!st.sel) return true;
+    if(st.before) st.before();
+    return guideVisible(document.querySelector(st.sel));
+  });
+  guideIdx = 0;
+  const dots = document.getElementById('guideDots');
+  dots.innerHTML = guideSteps.map(()=>'<span></span>').join('');
+  document.getElementById('guide').classList.add('open');
+  guideShow();
+}
+
+function closeGuide(){
+  document.getElementById('guide').classList.remove('open');
+  try{ localStorage.setItem('monitor-guide-seen-'+(role||'x'), '1'); }catch(e){}
+}
+
+function guideGo(d){
+  const n = guideIdx + d;
+  if(n >= guideSteps.length){ closeGuide(); return; }
+  if(n < 0) return;
+  guideIdx = n;
+  guideShow();
+}
+
+function guideShow(){
+  const st = guideSteps[guideIdx];
+  if(!st) return;
+  if(st.before) st.before();
+  document.getElementById('guideText').innerHTML = escapeHtml(st.text) + (st.sub ? '<small>'+escapeHtml(st.sub)+'</small>' : '');
+  document.querySelectorAll('#guideDots span').forEach((d,i)=>d.classList.toggle('on', i===guideIdx));
+  document.getElementById('guidePrev').disabled = guideIdx===0;
+  document.getElementById('guideNext').textContent = guideIdx===guideSteps.length-1 ? '¡Entendido!' : 'Siguiente ›';
+  const el = st.sel ? document.querySelector(st.sel) : null;
+  if(el){
+    el.scrollIntoView({ block:'center', inline:'nearest', behavior:'instant' });
+  }
+  requestAnimationFrame(guideLayout);
+}
+
+function guideLayout(){
+  const guide = document.getElementById('guide');
+  if(!guide.classList.contains('open')) return;
+  const st = guideSteps[guideIdx];
+  const el = st && st.sel ? document.querySelector(st.sel) : null;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const txt = document.getElementById('guideText');
+  guide.classList.toggle('has-target', !!el);
+  if(!el){
+    txt.style.top = Math.max(80, vh*0.5 - txt.offsetHeight/2 - 30) + 'px';
+    return;
+  }
+  const r = el.getBoundingClientRect();
+  const pad = 6;
+  const spot = document.getElementById('guideSpot');
+  spot.style.left = (r.left - pad)+'px'; spot.style.top = (r.top - pad)+'px';
+  spot.style.width = (r.width + pad*2)+'px'; spot.style.height = (r.height + pad*2)+'px';
+
+  // la yema del dedo apunta al centro del elemento; la mano sale por debajo (o por encima si no cabe)
+  // y se refleja en horizontal si el elemento está muy a la derecha
+  const hand = document.getElementById('guideHand');
+  const HW = 84, HH = 118, fx = 38/100*HW, fy = 6/140*HH;
+  const tx = r.left + r.width/2, ty = r.top + r.height/2;
+  const above = ty + HH > vh - 90;
+  const mirror = tx > vw*0.62;
+  hand.style.left = (tx - fx)+'px';
+  hand.style.top  = (ty - fy)+'px';
+  // el reflejo se aplica al contenedor (con origen en la yema) y el "toque" animado al dibujo,
+  // así la mano siempre se mueve hacia el elemento, venga de arriba o de abajo
+  hand.style.transformOrigin = fx+'px '+fy+'px';
+  hand.style.transform = 'scale('+(mirror?-1:1)+','+(above?-1:1)+')';
+
+  // el texto va en la mitad libre de la pantalla
+  const handBottom = above ? r.top : ty + HH;
+  const th = txt.offsetHeight;
+  let top;
+  if(!above && handBottom + 24 + th < vh - 90){ top = handBottom + 24; }
+  else if(r.top - 30 - th > 60 && !above){ top = r.top - 30 - th; }
+  else if(above){ top = Math.max(70, r.top - HH - 24 - th); if(top + th > r.top - HH) top = Math.min(vh - 100 - th, r.bottom + 24); }
+  else { top = Math.max(70, (vh - th)/2); }
+  txt.style.top = top+'px';
+}
+window.addEventListener('resize', ()=>requestAnimationFrame(guideLayout));
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('guide').classList.contains('open')) return;
+  if(e.key==='Escape') closeGuide();
+  else if(e.key==='ArrowRight' || e.key==='Enter') guideGo(1);
+  else if(e.key==='ArrowLeft') guideGo(-1);
+});
+
+// Primera vez en este dispositivo con este rol: se muestra sola al conectarse
+function maybeAutoGuide(){
+  let seen = null;
+  try{ seen = localStorage.getItem('monitor-guide-seen-'+role); }catch(e){}
+  if(!seen) setTimeout(startGuide, 700);
+}
 
 /* ---------- Tema claro / oscuro (preferencia local de cada dispositivo) ----------
    El rectángulo del monitor (ondas) se mantiene siempre oscuro, como un monitor real. */
