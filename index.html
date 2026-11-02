@@ -97,7 +97,6 @@
   @media (max-width:760px){
     .header-right{ gap:6px; }
     body.role-instructor .badge-role,
-    body.role-instructor .clock-sec,
     .btn-send-now .lbl{ display:none; }
     body.role-instructor .room-badge{ padding:4px 6px; }
     /* Instructor en móvil: todo en una sola línea → SIMULADOR · sala · hora · Sinc · (enviar) · ☀/☾
@@ -106,7 +105,6 @@
     body.role-instructor .header-right{ display:contents; }
     body.role-instructor .header-row > h1{ order:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:.04em; flex-shrink:1; }
     body.role-instructor .header-row .room-badge{ order:1; margin-left:auto; flex-shrink:0; font-size:10.5px; padding:3px 5px; gap:4px; }
-    body.role-instructor .header-row .clock{ order:2; flex-shrink:0; font-size:12px; }
     body.role-instructor .header-row .sync-toggle{ order:3; flex-shrink:0; gap:4px; margin-left:3px; }
     body.role-instructor .header-row .sync-label{ font-size:10.5px; }
     body.role-instructor .header-row .btn-send-now{ padding:4px 6px; }
@@ -115,7 +113,11 @@
     .btn-send-now{ padding:5px 8px; }
   }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
-  header .clock{ font-family:var(--font-num); font-size:13px; color:var(--text-dim);}
+  /* Hora dentro de la pantalla del monitor, arriba a la derecha (como en un monitor real) */
+  .wave-clock{
+    position:absolute; top:4px; right:8px; z-index:2; font-family:var(--font-num); font-size:12px;
+    color:var(--title); letter-spacing:.04em; pointer-events:none;
+  }
 
   .monitor{
     display:grid;
@@ -595,7 +597,6 @@
       <h1>Simulador<span class="title-role"> · Monitor</span></h1>
       <div class="header-right">
         <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText">sin conectar</span></span>
-        <div class="clock" id="clock">--:--:--</div>
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">☀</button>
         <div class="sync-toggle instructor-only">
@@ -630,6 +631,7 @@
             <button type="button" onclick="selectLead('V5')">V5</button>
             <button type="button" onclick="selectLead('V6')">V6</button>
           </div>
+          <div class="wave-clock" id="clock">--:--:--</div>
           <canvas id="cvEcg"></canvas>
         </div>
         <div class="trace-row" style="height:70px;">
