@@ -2185,20 +2185,12 @@ requestAnimationFrame(frame);
 // Pasos que explican las partes del monitor (comunes a instructor y alumno). "hand:false" = solo
 // se ilumina la zona, sin la mano tocando, porque son elementos para mirar, no para pulsar.
 const GUIDE_MONITOR_PARTS = [
-  { sel:'.waves', hand:false, text:'Esta es la pantalla del monitor.', sub:'Muestra las curvas en tiempo real, de izquierda a derecha, como un monitor de verdad.' },
-  { sel:'.waves .trace-row:nth-child(1)', hand:false, text:'ECG: la actividad eléctrica del corazón.', sub:'Cada pico alto (QRS) es un latido. Arriba a la izquierda, la derivación; a la derecha, la hora.' },
-  { sel:'.waves .trace-row:nth-child(2)', hand:false, text:'SpO₂ · Pleti: la onda de pulso del pulsioxímetro.', sub:'Una onda por cada latido que llega al dedo. Sin pulso, se queda plana aunque el ECG siga.' },
-  { sel:'.waves .trace-row:nth-child(3)', hand:false, text:'Resp: la curva respiratoria.', sub:'Cada ondulación es una respiración. En apnea se aplana.' },
-  { sel:'#cardHr', hand:false, text:'FC: frecuencia cardiaca, en latidos por minuto.', sub:'Debajo aparece el ritmo que se está mostrando.' },
-  { sel:'#cardSpo2', hand:false, text:'SpO₂: saturación de oxígeno en sangre (%).', sub:'Por debajo de 90 % salta la alarma.' },
-  { sel:'#cardResp', hand:false, text:'FR: frecuencia respiratoria, en respiraciones por minuto.' },
-  { sel:'#cardTemp', hand:false, text:'Tª: temperatura corporal, en °C.' },
-  { sel:'#cardBp', hand:false, text:'TA (NIBP): tensión arterial no invasiva, sistólica / diastólica en mmHg.', sub:'TAM es la tensión arterial media.' },
-  { sel:'.vitals', hand:false, text:'Si una constante se sale de rango, su tarjeta parpadea en rojo.', sub:'Si el paciente pierde el pulso, parpadea la tarjeta de FC.' }
+  { sel:'.waves', hand:false, text:'La pantalla del monitor.', sub:'Arriba el ECG (verde), en medio la onda de pulso de la SpO₂ (azul) y abajo la respiración (amarilla). Arriba a la derecha, la hora.' },
+  { sel:'.vitals', hand:false, text:'Las constantes: FC, SpO₂, FR, Tª y TA.', sub:'Si alguna se sale de rango, su tarjeta parpadea en rojo.' }
 ];
 const GUIDE_STEPS = {
   instructor: [
-    { text:'¡Bienvenido al simulador!', sub:'Primero, las partes del monitor; después, cómo controlarlo.' },
+    { text:'¡Bienvenido al simulador!', sub:'Te enseñamos lo básico en unos pocos pasos.' },
     ...GUIDE_MONITOR_PARTS,
     { text:'Ahora, los controles del instructor.', sub:'Todo lo que cambies aquí lo verá el alumno en su monitor.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
