@@ -83,11 +83,13 @@
     font-family:'Segoe UI', Arial, sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{ max-width:1100px; margin:0 auto; padding:14px; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:8px 14px 14px; }
 
   header{
-    padding:2px 4px 10px 4px; border-bottom:1px solid var(--line);
+    padding:8px 4px 10px 4px; border-bottom:1px solid var(--line);
     margin-bottom:10px;
+    /* barra superior siempre visible al hacer scroll */
+    position:sticky; top:0; z-index:30; background:var(--bg);
   }
   .header-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
   .header-right{ display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-left:auto; }
@@ -132,7 +134,7 @@
      por ser el valor más largo), para que el conjunto ocupe mucha menos altura.
      Se aplica tanto en modo Monitor (alumno) como en modo Instructor. */
   @media (max-width:760px){
-    body.role-monitor .wrap, body.role-instructor .wrap{ padding:8px; }
+    body.role-monitor .wrap, body.role-instructor .wrap{ padding:2px 8px 8px; }
     body.role-monitor header, body.role-instructor header{ padding-bottom:6px; margin-bottom:6px; }
     body.role-monitor header h1, body.role-instructor header h1{ font-size:12px; }
     body.role-monitor .monitor, body.role-instructor .monitor{ gap:6px; }
@@ -183,7 +185,7 @@
   @media (max-width:760px){
     body.role-instructor.sticky-monitor .monitor-left{ display:contents; }
     body.role-instructor.sticky-monitor .waves{
-      position:sticky; top:0; z-index:15; box-shadow:0 6px 16px rgba(0,0,0,.5);
+      position:sticky; top:var(--header-h, 0px); z-index:15; box-shadow:0 6px 16px rgba(0,0,0,.5);
     }
   }
 
@@ -1162,6 +1164,14 @@ function switchTab(name){
   updateStickyMonitor();
 }
 let currentTab = 'rhythm';
+// Altura de la barra superior fija, para que la pantalla del monitor (cuando también va fija) quede justo debajo
+(function(){
+  const hdr = document.querySelector('#appWrap header');
+  if(!hdr) return;
+  const setH = ()=>document.documentElement.style.setProperty('--header-h', hdr.offsetHeight+'px');
+  if(window.ResizeObserver) new ResizeObserver(setH).observe(hdr);
+  window.addEventListener('resize', setH); setH();
+})();
 // Monitor fijo arriba (solo móvil, ver CSS) en "Caso clínico" con un caso en marcha y en "Preguntas"
 function updateStickyMonitor(){
   const on = (currentTab==='case' && scenario.active) || currentTab==='quiz';
