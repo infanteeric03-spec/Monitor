@@ -176,6 +176,16 @@
   }
 
   .monitor-left{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+  /* Móvil (instructor): con un caso en marcha o en la pestaña Preguntas, la pantalla del monitor
+     se queda fija arriba al hacer scroll, para no perder de vista las curvas. "display:contents"
+     hace que las ondas, las pestañas y las constantes compartan contenedor, así la pantalla sigue
+     fija también al bajar hasta las constantes. */
+  @media (max-width:760px){
+    body.role-instructor.sticky-monitor .monitor-left{ display:contents; }
+    body.role-instructor.sticky-monitor .waves{
+      position:sticky; top:0; z-index:15; box-shadow:0 6px 16px rgba(0,0,0,.5);
+    }
+  }
 
   .waves{
     background:var(--panel); border:1px solid var(--line); border-radius:6px;
@@ -1148,6 +1158,14 @@ function switchTab(name){
     document.getElementById(panes[key]).classList.toggle('active', key===name);
     document.getElementById(btns[key]).classList.toggle('active', key===name);
   });
+  currentTab = name;
+  updateStickyMonitor();
+}
+let currentTab = 'rhythm';
+// Monitor fijo arriba (solo móvil, ver CSS) en "Caso clínico" con un caso en marcha y en "Preguntas"
+function updateStickyMonitor(){
+  const on = (currentTab==='case' && scenario.active) || currentTab==='quiz';
+  document.body.classList.toggle('sticky-monitor', on);
 }
 
 /* ---------- Sincronización entre dispositivos (Supabase Realtime) ----------
@@ -2265,6 +2283,7 @@ function onCaseSelect(key){
   document.getElementById('btnPlay').textContent = '▶ Iniciar';
   updateCaseActionButtons();
   applyScenarioAtTime(0);
+  updateStickyMonitor();
 }
 
 function togglePlay(){
@@ -2317,6 +2336,7 @@ function stopScenario(){
   enableManualControls(true);
   updateCaseActionButtons();
   updateCprPanel();
+  updateStickyMonitor();
 }
 
 function applyScenarioAtTime(t){
