@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitor de Constantes — Simulador</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <meta name="theme-color" content="#02163c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -90,28 +90,7 @@
     margin-bottom:10px;
     /* barra superior siempre visible al hacer scroll */
     position:sticky; top:0; z-index:30; background:var(--bg);
-    /* en el iPhone con la app instalada, deja sitio a la barra de estado */
-    padding-top:calc(8px + env(safe-area-inset-top, 0px));
   }
-  .wrap{ padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px)); }
-  @media (max-width:760px){ body .wrap{ padding-left:max(8px, env(safe-area-inset-left, 0px)); padding-right:max(8px, env(safe-area-inset-right, 0px)); } }
-  #gate{ padding-top:max(20px, env(safe-area-inset-top, 0px)); padding-bottom:max(20px, env(safe-area-inset-bottom, 0px)); }
-
-  /* ---- Instalar la app (Chrome / Samsung Internet / Safari) ---- */
-  .install-btn{
-    display:none; width:100%; margin-top:14px; background:transparent; border:1px dashed var(--line);
-    color:var(--text-dim); border-radius:8px; padding:10px; font-size:13px; cursor:pointer; font-family:inherit;
-  }
-  .install-btn.show{ display:block; }
-  .install-btn:hover{ color:var(--text); border-color:var(--text-dim); }
-  #installOverlay{
-    display:none; position:fixed; inset:0; background:rgba(2,4,5,0.75); z-index:60;
-    align-items:center; justify-content:center; padding:20px;
-  }
-  #installOverlay.open{ display:flex; }
-  #installOverlay ol{ margin:8px 0 0 0; padding-left:20px; }
-  #installOverlay li{ margin:6px 0; }
-  #installOverlay .ios-share{ display:inline-block; vertical-align:-3px; }
   .header-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
   .header-right{ display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-left:auto; }
   .sync-label.off{ opacity:.6; }
@@ -218,8 +197,8 @@
   /* ---- Móvil en horizontal: pantalla del monitor fija a la izquierda y, a la derecha,
      las pestañas y las constantes, que se desplazan con el scroll ---- */
   @media (orientation:landscape) and (max-height:560px){
-    body.role-monitor .wrap, body.role-instructor .wrap{ max-width:none; padding:2px max(10px, env(safe-area-inset-right, 0px)) 8px max(10px, env(safe-area-inset-left, 0px)); }
-    body.role-monitor header, body.role-instructor header{ padding-top:calc(6px + env(safe-area-inset-top, 0px)); padding-bottom:5px; margin-bottom:6px; }
+    body.role-monitor .wrap, body.role-instructor .wrap{ max-width:none; padding:2px 10px 8px; }
+    body.role-monitor header, body.role-instructor header{ padding-top:6px; padding-bottom:5px; margin-bottom:6px; }
     body.role-monitor header h1, body.role-instructor header h1{ font-size:12px; }
     body.role-monitor .monitor, body.role-instructor .monitor{
       grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:8px; align-items:start;
@@ -827,7 +806,6 @@
           <div class="desc">Solo visualización, para el alumno</div>
         </div>
       </div>
-      <button type="button" class="install-btn" id="installBtn" onclick="installApp()">📲 Instalar la app en este dispositivo</button>
     </div>
 
     <div id="gateRoomStep">
@@ -840,20 +818,6 @@
       <button class="gate-btn secondary" onclick="backToRoleStep()">← Cambiar de rol</button>
       <div class="gate-status" id="gateStatus"></div>
     </div>
-  </div>
-</div>
-
-<div id="installOverlay" onclick="if(event.target===this) closeInstallHelp()">
-  <div class="info-card">
-    <button type="button" class="info-card-close" onclick="closeInstallHelp()" aria-label="Cerrar">×</button>
-    <b>Instalar en iPhone / iPad (Safari)</b>
-    <ol>
-      <li>Pulsa el botón <b>Compartir</b>
-        <svg class="ios-share" width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 11V1.5M4.5 5 8 1.5 11.5 5"/><path d="M5 7.5H3.5A1.5 1.5 0 0 0 2 9v6.5A1.5 1.5 0 0 0 3.5 17h9a1.5 1.5 0 0 0 1.5-1.5V9a1.5 1.5 0 0 0-1.5-1.5H11"/></svg>
-        de la barra de Safari.</li>
-      <li>Elige <b>«Añadir a pantalla de inicio»</b>.</li>
-      <li>Pulsa <b>Añadir</b>: el icono aparecerá junto a tus apps y se abrirá a pantalla completa.</li>
-    </ol>
   </div>
 </div>
 
@@ -3126,42 +3090,6 @@ function toggleTheme(){
   refreshThemeUI();
 }
 refreshThemeUI();
-
-
-/* ---------- Instalar la app ----------
-   Chrome y Samsung Internet avisan con "beforeinstallprompt" cuando la web se puede instalar:
-   se guarda ese aviso y el botón de la pantalla de inicio lo lanza. Safari (iPhone/iPad) no tiene
-   ese aviso, así que el botón muestra los pasos para "Añadir a pantalla de inicio". */
-let deferredInstall = null;
-function isStandalone(){
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
-function isIOS(){
-  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-}
-function refreshInstallBtn(){
-  const b = document.getElementById('installBtn');
-  if(!b) return;
-  b.classList.toggle('show', !isStandalone() && (!!deferredInstall || isIOS()));
-}
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();            // se lanza desde nuestro botón, no con el aviso automático
-  deferredInstall = e;
-  refreshInstallBtn();
-});
-window.addEventListener('appinstalled', ()=>{ deferredInstall = null; refreshInstallBtn(); });
-async function installApp(){
-  if(deferredInstall){
-    deferredInstall.prompt();
-    try{ await deferredInstall.userChoice; }catch(e){}
-    deferredInstall = null;
-    refreshInstallBtn();
-  } else if(isIOS()){
-    document.getElementById('installOverlay').classList.add('open');
-  }
-}
-function closeInstallHelp(){ document.getElementById('installOverlay').classList.remove('open'); }
-refreshInstallBtn();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){

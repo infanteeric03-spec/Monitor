@@ -6,9 +6,8 @@
 // reciente del servidor y actualiza la caché con ella; solo si no hay conexión (modo
 // offline) recurre a la última copia guardada. Así los cambios se ven de inmediato sin
 // tener que borrar el historial o la caché del navegador.
-const CACHE_NAME = 'monitor-urgencias-v3';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png',
-  './icon-maskable-192.png', './icon-maskable-512.png', './icon-180.png', './favicon-32.png'];
+const CACHE_NAME = 'monitor-urgencias-v2';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
