@@ -323,7 +323,10 @@
   #caseBox{ display:none; margin-top:10px; }
   .case-time{ font-family:var(--font-num); font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; align-items:center; gap:8px; }
   /* Selector de velocidad del caso (x1 / x2 / x4) */
-  .speed-seg button{ padding:3px 9px; font-size:11px; font-family:var(--font-num); }
+  .speed-seg button{ padding:3px 7px; font-size:11px; font-family:var(--font-num); }
+  .case-time .ct-label, #caseTime{ white-space:nowrap; }
+  @media (max-width:430px){ .case-time .ct-long{ display:none; } .speed-seg button{ padding:3px 6px; } }
+  @media (max-width:380px){ .case-time .ct-label{ display:none; } }
   .case-bar{ height:6px; background:var(--field); border-radius:3px; overflow:hidden; margin:4px 0 8px 0; }
   .case-bar-fill{ height:100%; width:0%; background:var(--ecg); transition:width .2s linear; }
   .case-narrative{
@@ -883,8 +886,9 @@
               </div>
               <div id="caseBox">
                 <div class="case-time">
-                  <span>Cronología del caso</span>
+                  <span class="ct-label">Cronología<span class="ct-long"> del caso</span></span>
                   <div class="algo-seg speed-seg" role="group" aria-label="Velocidad del caso">
+                    <button type="button" data-speed="0.5" onclick="setCaseSpeed(0.5)">x0,5</button>
                     <button type="button" data-speed="1" class="on" onclick="setCaseSpeed(1)">x1</button>
                     <button type="button" data-speed="2" onclick="setCaseSpeed(2)">x2</button>
                     <button type="button" data-speed="4" onclick="setCaseSpeed(4)">x4</button>
