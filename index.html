@@ -438,6 +438,43 @@
     border:1px solid var(--line); border-radius:5px; padding:8px 10px; min-height:44px;
   }
   select:disabled, input:disabled{ opacity:.45; }
+  /* ---------- Desplegables propios (sustituyen al selector del sistema) ----------
+     El <select> original se queda oculto como "fuente de verdad" (valor, opciones y eventos
+     onchange siguen funcionando igual); encima se pinta un botón y una lista con el estilo de la app. */
+  select.csel-native{ display:none !important; }
+  .csel-btn{
+    display:flex; align-items:center; gap:8px; width:100%; min-width:0; text-align:left;
+    background:var(--field); color:var(--text); border:1px solid var(--line); border-radius:4px;
+    padding:7px 10px; font-size:13px; font-family:inherit; cursor:pointer; line-height:1.3;
+  }
+  .csel-btn:hover:not(:disabled), .csel-btn.open{ border-color:var(--text-dim); }
+  .csel-btn.open{ box-shadow:0 0 0 2px rgba(53,255,107,.18); }
+  .csel-btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .csel-btn .csel-text{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .csel-btn .csel-text.placeholder{ color:var(--text-dim); }
+  .csel-btn .csel-chev{ flex-shrink:0; width:12px; height:12px; color:var(--text-dim); transition:transform .15s; }
+  .csel-btn.open .csel-chev{ transform:rotate(180deg); }
+  #rhythmSelect + .csel-btn{ min-width:230px; }
+  .kf-field .csel-btn{ padding:6px; height:32px; }
+  #csel-pop{
+    position:fixed; z-index:90; display:none; overflow-y:auto; overscroll-behavior:contain;
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:4px;
+    box-shadow:0 10px 28px rgba(0,0,0,.45); -webkit-overflow-scrolling:touch;
+  }
+  #csel-pop.open{ display:block; }
+  .csel-group{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim);
+    padding:9px 10px 4px; }
+  .csel-group:first-child{ padding-top:5px; }
+  .csel-opt{
+    display:flex; align-items:flex-start; gap:8px; width:100%; text-align:left; background:none; border:none;
+    color:var(--text); font-family:inherit; font-size:13px; line-height:1.35; padding:8px 10px; border-radius:5px; cursor:pointer;
+  }
+  .csel-opt:hover, .csel-opt:focus{ background:var(--hover); outline:none; }
+  .csel-opt.sel{ color:var(--ecg); font-weight:600; }
+  .csel-opt .csel-check{ width:14px; flex-shrink:0; visibility:hidden; }
+  .csel-opt.sel .csel-check{ visibility:visible; }
+  .csel-opt:disabled{ opacity:.4; cursor:default; }
+
 
   /* ---- Creador/editor de casos clínicos propios ---- */
   #caseBuilder{ display:none; margin-top:10px; }
@@ -3143,6 +3180,148 @@ function toggleTheme(){
   refreshThemeUI();
 }
 refreshThemeUI();
+
+
+/* ---------- Desplegables propios ----------
+   Cada <select> se oculta y se sustituye por un botón con el estilo de la app; al pulsarlo se abre
+   una lista propia (con los grupos de opciones), en vez del selector del sistema. El <select>
+   sigue siendo el que guarda el valor: al elegir se le asigna y se lanza su "change", así todo el
+   código existente sigue funcionando sin cambios. */
+(function(){
+  const VALUE = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+  const INDEX = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+  const CHEV = '<svg class="csel-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
+  const CHECK = '<svg class="csel-check" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 7.5 5.5 10.5 11.5 3.5"/></svg>';
+  let pop = null, openSel = null;
+
+  function getPop(){
+    if(!pop){
+      pop = document.createElement('div');
+      pop.id = 'csel-pop'; pop.setAttribute('role','listbox');
+      document.body.appendChild(pop);
+      pop.addEventListener('keydown', onPopKey);
+    }
+    return pop;
+  }
+
+  function refresh(sel){
+    const btn = sel._cselBtn; if(!btn) return;
+    const o = sel.options[INDEX.get.call(sel)];
+    const txt = btn.querySelector('.csel-text');
+    txt.textContent = o ? o.textContent : '';
+    txt.classList.toggle('placeholder', !o || o.value==='');
+    btn.disabled = sel.disabled;
+    if(openSel===sel) render(sel);
+  }
+
+  function enhance(sel){
+    if(sel._cselBtn || sel.dataset.native!==undefined) return;
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'csel-btn';
+    btn.setAttribute('aria-haspopup','listbox');
+    if(sel.id) btn.setAttribute('aria-controls', 'csel-pop');
+    btn.innerHTML = '<span class="csel-text"></span>'+CHEV;
+    sel.classList.add('csel-native');
+    sel.insertAdjacentElement('afterend', btn);
+    sel._cselBtn = btn;
+    // label for="…" → pulsa el botón
+    if(sel.id){ document.querySelectorAll('label[for="'+sel.id+'"]').forEach(l=>l.addEventListener('click', e=>{ e.preventDefault(); btn.focus(); })); }
+    btn.addEventListener('click', ()=>{ openSel===sel ? close() : open(sel); });
+    btn.addEventListener('keydown', e=>{
+      if(['ArrowDown','ArrowUp','Enter',' '].includes(e.key)){ e.preventDefault(); open(sel, true); }
+    });
+    // si el código cambia el valor (sel.value = …) o las opciones, el botón se actualiza solo
+    Object.defineProperty(sel, 'value', { configurable:true, get(){ return VALUE.get.call(this); }, set(v){ VALUE.set.call(this, v); refresh(this); } });
+    Object.defineProperty(sel, 'selectedIndex', { configurable:true, get(){ return INDEX.get.call(this); }, set(v){ INDEX.set.call(this, v); refresh(this); } });
+    new MutationObserver(()=>refresh(sel)).observe(sel, { childList:true, subtree:true, attributes:true, attributeFilter:['disabled'] });
+    refresh(sel);
+  }
+
+  function render(sel){
+    const p = getPop();
+    const cur = VALUE.get.call(sel);
+    let html = '';
+    const optHtml = o => '<button type="button" role="option" class="csel-opt'+(o.value===cur?' sel':'')+'" data-v="'+escapeHtml(o.value)+'"'
+      + (o.disabled?' disabled':'') + ' aria-selected="'+(o.value===cur)+'">'+CHECK+'<span>'+escapeHtml(o.textContent)+'</span></button>';
+    [...sel.children].forEach(ch=>{
+      if(ch.tagName==='OPTGROUP'){
+        html += '<div class="csel-group">'+escapeHtml(ch.label)+'</div>';
+        [...ch.children].forEach(o=>{ html += optHtml(o); });
+      } else if(ch.tagName==='OPTION'){ html += optHtml(ch); }
+    });
+    p.innerHTML = html;
+    p.querySelectorAll('.csel-opt').forEach(b=>b.addEventListener('click', ()=>choose(sel, b.dataset.v)));
+  }
+
+  function place(sel){
+    const p = getPop(), r = sel._cselBtn.getBoundingClientRect();
+    const vw = innerWidth, vh = innerHeight, m = 8;
+    const w = Math.min(Math.max(r.width, 240), vw - 2*m);
+    p.style.width = w+'px';
+    p.style.left = Math.min(Math.max(m, r.left), vw - w - m)+'px';
+    const below = vh - r.bottom - m, above = r.top - m;
+    const maxH = Math.min(380, Math.max(below, above) - 4);
+    p.style.maxHeight = Math.max(120, maxH)+'px';
+    const h = Math.min(p.scrollHeight, Math.max(120, maxH));
+    p.style.top = (below >= h || below >= above ? r.bottom + 4 : r.top - 4 - h)+'px';
+  }
+
+  function open(sel, focusList){
+    if(sel.disabled) return;
+    close();
+    openSel = sel;
+    render(sel);
+    const p = getPop(); p.classList.add('open');
+    sel._cselBtn.classList.add('open');
+    sel._cselBtn.setAttribute('aria-expanded','true');
+    place(sel);
+    const s = p.querySelector('.csel-opt.sel') || p.querySelector('.csel-opt');
+    if(s){ s.scrollIntoView({ block:'nearest' }); if(focusList) s.focus(); }
+  }
+
+  function close(refocus){
+    if(!openSel) return;
+    const btn = openSel._cselBtn;
+    btn.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+    getPop().classList.remove('open');
+    openSel = null;
+    if(refocus) btn.focus();
+  }
+
+  function choose(sel, v){
+    const changed = VALUE.get.call(sel) !== v;
+    VALUE.set.call(sel, v);
+    refresh(sel);
+    close(true);
+    if(changed) sel.dispatchEvent(new Event('change', { bubbles:true }));
+  }
+
+  function onPopKey(e){
+    const items = [...pop.querySelectorAll('.csel-opt:not(:disabled)')];
+    const i = items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); (items[i+1]||items[0]).focus(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); (items[i-1]||items[items.length-1]).focus(); }
+    else if(e.key==='Escape' || e.key==='Tab'){ e.preventDefault(); close(true); }
+  }
+
+  document.addEventListener('pointerdown', e=>{
+    if(!openSel) return;
+    if(pop.contains(e.target) || openSel._cselBtn.contains(e.target)) return;
+    close();
+  }, true);
+  document.addEventListener('keydown', e=>{ if(openSel && e.key==='Escape') close(true); });
+  window.addEventListener('resize', ()=>close());
+  document.addEventListener('scroll', e=>{ if(openSel && !(pop && pop.contains(e.target))) close(); }, true);
+
+  // todos los desplegables actuales y los que se creen después (p. ej. en el editor de casos)
+  document.querySelectorAll('select').forEach(enhance);
+  new MutationObserver(muts=>{
+    muts.forEach(m=>m.addedNodes.forEach(n=>{
+      if(n.nodeType!==1) return;
+      if(n.tagName==='SELECT') enhance(n); else n.querySelectorAll && n.querySelectorAll('select').forEach(enhance);
+    }));
+  }).observe(document.body, { childList:true, subtree:true });
+})();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
