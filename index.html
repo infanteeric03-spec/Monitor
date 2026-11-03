@@ -321,7 +321,9 @@
   .casebtn:disabled{ opacity:.35; cursor:not-allowed; }
   .casebtn.primary{ border-color:var(--ecg); color:var(--ecg); }
   #caseBox{ display:none; margin-top:10px; }
-  .case-time{ font-family:var(--font-num); font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; }
+  .case-time{ font-family:var(--font-num); font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  /* Selector de velocidad del caso (x1 / x2 / x4) */
+  .speed-seg button{ padding:3px 9px; font-size:11px; font-family:var(--font-num); }
   .case-bar{ height:6px; background:var(--field); border-radius:3px; overflow:hidden; margin:4px 0 8px 0; }
   .case-bar-fill{ height:100%; width:0%; background:var(--ecg); transition:width .2s linear; }
   .case-narrative{
@@ -880,7 +882,15 @@
                 <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;">🗑 Eliminar</button>
               </div>
               <div id="caseBox">
-                <div class="case-time"><span>Cronología del caso</span><span id="caseTime">00:00 / 00:00</span></div>
+                <div class="case-time">
+                  <span>Cronología del caso</span>
+                  <div class="algo-seg speed-seg" role="group" aria-label="Velocidad del caso">
+                    <button type="button" data-speed="1" class="on" onclick="setCaseSpeed(1)">x1</button>
+                    <button type="button" data-speed="2" onclick="setCaseSpeed(2)">x2</button>
+                    <button type="button" data-speed="4" onclick="setCaseSpeed(4)">x4</button>
+                  </div>
+                  <span id="caseTime">00:00 / 00:00</span>
+                </div>
                 <div class="case-bar"><div class="case-bar-fill" id="caseProgress"></div></div>
                 <div class="case-narrative" id="caseNarrative">Selecciona "Iniciar" para comenzar el caso.</div>
               </div>
@@ -1791,6 +1801,7 @@ async function restoreHiddenQuestions(){
 /* ---- Panel de RCP dentro del caso clínico ----
    Aparece si el caso tiene alguna fase de parada y propone primero las preguntas de la fase actual. */
 let cprPanelKey = null;
+let cprLastCtx = null;   // fase anterior, para desplegar la barra solo al entrar en la parada
 function toggleCprPanel(){
   const p = document.getElementById('cprPanel');
   const open = p.classList.toggle('open');
@@ -1812,8 +1823,15 @@ function updateCprPanel(force){
   const c = scenario.active ? getCase(scenario.key) : null;
   const caseHasArrest = !!(c && c.keyframes.some(isArrestPhase));
   panel.classList.toggle('show', caseHasArrest);
-  if(!caseHasArrest){ cprPanelKey = null; return; }
+  if(!caseHasArrest){ cprPanelKey = null; cprLastCtx = null; panel.classList.remove('open'); return; }
   const ctx = cprContextNow();
+  // al entrar en una fase de parada (FV/TVSP o asistolia/AESP) la barra "Q. RCP" se despliega sola
+  const isArrest = ctx==='shock' || ctx==='noshock';
+  if(isArrest && cprLastCtx!==ctx && !(cprLastCtx==='shock' || cprLastCtx==='noshock')){
+    panel.classList.add('open');
+    document.getElementById('cprToggle').setAttribute('aria-expanded', true);
+  }
+  cprLastCtx = ctx;
   const key = scenario.key+'|'+ctx+'|'+cprAlgo;
   if(key===cprPanelKey && !force) return;   // se llama en cada fotograma: solo se repinta si cambia algo
   cprPanelKey = key;
@@ -1893,7 +1911,13 @@ const CASES = {
   }
 };
 
-const scenario = { active:false, playing:false, key:null, t:0, noPulseOverride:false, syncPrompted:false };
+const scenario = { active:false, playing:false, key:null, t:0, noPulseOverride:false, syncPrompted:false, speed:1 };
+
+// Velocidad de reproducción del caso: acelera la cronología (no el ritmo cardiaco ni las ondas)
+function setCaseSpeed(v){
+  scenario.speed = v;
+  document.querySelectorAll('.speed-seg button').forEach(b=>b.classList.toggle('on', +b.dataset.speed===v));
+}
 
 /* ---------- Casos clínicos personalizados (guardados en Supabase) ---------- */
 let customCases = {}; // keyed by uuid de la fila en Supabase
@@ -2681,7 +2705,7 @@ function frame(ts){
   if(role!=='monitor'){
     // avance del caso clínico, si hay uno activo y en reproducción (solo decide el Instructor / modo local)
     if(scenario.active && scenario.playing){
-      scenario.t += dtSec;
+      scenario.t += dtSec * (scenario.speed || 1);
       applyScenarioAtTime(scenario.t);
     }
     // pulso presente según el ritmo (siempre ausente en FV/asistolia), forzado por el caso clínico
