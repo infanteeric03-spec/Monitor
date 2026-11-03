@@ -237,6 +237,23 @@
     body.role-instructor .vital-card .stepper > *{ flex:1 1 0; min-width:0; }
     body.role-instructor .vital-card .stepper button{ padding:3px 6px; font-size:11px; }
     body.role-instructor .vital-card .stepper input{ font-size:11px; padding:3px 4px; }
+
+    /* Instructor: a la izquierda el monitor y debajo las constantes (siempre a la vista);
+       a la derecha las pestañas, que se desplazan dentro de su propio panel */
+    body.role-instructor .monitor{
+      height:calc(100vh - var(--header-h, 0px) - 16px);
+      height:calc(100dvh - var(--header-h, 0px) - 16px);
+      grid-template-rows:minmax(0,1fr) auto; align-items:stretch;
+    }
+    body.role-instructor .waves{ grid-column:1; grid-row:1; position:static; height:auto; min-height:0; }
+    body.role-instructor .vitals{ grid-column:1; grid-row:2; grid-template-columns:repeat(3, minmax(0,1fr)); gap:5px; }
+    body.role-instructor #cardBp{ grid-column:span 2; }
+    body.role-instructor .vital-card{ padding:4px 8px; }
+    body.role-instructor .vitals .vital-value{ font-size:20px; }
+    body.role-instructor .vitals .vital-sub{ display:none; }
+    body.role-instructor .vital-card .stepper{ margin-top:2px; }
+    body.role-instructor .vital-card .stepper button, body.role-instructor .vital-card .stepper input{ padding:2px 4px; font-size:10.5px; }
+    body.role-instructor .tabs-panel{ grid-column:2; grid-row:1 / span 2; min-height:0; height:100%; }
   }
 
   .trace-row{ position:relative; border-bottom:1px solid var(--trace-sep); }
