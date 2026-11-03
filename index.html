@@ -826,6 +826,47 @@
     body .waves.expanded{ width:96vw !important; height:92vh !important; }
   }
   body.waves-open{ overflow:hidden; }
+  /* constantes dentro de la ventana ampliada */
+  .wx-vitals{ display:none; }
+  body .waves.expanded{
+    display:grid !important; grid-template-columns:minmax(0,1fr) clamp(150px,19vw,230px);
+    grid-template-rows:5fr 3fr 2.4fr; column-gap:10px;
+  }
+  body .waves.expanded .trace-row{ grid-column:1; }
+  body .waves.expanded .trace-row:nth-child(1){ grid-row:1; }
+  body .waves.expanded .trace-row:nth-child(2){ grid-row:2; }
+  body .waves.expanded .trace-row:nth-child(3){ grid-row:3; }
+  body .waves.expanded .wx-vitals{
+    grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; gap:6px; min-height:0; padding-bottom:42px;
+  }
+  .wx-card{
+    flex:1 1 0; min-height:0; display:flex; flex-direction:column; justify-content:center;
+    border:1px solid #1c2528; border-radius:6px; padding:4px 10px; background:rgba(255,255,255,.02); overflow:hidden;
+  }
+  .wx-card.alarm{ animation:alarmPulse 1s infinite; border-color:var(--alarm); }
+  .wx-top{ display:flex; justify-content:space-between; font-size:11px; letter-spacing:.06em; color:#8a979b; text-transform:uppercase; }
+  .wx-val{ font-family:var(--font-num); font-weight:bold; line-height:1.05;
+    font-size:clamp(22px,min(4.2vw,7vh),52px); text-shadow:0 0 10px currentColor; white-space:nowrap; text-align:right; }
+  .wx-card[data-src="Hr"] .wx-val{ font-size:clamp(28px,min(5.4vw,9vh),68px); }
+  .wx-card[data-src="Bp"] .wx-val{ font-size:clamp(20px,min(3.4vw,6vh),44px); }
+  .wx-top span:last-child{ text-transform:none; letter-spacing:0; }
+  body .waves.expanded .wave-clock{ top:4px !important; right:10px !important; font-size:12px; }
+  .wx-sub{ font-size:11px; color:#8a979b; text-align:right; }
+  /* pantallas estrechas en vertical: constantes en una fila debajo de las ondas */
+  @media (max-width:760px) and (orientation:portrait){
+    body .waves.expanded{ grid-template-columns:minmax(0,1fr); grid-template-rows:5fr 3fr 2.4fr auto; }
+    body .waves.expanded .wx-vitals{ grid-column:1; grid-row:4; display:grid; grid-template-columns:repeat(3,1fr); padding:6px 0 44px; }
+    body .waves.expanded .wx-card{ padding:6px 8px; }
+    body .waves.expanded .wx-card .wx-val{ font-size:26px; }
+    body .waves.expanded .wx-card[data-src="Bp"] .wx-val{ font-size:20px; }
+  }
+  @media (orientation:landscape) and (max-height:560px){
+    body .waves.expanded .wx-vitals{ gap:4px; padding-bottom:40px; }
+    .wx-card{ padding:2px 8px; }
+    .wx-top{ font-size:9px; }
+    .wx-sub{ display:none; }
+  }
+
 </style>
 </head>
 <body>
@@ -1020,6 +1061,13 @@
         <div class="trace-row" style="height:60px;">
           <div class="trace-label" style="color:var(--resp);">Resp</div>
           <canvas id="cvResp"></canvas>
+        </div>
+        <div class="wx-vitals" aria-hidden="true">
+          <div class="wx-card" data-src="Hr"><div class="wx-top"><span>FC</span><span>lpm</span></div><div class="wx-val c-hr"></div></div>
+          <div class="wx-card" data-src="Spo2"><div class="wx-top"><span>SpO₂</span><span>%</span></div><div class="wx-val c-spo2"></div></div>
+          <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
+          <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
+          <div class="wx-card" data-src="Temp"><div class="wx-top"><span>Tª</span><span>°C</span></div><div class="wx-val c-temp"></div></div>
         </div>
         <button type="button" class="waves-expand-btn" id="wavesExpandBtn" onclick="toggleWavesExpand()" aria-label="Ampliar monitor" title="Ampliar monitor">
           <svg class="ic-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>
@@ -3434,8 +3482,24 @@ function toggleWavesExpand(force){
   document.getElementById('wavesBackdrop').classList.toggle('open', open);
   const lbl = open ? 'Reducir monitor' : 'Ampliar monitor';
   btn.setAttribute('aria-label', lbl); btn.title = lbl;
+  if(open) syncWxVitals();
   requestAnimationFrame(()=>{ [ecgSweep, spo2Sweep, respSweep].forEach(s=>s && s.resize && s.resize()); });
 }
+// copia de las constantes (valor + alarma) en la ventana ampliada
+function syncWxVitals(){
+  document.querySelectorAll('.wx-card').forEach(c=>{
+    const k = c.dataset.src, v = document.getElementById('val'+k), card = document.getElementById('card'+k);
+    if(v) c.querySelector('.wx-val').textContent = v.textContent;
+    if(card) c.classList.toggle('alarm', card.classList.contains('alarm'));
+    const sub = c.querySelector('.wx-sub'), sb = document.getElementById('sub'+k);
+    if(sub && sb) sub.textContent = sb.textContent;
+  });
+}
+(function(){
+  const src = document.querySelector('.vitals');
+  if(src) new MutationObserver(()=>{ if(document.querySelector('.waves.expanded')) syncWxVitals(); })
+    .observe(src, { subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['class'] });
+})();
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape' && document.querySelector('.waves.expanded')) toggleWavesExpand(false);
 });
