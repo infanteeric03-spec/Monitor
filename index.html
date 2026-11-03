@@ -2268,6 +2268,11 @@ function onCaseSelect(key){
     return;
   }
   if(!key){ stopScenario(); return; }
+  // se guarda cómo estaba el paciente antes del caso, para volver a ese estado al salir (✕)
+  if(!scenario.active){
+    scenario.baseline = { rhythm:state.rhythm, hr:state.hr, spo2:state.spo2, sys:state.sys, dia:state.dia,
+                          rr:state.rr, temp:state.temp, pulseOff:pulseManuallyDisabled };
+  }
   scenario.key = key;
   scenario.active = true;
   scenario.playing = false;
@@ -2334,9 +2339,35 @@ function stopScenario(){
   document.getElementById('btnReset').disabled = true;
   document.getElementById('btnStop').disabled = true;
   enableManualControls(true);
+  scenario.noPulseOverride = false;
+  restoreCaseBaseline();
   updateCaseActionButtons();
   updateCprPanel();
   updateStickyMonitor();
+}
+
+// Al salir de un caso, el monitor vuelve al ritmo y las constantes que había antes de iniciarlo
+function restoreCaseBaseline(){
+  const b = scenario.baseline;
+  if(!b) return;
+  scenario.baseline = null;
+  if(state.rhythm !== b.rhythm){
+    av.atrialTimer = 0; av.ventTimer = 0; av.pAge = 999; av.qAge = 999;
+    av.wbIndex = 0; av.m2Count = 0; av.pendingQrsIn = null;
+  }
+  state.nextPvcIn = null;
+  state.rhythm = b.rhythm; state.hr = b.hr; state.spo2 = b.spo2; state.sys = b.sys; state.dia = b.dia;
+  state.rr = b.rr; state.temp = b.temp;
+  pulseManuallyDisabled = b.pulseOff;
+  document.getElementById('rhythmSelect').value = state.rhythm;
+  document.getElementById('inHr').value = state.hr;
+  document.getElementById('inSpo2').value = state.spo2;
+  document.getElementById('inSys').value = state.sys;
+  document.getElementById('inDia').value = state.dia;
+  document.getElementById('inRr').value = state.rr;
+  document.getElementById('inTemp').value = state.temp.toFixed(1);
+  refreshPulseToggleUI();
+  syncInputs();
 }
 
 function applyScenarioAtTime(t){
