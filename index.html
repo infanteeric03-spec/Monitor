@@ -793,6 +793,39 @@
     border:3px solid #fff; background:rgba(8,12,14,.7); color:#fff; font-size:26px; line-height:1; cursor:pointer;
     display:flex; align-items:center; justify-content:center; padding:0;
   }
+
+  /* ---------- Monitor ampliado (ventana flotante) ---------- */
+  .waves{ position:relative; }
+  .waves-expand-btn{
+    position:absolute; right:6px; bottom:6px; z-index:4; width:30px; height:30px; padding:0;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:rgba(5,8,10,.55); color:#c9d3d6; border:1px solid rgba(255,255,255,.18); border-radius:6px;
+    opacity:.75; transition:opacity .15s, background .15s;
+  }
+  .waves-expand-btn:hover, .waves-expand-btn:focus-visible{ opacity:1; background:rgba(5,8,10,.85); }
+  .waves-expand-btn svg{ width:16px; height:16px; }
+  .waves-expand-btn .ic-collapse{ display:none; }
+  .waves.expanded .waves-expand-btn .ic-expand{ display:none; }
+  .waves.expanded .waves-expand-btn .ic-collapse{ display:block; }
+  #wavesBackdrop{ position:fixed; inset:0; z-index:84; background:rgba(0,0,0,.65); display:none; }
+  #wavesBackdrop.open{ display:block; }
+  body .waves.expanded{
+    position:fixed !important; top:50% !important; left:50% !important; right:auto !important; bottom:auto !important;
+    transform:translate(-50%,-50%); margin:0 !important;
+    width:min(96vw,1200px) !important; height:min(88vh,680px) !important; max-height:none !important;
+    z-index:85 !important; padding:10px !important; gap:2px !important;
+    box-shadow:0 14px 48px rgba(0,0,0,.65); border-color:#2a3438;
+  }
+  body .waves.expanded .trace-row{ height:auto !important; min-height:0; overflow:hidden; flex:1 1 0 !important; }
+  body .waves.expanded .trace-row:nth-child(1){ flex-grow:5 !important; }
+  body .waves.expanded .trace-row:nth-child(2){ flex-grow:3 !important; }
+  body .waves.expanded .trace-row:nth-child(3){ flex-grow:2.4 !important; }
+  body .waves.expanded .waves-expand-btn{ width:36px; height:36px; opacity:.9; }
+  body .waves.expanded .waves-expand-btn svg{ width:18px; height:18px; }
+  @media (orientation:landscape) and (max-height:560px){
+    body .waves.expanded{ width:96vw !important; height:92vh !important; }
+  }
+  body.waves-open{ overflow:hidden; }
 </style>
 </head>
 <body>
@@ -988,7 +1021,12 @@
           <div class="trace-label" style="color:var(--resp);">Resp</div>
           <canvas id="cvResp"></canvas>
         </div>
+        <button type="button" class="waves-expand-btn" id="wavesExpandBtn" onclick="toggleWavesExpand()" aria-label="Ampliar monitor" title="Ampliar monitor">
+          <svg class="ic-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>
+          <svg class="ic-collapse" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 6H10V2.5M2.5 10H6v3.5M10 6l4-4M6 10l-4 4"/></svg>
+        </button>
       </div>
+      <div id="wavesBackdrop" onclick="toggleWavesExpand(false)"></div>
 
       <div class="tabs-panel">
         <div class="tab-nav">
@@ -3371,6 +3409,36 @@ refreshThemeUI();
     }));
   }).observe(document.body, { childList:true, subtree:true });
 })();
+
+
+/* ---------- Monitor ampliado como ventana flotante ----------
+   Se deja un hueco del mismo tamaño en su sitio para que el resto de la página no salte. */
+let wavesPlaceholder = null;
+function toggleWavesExpand(force){
+  const w = document.querySelector('.waves');
+  const open = force===undefined ? !w.classList.contains('expanded') : force;
+  if(open === w.classList.contains('expanded')) return;
+  const btn = document.getElementById('wavesExpandBtn');
+  if(open){
+    const r = w.getBoundingClientRect();
+    wavesPlaceholder = document.createElement('div');
+    wavesPlaceholder.className = 'waves-placeholder';
+    wavesPlaceholder.style.cssText = 'height:'+r.height+'px;flex-shrink:0;';
+    const cs = getComputedStyle(w);
+    if(cs.gridColumn) wavesPlaceholder.style.gridColumn = cs.gridColumn;
+    if(cs.gridRow) wavesPlaceholder.style.gridRow = cs.gridRow;
+    w.parentNode.insertBefore(wavesPlaceholder, w);
+  } else if(wavesPlaceholder){ wavesPlaceholder.remove(); wavesPlaceholder = null; }
+  w.classList.toggle('expanded', open);
+  document.body.classList.toggle('waves-open', open);
+  document.getElementById('wavesBackdrop').classList.toggle('open', open);
+  const lbl = open ? 'Reducir monitor' : 'Ampliar monitor';
+  btn.setAttribute('aria-label', lbl); btn.title = lbl;
+  requestAnimationFrame(()=>{ [ecgSweep, spo2Sweep, respSweep].forEach(s=>s && s.resize && s.resize()); });
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && document.querySelector('.waves.expanded')) toggleWavesExpand(false);
+});
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
