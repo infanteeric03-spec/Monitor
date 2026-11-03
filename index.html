@@ -400,6 +400,16 @@
 
   .case-row{ display:flex; flex-direction:column; align-items:stretch; gap:8px; }
   .case-select-wrap select{ width:100%; min-width:0; }
+  .case-label-row{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .case-label-row label{ font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; }
+  /* tiempo del caso junto a "Caso clínico": solo en el móvil en horizontal (ahí se quita de la fila de cronología) */
+  .case-time-top{ display:none; font-family:var(--font-num); font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  @media (orientation:landscape) and (max-height:560px){
+    body.role-instructor .case-time-top.on{ display:inline; }
+    body.role-instructor .case-time #caseTime{ display:none; }
+    body.role-instructor .case-time .ct-long{ display:none; }
+    body.role-instructor .case-player .lbl{ display:none; }   /* ⟲ y ✕ solo con icono, como en vertical */
+  }
   /* Controles del caso en una rejilla fija: ⏮ | ▶ Iniciar (doble) | ⏭ | ⟲ | ✕, siempre alineados */
   .case-player{ display:grid; grid-template-columns:1fr 2fr 1fr 1fr 1fr; gap:6px; max-width:560px; }
   .case-player .casebtn{ width:100%; padding:8px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -958,7 +968,10 @@
             <div id="caseNormalView">
               <div class="case-row">
                 <div class="case-select-wrap">
-                  <label style="font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; display:block; margin-bottom:4px;">Caso clínico</label>
+                  <div class="case-label-row">
+                    <label for="caseSelect">Caso clínico</label>
+                    <span class="case-time-top" id="caseTimeTop"></span>
+                  </div>
                   <select id="caseSelect" onchange="onCaseSelect(this.value)">
                     <option value="">— Ninguno (modo manual) —</option>
                     <option value="__new__">+ Crear caso nuevo…</option>
@@ -2436,6 +2449,7 @@ function stopScenario(){
   updateCaseActionButtons();
   updateCprPanel();
   updateStickyMonitor();
+  document.getElementById('caseTimeTop').classList.remove('on');
 }
 
 // Al salir de un caso, el monitor vuelve al ritmo y las constantes que había antes de iniciarlo
@@ -2496,6 +2510,8 @@ function applyScenarioAtTime(t){
   document.getElementById('caseNarrative').textContent = a.label;
   const totalT = kfs[kfs.length-1].t;
   document.getElementById('caseTime').textContent = formatTime(t)+' / '+formatTime(totalT);
+  const ctt = document.getElementById('caseTimeTop');
+  ctt.textContent = formatTime(t)+' / '+formatTime(totalT); ctt.classList.add('on');
   document.getElementById('caseProgress').style.width = (100*clamp(t/totalT,0,1))+'%';
 
   if(t >= totalT){ scenario.playing = false; document.getElementById('btnPlay').textContent = '▶ Iniciar'; }
