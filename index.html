@@ -260,7 +260,7 @@
       height:calc(100dvh - var(--header-h, 0px) - 16px);
       grid-template-rows:minmax(0,1fr) auto; align-items:stretch;
     }
-    body.role-instructor .waves{ grid-column:1; grid-row:1; position:static; height:auto; min-height:0; }
+    body.role-instructor .waves{ grid-column:1; grid-row:1; position:relative; top:auto; height:auto; min-height:0; }
     body.role-instructor .vitals{ grid-column:1; grid-row:2; grid-template-columns:repeat(3, minmax(0,1fr)); gap:5px; }
     body.role-instructor #cardBp{ grid-column:span 2; }
     body.role-instructor .vital-card{ padding:4px 8px; }
@@ -826,45 +826,43 @@
     body .waves.expanded{ width:96vw !important; height:92vh !important; }
   }
   body.waves-open{ overflow:hidden; }
-  /* constantes dentro de la ventana ampliada */
+  /* constantes dentro de la ventana ampliada: fila inferior, una al lado de otra.
+     Los tamaños usan unidades del contenedor (cqw/cqh) para que funcionen igual cuando la
+     ventana se gira en el móvil en vertical. */
   .wx-vitals{ display:none; }
   body .waves.expanded{
-    display:grid !important; grid-template-columns:minmax(0,1fr) clamp(150px,19vw,230px);
-    grid-template-rows:5fr 3fr 2.4fr; column-gap:10px;
+    display:grid !important; container-type:size;
+    grid-template-columns:minmax(0,1fr); grid-template-rows:5fr 3fr 2.4fr 3.4fr;
   }
   body .waves.expanded .trace-row{ grid-column:1; }
   body .waves.expanded .trace-row:nth-child(1){ grid-row:1; }
   body .waves.expanded .trace-row:nth-child(2){ grid-row:2; }
   body .waves.expanded .trace-row:nth-child(3){ grid-row:3; }
   body .waves.expanded .wx-vitals{
-    grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; gap:6px; min-height:0; padding-bottom:42px;
+    grid-column:1; grid-row:4; display:grid; grid-template-columns:1.1fr 1fr 1.35fr 1fr;
+    gap:1.2cqw; min-height:0; padding:1cqh calc(min(36px,9cqh) + 1.5cqw) 0 0;
   }
   .wx-card{
-    flex:1 1 0; min-height:0; display:flex; flex-direction:column; justify-content:center;
-    border:1px solid #1c2528; border-radius:6px; padding:4px 10px; background:rgba(255,255,255,.02); overflow:hidden;
+    min-height:0; min-width:0; display:flex; flex-direction:column; justify-content:center;
+    border:1px solid rgba(120,140,145,.28); border-radius:6px; padding:.6cqh 1.4cqw; overflow:hidden;
+    background:rgba(24,34,38,.4);
   }
   .wx-card.alarm{ animation:alarmPulse 1s infinite; border-color:var(--alarm); }
-  .wx-top{ display:flex; justify-content:space-between; font-size:11px; letter-spacing:.06em; color:#8a979b; text-transform:uppercase; }
-  .wx-val{ font-family:var(--font-num); font-weight:bold; line-height:1.05;
-    font-size:clamp(22px,min(4.2vw,7vh),52px); text-shadow:0 0 10px currentColor; white-space:nowrap; text-align:right; }
-  .wx-card[data-src="Hr"] .wx-val{ font-size:clamp(28px,min(5.4vw,9vh),68px); }
-  .wx-card[data-src="Bp"] .wx-val{ font-size:clamp(20px,min(3.4vw,6vh),44px); }
+  .wx-top{ display:flex; justify-content:space-between; gap:6px; font-size:clamp(9px,2.6cqh,13px);
+    letter-spacing:.06em; color:#8a979b; text-transform:uppercase; }
   .wx-top span:last-child{ text-transform:none; letter-spacing:0; }
+  .wx-val{ font-family:var(--font-num); font-weight:bold; line-height:1.05; white-space:nowrap; text-align:right;
+    font-size:min(14cqh,6.2cqw); text-shadow:0 0 10px currentColor; }
+  .wx-card[data-src="Bp"] .wx-val{ font-size:min(12cqh,4.4cqw); }
+  .wx-sub{ font-size:clamp(9px,2.4cqh,12px); color:#8a979b; text-align:right; }
   body .waves.expanded .wave-clock{ top:4px !important; right:10px !important; font-size:12px; }
-  .wx-sub{ font-size:11px; color:#8a979b; text-align:right; }
-  /* pantallas estrechas en vertical: constantes en una fila debajo de las ondas */
+  body .waves.expanded .waves-expand-btn{ width:min(36px,9cqh); height:min(36px,9cqh); }
+  /* móvil en vertical: la ventana se gira 90° para verse en horizontal */
   @media (max-width:760px) and (orientation:portrait){
-    body .waves.expanded{ grid-template-columns:minmax(0,1fr); grid-template-rows:5fr 3fr 2.4fr auto; }
-    body .waves.expanded .wx-vitals{ grid-column:1; grid-row:4; display:grid; grid-template-columns:repeat(3,1fr); padding:6px 0 44px; }
-    body .waves.expanded .wx-card{ padding:6px 8px; }
-    body .waves.expanded .wx-card .wx-val{ font-size:26px; }
-    body .waves.expanded .wx-card[data-src="Bp"] .wx-val{ font-size:20px; }
-  }
-  @media (orientation:landscape) and (max-height:560px){
-    body .waves.expanded .wx-vitals{ gap:4px; padding-bottom:40px; }
-    .wx-card{ padding:2px 8px; }
-    .wx-top{ font-size:9px; }
-    .wx-sub{ display:none; }
+    body .waves.expanded{
+      width:94dvh !important; height:94vw !important;
+      transform:translate(-50%,-50%) rotate(90deg);
+    }
   }
 
 </style>
@@ -1067,7 +1065,6 @@
           <div class="wx-card" data-src="Spo2"><div class="wx-top"><span>SpO₂</span><span>%</span></div><div class="wx-val c-spo2"></div></div>
           <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
-          <div class="wx-card" data-src="Temp"><div class="wx-top"><span>Tª</span><span>°C</span></div><div class="wx-val c-temp"></div></div>
         </div>
         <button type="button" class="waves-expand-btn" id="wavesExpandBtn" onclick="toggleWavesExpand()" aria-label="Ampliar monitor" title="Ampliar monitor">
           <svg class="ic-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>
@@ -2950,8 +2947,10 @@ function makeSweeper(canvasId, color, sweepSeconds, glow){
   let buffer=[], cursor=0, gap=14, fracAdvance=0;
 
   function resize(){
-    const rect = canvas.parentElement.getBoundingClientRect();
-    W = Math.floor(rect.width); H = Math.floor(rect.height);
+    // clientWidth/Height (y no getBoundingClientRect) para no verse afectado por el giro
+    // del monitor ampliado en el móvil en vertical
+    const par = canvas.parentElement;
+    W = Math.floor(par.clientWidth); H = Math.floor(par.clientHeight);
     canvas.width = W*dpr; canvas.height = H*dpr;
     canvas.style.width=W+'px'; canvas.style.height=H+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
