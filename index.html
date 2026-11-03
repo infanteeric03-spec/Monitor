@@ -419,6 +419,20 @@
   .case-label-row label{ font-size:11px; color:var(--text-dim); letter-spacing:.05em; text-transform:uppercase; }
   /* tiempo del caso junto a "Caso clínico": solo en el móvil en horizontal (ahí se quita de la fila de cronología) */
   .case-time-top{ display:none; font-family:var(--font-num); font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  /* Móvil en vertical: el tiempo pasa junto a "Caso clínico", ▶ sin texto, y la velocidad es un
+     botón más al final de la fila (x1 por defecto; al pulsarlo se elige en un desplegable) */
+  @media (max-width:760px){
+    body.role-instructor .case-time-top.on{ display:inline; }
+    body.role-instructor .case-time{ display:none; }
+    body.role-instructor .case-player{ grid-template-columns:repeat(6, minmax(0,1fr)); max-width:none; }
+    body.role-instructor .case-player .play-lbl{ display:none; }
+    body.role-instructor #btnPlay{ font-size:16px; line-height:1; }
+    body.role-instructor #speedSelect + .csel-btn{
+      display:flex; justify-content:center; gap:4px; height:100%; padding:8px 4px;
+      font-family:var(--font-num); font-size:12.5px; border-radius:5px;
+    }
+    body.role-instructor #speedSelect + .csel-btn .csel-text{ flex:0 1 auto; }
+  }
   @media (orientation:landscape) and (max-height:560px){
     body.role-instructor .case-time-top.on{ display:inline; }
     body.role-instructor .case-time #caseTime{ display:none; }
@@ -429,6 +443,8 @@
   .case-player{ display:grid; grid-template-columns:1fr 2fr 1fr 1fr 1fr; gap:6px; max-width:560px; }
   .case-player .casebtn{ width:100%; padding:8px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .case-player .lbl{ display:none; }
+  /* la velocidad en la fila de botones solo se usa en el móvil (ver más abajo) */
+  #speedSelect + .csel-btn{ display:none; }
   @media (min-width:761px){ .case-player .lbl{ display:inline; } }
   .case-edit-btns{ margin-top:8px; display:none; }
   .case-edit-btns.show{ display:flex; }
@@ -1033,10 +1049,17 @@
                 </div>
                 <div class="case-player">
                   <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior">⏮</button>
-                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled>▶ Iniciar</button>
+                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled>▶<span class="play-lbl"> Iniciar</span></button>
                   <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente">⏭</button>
                   <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso">⟲<span class="lbl"> Reiniciar</span></button>
                   <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled title="Salir del caso (modo manual)">✕<span class="lbl"> Salir</span></button>
+                  <!-- velocidad del caso (en el móvil en vertical; en pantallas grandes está junto a "Cronología") -->
+                  <select id="speedSelect" class="speed-select" data-popw="130" onchange="setCaseSpeed(parseFloat(this.value))" disabled aria-label="Velocidad del caso">
+                    <option value="0.5">x0,5</option>
+                    <option value="1" selected>x1</option>
+                    <option value="2">x2</option>
+                    <option value="4">x4</option>
+                  </select>
                 </div>
               </div>
               <div class="casebtns case-edit-btns">
@@ -2096,6 +2119,14 @@ const scenario = { active:false, playing:false, key:null, t:0, noPulseOverride:f
 function setCaseSpeed(v){
   scenario.speed = v;
   document.querySelectorAll('.speed-seg button').forEach(b=>b.classList.toggle('on', +b.dataset.speed===v));
+  const ss = document.getElementById('speedSelect');
+  if(ss && parseFloat(ss.value)!==v) ss.value = String(v);
+}
+
+// Botón de iniciar/pausar: el texto va en un <span> que en el móvil en vertical se oculta (solo icono)
+function setPlayLabel(mode){
+  const m = { start:['▶','Iniciar'], resume:['▶','Continuar'], pause:['⏸','Pausar'] }[mode];
+  document.getElementById('btnPlay').innerHTML = m[0]+'<span class="play-lbl"> '+m[1]+'</span>';
 }
 
 /* ---------- Casos clínicos personalizados (guardados en Supabase) ---------- */
@@ -2442,7 +2473,8 @@ function onCaseSelect(key){
   document.getElementById('btnNextStep').disabled = false;
   document.getElementById('btnReset').disabled = false;
   document.getElementById('btnStop').disabled = false;
-  document.getElementById('btnPlay').textContent = '▶ Iniciar';
+  document.getElementById('speedSelect').disabled = false;
+  setPlayLabel('start');
   updateCaseActionButtons();
   applyScenarioAtTime(0);
   updateStickyMonitor();
@@ -2451,7 +2483,7 @@ function onCaseSelect(key){
 function togglePlay(){
   if(!scenario.active) return;
   scenario.playing = !scenario.playing;
-  document.getElementById('btnPlay').textContent = scenario.playing ? '⏸ Pausar' : '▶ Continuar';
+  setPlayLabel(scenario.playing ? 'pause' : 'resume');
 
   // Al arrancar el caso, si no está sincronizado se sugiere activarlo (solo una vez por caso):
   // si no, los cambios que va generando el caso no llegarán al monitor hasta pulsar "Enviar".
@@ -2467,7 +2499,7 @@ function togglePlay(){
 function stepScenario(direction){
   if(!scenario.active) return;
   scenario.playing = false;
-  document.getElementById('btnPlay').textContent = '▶ Continuar';
+  setPlayLabel('resume');
   const kfs = getCase(scenario.key).keyframes;
   let idx = 0;
   for(let i=0;i<kfs.length;i++){ if(kfs[i].t<=scenario.t+0.01) idx = i; }
@@ -2480,7 +2512,7 @@ function resetScenario(){
   if(!scenario.active) return;
   scenario.t = 0;
   scenario.playing = false;
-  document.getElementById('btnPlay').textContent = '▶ Iniciar';
+  setPlayLabel('start');
   applyScenarioAtTime(0);
 }
 
@@ -2495,6 +2527,7 @@ function stopScenario(){
   document.getElementById('btnNextStep').disabled = true;
   document.getElementById('btnReset').disabled = true;
   document.getElementById('btnStop').disabled = true;
+  document.getElementById('speedSelect').disabled = true;
   enableManualControls(true);
   scenario.noPulseOverride = false;
   restoreCaseBaseline();
@@ -2566,7 +2599,7 @@ function applyScenarioAtTime(t){
   ctt.textContent = formatTime(t)+' / '+formatTime(totalT); ctt.classList.add('on');
   document.getElementById('caseProgress').style.width = (100*clamp(t/totalT,0,1))+'%';
 
-  if(t >= totalT){ scenario.playing = false; document.getElementById('btnPlay').textContent = '▶ Iniciar'; }
+  if(t >= totalT){ scenario.playing = false; setPlayLabel('start'); }
   updateCprPanel();
 }
 
@@ -3271,7 +3304,8 @@ refreshThemeUI();
   function place(sel){
     const p = getPop(), r = sel._cselBtn.getBoundingClientRect();
     const vw = innerWidth, vh = innerHeight, m = 8;
-    const w = Math.min(Math.max(r.width, 240), vw - 2*m);
+    const minW = sel.dataset.popw ? +sel.dataset.popw : 240;   // ancho mínimo de la lista (p. ej. la velocidad, más estrecha)
+    const w = Math.min(Math.max(r.width, minW), vw - 2*m);
     p.style.width = w+'px';
     p.style.left = Math.min(Math.max(m, r.left), vw - w - m)+'px';
     const below = vh - r.bottom - m, above = r.top - m;
