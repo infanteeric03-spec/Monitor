@@ -1015,17 +1015,6 @@
   .rhythm-pick .csel-btn{ flex:1 1 auto; }
   .rhythm-send{ flex:0 0 auto; white-space:nowrap; display:flex; align-items:center; gap:2px; }
   .rhythm-send.sent{ background:rgba(53,255,107,.12); }
-  #rhythmNameCard{
-    position:fixed; left:50%; top:calc(var(--header-h, 56px) + 14px); transform:translate(-50%,-8px); z-index:45;
-    min-width:min(88vw,280px); max-width:min(92vw,560px); padding:12px 44px 12px 18px; border-radius:10px;
-    background:rgba(5,8,10,.94); border:1px solid #2a3a33; border-left:4px solid #35ff6b; color:#e6f2ee;
-    box-shadow:0 12px 36px rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-  }
-  #rhythmNameCard.open{ opacity:1; transform:translate(-50%,0); pointer-events:auto; }
-  #rhythmNameCard .rn-k{ font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#6f8a80; }
-  #rhythmNameCard .rn-t{ font-size:clamp(18px,4.2vw,28px); font-weight:800; line-height:1.2; margin-top:2px; text-wrap:balance; }
-  #rhythmNameCard .rn-close{ position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:6px;
-    background:transparent; border:1px solid #2a3a33; color:#9fb3ac; font-size:18px; cursor:pointer; line-height:1; }
 
   /* móvil en vertical (instructor): las constantes van justo debajo del monitor y las pestañas
      (Ritmo / Caso clínico / Preguntas) después */
@@ -1035,6 +1024,44 @@
     body.role-instructor .monitor > .monitor-left > .waves-placeholder{ order:1; }
     body.role-instructor .monitor > .vitals{ order:2; }
     body.role-instructor .monitor > .monitor-left > .tabs-panel{ order:3; }
+  }
+
+  /* ficha plegable (instructor) */
+  .rhythm-info .ri-head{ display:flex; align-items:center; gap:8px; width:100%; background:none; border:none; padding:0; margin:0;
+    color:var(--text); font-family:inherit; text-align:left; cursor:pointer; }
+  .ri-head-k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); flex-shrink:0; }
+  .ri-head-t{ flex:1; min-width:0; font-size:14px; font-weight:700; text-wrap:balance; }
+  .ri-chev{ width:14px; height:14px; flex-shrink:0; color:var(--text-dim); transform:rotate(180deg); transition:transform .15s; }
+  .rhythm-info.collapsed .ri-chev{ transform:none; }
+  .rhythm-info .ri-body{ margin-top:10px; }
+  .rhythm-info.collapsed .ri-body{ display:none; }
+  .rhythm-info.collapsed{ padding-top:10px; padding-bottom:10px; }
+  @media (max-width:420px){ .ri-head-k{ display:none; } }
+  /* ficha enviada al alumno, debajo de las constantes */
+  .rhythm-share{ display:none; position:relative; margin-top:10px; }
+  .rhythm-share.open{ display:block; }
+  .rhythm-share .rs-title{ font-size:20px; margin:2px 40px 10px 0; }
+  .rhythm-share .rn-close{ position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:6px;
+    background:transparent; border:1px solid var(--line); color:var(--text-dim); font-size:18px; cursor:pointer; line-height:1; }
+  .ri-thumb.ri-thumb-big{ float:none; width:100%; max-width:560px; margin:0 0 12px; }
+  .ri-thumb.ri-thumb-big .ri-thumb-tag{ font-size:10.5px; padding:2px 7px; left:6px; bottom:6px; }
+  .ri-thumb.ri-thumb-big .ri-thumb-tag svg{ width:10px; height:10px; }
+  body.role-instructor .rhythm-share{ display:none !important; }
+
+  /* ---------- Vista del alumno: tarjetas de constantes más compactas y sin descripciones ---------- */
+  body.role-monitor .vital-sub{ display:none; }
+  body.role-monitor #cardBp .vital-sub{ display:block; }
+  @media (max-width:760px){
+    body.role-monitor .vitals{ grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; }
+    body.role-monitor .vitals #cardHr, body.role-monitor .vitals #cardSpo2{ grid-column:span 3; }
+    body.role-monitor .vitals #cardResp, body.role-monitor .vitals #cardTemp, body.role-monitor .vitals #cardBp{ grid-column:span 2; }
+    body.role-monitor .vitals .vital-card{ padding:6px 9px; }
+    body.role-monitor .vitals .vital-name, body.role-monitor .vitals .vital-unit{ font-size:9.5px; }
+    body.role-monitor .vitals #cardHr .vital-value, body.role-monitor .vitals #cardSpo2 .vital-value{ font-size:30px; }
+    body.role-monitor .vitals #cardResp .vital-value, body.role-monitor .vitals #cardTemp .vital-value{ font-size:22px; }
+    body.role-monitor .vitals #cardBp .vital-value{ font-size:clamp(15px,4.6vw,22px); white-space:nowrap; }
+    body.role-monitor .vitals #cardBp .vital-sub{ font-size:9px; }
+    body.role-monitor .vitals #cardBp .vital-unit{ display:none; }
   }
 </style>
 </head>
@@ -1530,6 +1557,7 @@
     </div>
   </div>
 
+  <section id="rhythmShare" class="rhythm-info rhythm-share" aria-live="polite"></section>
   <p class="note">Simulador educativo con fines de práctica clínica/formación. Las formas de onda son aproximaciones esquemáticas, no señales fisiológicas reales, y no deben usarse para diagnóstico ni interpretación clínica real.</p>
 
 
@@ -1571,11 +1599,6 @@
     <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas></div>
     <div class="ecg12-foot">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
   </div>
-</div>
-<div id="rhythmNameCard" role="status" aria-live="assertive">
-  <div class="rn-k">Ritmo</div>
-  <div class="rn-t" id="rhythmNameText"></div>
-  <button type="button" class="rn-close" onclick="hideRhythmName()" aria-label="Cerrar">×</button>
 </div>
 <div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
   <div class="quiz-card">
@@ -1688,7 +1711,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'state'}, (msg)=> applyRemoteState(msg.payload));
     channel.on('broadcast', {event:'question'}, (msg)=> showQuestionOnMonitor(msg.payload));
     channel.on('broadcast', {event:'question_clear'}, ()=> hideQuestionOnMonitor());
-    channel.on('broadcast', {event:'rhythm_name'}, (msg)=> showRhythmName(msg.payload && msg.payload.name));
+    channel.on('broadcast', {event:'rhythm_name'}, (msg)=> msg.payload && showRhythmShare(msg.payload.key, msg.payload.name));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -4014,20 +4037,49 @@ var RHYTHM_INFO = {
     e:['Línea prácticamente plana, sin QRS','Pueden verse ondas P aisladas (asistolia con ondas P o "asistolia ventricular")'],
     c:'Ritmo no desfibrilable: RCP de alta calidad y adrenalina lo antes posible. Antes de confirmarla comprueba electrodos, cables, ganancia y al menos dos derivaciones, para no confundirla con una FV fina. Busca y trata causas reversibles (4H y 4T). Si hay ondas P, valora la estimulación con marcapasos.' }
 };
-function updateRhythmInfo(r){
-  const el = document.getElementById('rhythmInfo');
-  if(!el) return;
-  const i = RHYTHM_INFO && RHYTHM_INFO[r];
-  if(!RHYTHM_INFO) return;
-  if(!i){ el.innerHTML = ''; return; }
-  el.innerHTML = '<button type="button" class="ri-thumb" onclick="openEcg12(\''+r+'\')" aria-label="Ver ECG de 12 derivaciones de '+escapeHtml(i.t)+'">'
+function rhythmThumbHTML(r, i, big){
+  return '<button type="button" class="ri-thumb'+(big?' ri-thumb-big':'')+'" onclick="openEcg12(\''+r+'\')" aria-label="Ver ECG de 12 derivaciones de '+escapeHtml(i.t)+'">'
     + '<img src="'+ecg12Thumb(r)+'" alt="" width="440" height="214">'
-    + '<span class="ri-thumb-tag"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>12 D</span></button>'
-    + '<h3>'+escapeHtml(i.t)+'</h3><p>'+escapeHtml(i.d)+'</p>'
+    + '<span class="ri-thumb-tag"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>'+(big?'ECG de 12 derivaciones':'12 D')+'</span></button>';
+}
+function rhythmBodyHTML(i){
+  return '<p>'+escapeHtml(i.d)+'</p>'
     + '<div class="ri-k">Claves en el ECG</div><ul>'+i.e.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>'
     + '<div class="ri-k">A tener en cuenta</div><p>'+escapeHtml(i.c)+'</p>'
     + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
 }
+const RI_CHEV = '<svg class="ri-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
+let rhythmInfoCollapsed = false;
+try{ rhythmInfoCollapsed = localStorage.getItem('monitor-ri-collapsed')==='1'; }catch(e){}
+function toggleRhythmInfo(){
+  rhythmInfoCollapsed = !rhythmInfoCollapsed;
+  try{ localStorage.setItem('monitor-ri-collapsed', rhythmInfoCollapsed?'1':'0'); }catch(e){}
+  const el = document.getElementById('rhythmInfo');
+  el.classList.toggle('collapsed', rhythmInfoCollapsed);
+  const h = el.querySelector('.ri-head'); if(h) h.setAttribute('aria-expanded', rhythmInfoCollapsed?'false':'true');
+}
+function updateRhythmInfo(r){
+  const el = document.getElementById('rhythmInfo');
+  if(!el) return;
+  if(!RHYTHM_INFO) return;
+  const i = RHYTHM_INFO[r];
+  if(!i){ el.innerHTML = ''; return; }
+  el.classList.toggle('collapsed', rhythmInfoCollapsed);
+  el.innerHTML = '<button type="button" class="ri-head" onclick="toggleRhythmInfo()" aria-expanded="'+(rhythmInfoCollapsed?'false':'true')+'" aria-controls="rhythmInfoBody">'
+    + '<span class="ri-head-k">Ficha del ritmo</span><span class="ri-head-t">'+escapeHtml(i.t)+'</span>'+RI_CHEV+'</button>'
+    + '<div class="ri-body" id="rhythmInfoBody">'+rhythmThumbHTML(r,i,false)+rhythmBodyHTML(i)+'</div>';
+}
+/* vista del alumno: ficha enviada por el instructor, debajo de las constantes */
+function showRhythmShare(key, name){
+  const el = document.getElementById('rhythmShare'); if(!el) return;
+  const i = RHYTHM_INFO[key];
+  el.innerHTML = '<button type="button" class="rn-close" onclick="hideRhythmShare()" aria-label="Cerrar ficha">×</button>'
+    + '<div class="ri-head-k">Ritmo</div><h3 class="rs-title">'+escapeHtml(i ? i.t : (name||''))+'</h3>'
+    + (i ? rhythmThumbHTML(key,i,true) + rhythmBodyHTML(i) : '');
+  el.classList.add('open');
+  el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest' });
+}
+function hideRhythmShare(){ const el=document.getElementById('rhythmShare'); if(el){ el.classList.remove('open'); el.innerHTML=''; } }
 updateRhythmInfo(document.getElementById('rhythmSelect').value || 'nsr');
 
 
@@ -4041,17 +4093,11 @@ function sendRhythmName(){
   if(role!=='instructor' || !channel){
     lbl.textContent = ' Sin conexión'; setTimeout(()=>{ lbl.textContent = ' Enviar'; }, 1800); return;
   }
-  channel.send({ type:'broadcast', event:'rhythm_name', payload:{ name } });
+  channel.send({ type:'broadcast', event:'rhythm_name', payload:{ key:state.rhythm, name } });
   btn.classList.add('sent'); lbl.textContent = ' Enviado';
   clearTimeout(sendRhythmName._t);
   sendRhythmName._t = setTimeout(()=>{ btn.classList.remove('sent'); lbl.textContent = ' Enviar'; }, 1800);
 }
-function showRhythmName(name){
-  if(!name) return;
-  document.getElementById('rhythmNameText').textContent = name;
-  document.getElementById('rhythmNameCard').classList.add('open');
-}
-function hideRhythmName(){ document.getElementById('rhythmNameCard').classList.remove('open'); }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
