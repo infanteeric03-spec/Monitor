@@ -1009,6 +1009,23 @@
   @media (max-width:760px) and (orientation:portrait){
     .ecg12-box{ width:94dvh; height:94vw; transform:translate(-50%,-50%) rotate(90deg); }
   }
+
+  /* ---------- Enviar el nombre del ritmo al alumno ---------- */
+  .rhythm-pick{ display:flex; gap:8px; align-items:stretch; }
+  .rhythm-pick .csel-btn{ flex:1 1 auto; }
+  .rhythm-send{ flex:0 0 auto; white-space:nowrap; display:flex; align-items:center; gap:2px; }
+  .rhythm-send.sent{ background:rgba(53,255,107,.12); }
+  #rhythmNameCard{
+    position:fixed; left:50%; top:calc(var(--header-h, 56px) + 14px); transform:translate(-50%,-8px); z-index:45;
+    min-width:min(88vw,280px); max-width:min(92vw,560px); padding:12px 44px 12px 18px; border-radius:10px;
+    background:rgba(5,8,10,.94); border:1px solid #2a3a33; border-left:4px solid #35ff6b; color:#e6f2ee;
+    box-shadow:0 12px 36px rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+  }
+  #rhythmNameCard.open{ opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+  #rhythmNameCard .rn-k{ font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#6f8a80; }
+  #rhythmNameCard .rn-t{ font-size:clamp(18px,4.2vw,28px); font-weight:800; line-height:1.2; margin-top:2px; text-wrap:balance; }
+  #rhythmNameCard .rn-close{ position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:6px;
+    background:transparent; border:1px solid #2a3a33; color:#9fb3ac; font-size:18px; cursor:pointer; line-height:1; }
 </style>
 </head>
 <body>
@@ -1237,6 +1254,7 @@
             <div class="controls">
               <div>
                 <label>Ritmo cardiaco</label>
+                <div class="rhythm-pick">
                 <select id="rhythmSelect" onchange="setRhythm(this.value)">
                   <option value="nsr">Ritmo sinusal normal</option>
                   <option value="stach">Taquicardia sinusal</option>
@@ -1254,6 +1272,8 @@
                   <option value="vfib">Fibrilación ventricular</option>
                   <option value="asystole">Asistolia</option>
                 </select>
+                <button type="button" class="casebtn primary rhythm-send" id="btnSendRhythm" onclick="sendRhythmName()" title="Enviar al alumno el nombre del ritmo" aria-label="Enviar al alumno el nombre del ritmo"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></button>
+                </div>
               </div>
               <span class="badge" id="pulseBadge">— pulso presente —</span>
 
@@ -1542,6 +1562,11 @@
     <div class="ecg12-foot">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
   </div>
 </div>
+<div id="rhythmNameCard" role="status" aria-live="assertive">
+  <div class="rn-k">Ritmo</div>
+  <div class="rn-t" id="rhythmNameText"></div>
+  <button type="button" class="rn-close" onclick="hideRhythmName()" aria-label="Cerrar">×</button>
+</div>
 <div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
   <div class="quiz-card">
     <div class="qtext" id="quizCardText"></div>
@@ -1653,6 +1678,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'state'}, (msg)=> applyRemoteState(msg.payload));
     channel.on('broadcast', {event:'question'}, (msg)=> showQuestionOnMonitor(msg.payload));
     channel.on('broadcast', {event:'question_clear'}, ()=> hideQuestionOnMonitor());
+    channel.on('broadcast', {event:'rhythm_name'}, (msg)=> showRhythmName(msg.payload && msg.payload.name));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -3993,6 +4019,29 @@ function updateRhythmInfo(r){
     + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
 }
 updateRhythmInfo(document.getElementById('rhythmSelect').value || 'nsr');
+
+
+/* ---------- Enviar al alumno el nombre del ritmo que se está viendo ---------- */
+function sendRhythmName(){
+  const btn = document.getElementById('btnSendRhythm');
+  const sel = document.getElementById('rhythmSelect');
+  const opt = sel.options[sel.selectedIndex];
+  const name = (RHYTHM_INFO[state.rhythm] && RHYTHM_INFO[state.rhythm].t) || (opt && opt.textContent) || '';
+  const lbl = btn.querySelector('.lbl');
+  if(role!=='instructor' || !channel){
+    lbl.textContent = ' Sin conexión'; setTimeout(()=>{ lbl.textContent = ' Enviar'; }, 1800); return;
+  }
+  channel.send({ type:'broadcast', event:'rhythm_name', payload:{ name } });
+  btn.classList.add('sent'); lbl.textContent = ' Enviado';
+  clearTimeout(sendRhythmName._t);
+  sendRhythmName._t = setTimeout(()=>{ btn.classList.remove('sent'); lbl.textContent = ' Enviar'; }, 1800);
+}
+function showRhythmName(name){
+  if(!name) return;
+  document.getElementById('rhythmNameText').textContent = name;
+  document.getElementById('rhythmNameCard').classList.add('open');
+}
+function hideRhythmName(){ document.getElementById('rhythmNameCard').classList.remove('open'); }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
