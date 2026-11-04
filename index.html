@@ -1026,6 +1026,16 @@
   #rhythmNameCard .rn-t{ font-size:clamp(18px,4.2vw,28px); font-weight:800; line-height:1.2; margin-top:2px; text-wrap:balance; }
   #rhythmNameCard .rn-close{ position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:6px;
     background:transparent; border:1px solid #2a3a33; color:#9fb3ac; font-size:18px; cursor:pointer; line-height:1; }
+
+  /* móvil en vertical (instructor): las constantes van justo debajo del monitor y las pestañas
+     (Ritmo / Caso clínico / Preguntas) después */
+  @media (max-width:760px){
+    body.role-instructor .monitor-left{ display:contents; }
+    body.role-instructor .monitor > .monitor-left > .waves,
+    body.role-instructor .monitor > .monitor-left > .waves-placeholder{ order:1; }
+    body.role-instructor .monitor > .vitals{ order:2; }
+    body.role-instructor .monitor > .monitor-left > .tabs-panel{ order:3; }
+  }
 </style>
 </head>
 <body>
