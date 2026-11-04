@@ -349,13 +349,24 @@
   }
   .stepper button:active{ background:var(--hover); }
   .stepper button:hover:not(:disabled){ border-color:var(--text-dim); }
-  /* tablet / ordenador: la TA usa dos filas (sistólica arriba, diastólica abajo) para que
-     botones y casillas tengan aire a los lados */
+  /* tablet / ordenador (instructor): como en el móvil, los mandos −/+ van a la derecha del valor,
+     sin la casilla del número ni el texto descriptivo. En la TA, la pareja de la sistólica va
+     arriba y la de la diastólica abajo, en el mismo orden en que se lee "120/78". */
   @media (min-width:761px) and (min-height:561px){
-    #cardBp .stepper{ flex-wrap:wrap; gap:4px; }
-    #cardBp .stepper > *{ box-sizing:border-box; }
-    #cardBp .stepper > button{ flex:0 0 44px; }
-    #cardBp .stepper > input{ flex:1 1 calc(100% - 96px); }
+    body.role-instructor .vital-card{
+      display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto auto;
+      column-gap:10px; align-items:center;
+    }
+    body.role-instructor .vital-card .vital-top{ grid-column:1 / -1; }
+    body.role-instructor .vital-card .vital-value{ grid-column:1; grid-row:2; min-width:0; white-space:nowrap; }
+    body.role-instructor .vital-card .vital-sub{ display:none; }
+    body.role-instructor #cardBp .vital-sub{ display:block; grid-column:1; grid-row:3; }
+    body.role-instructor .vital-card .stepper{ grid-column:2; grid-row:2 / 4; margin:0; display:flex; gap:6px; flex-wrap:nowrap; align-self:center; }
+    body.role-instructor .vital-card .stepper input{ display:none; }
+    body.role-instructor .vital-card .stepper > button{ flex:0 0 auto; min-width:44px; padding:8px 10px; font-size:14px; }
+    body.role-instructor #cardBp .vital-value{ font-size:26px; }
+    body.role-instructor #cardBp .stepper{ display:grid; grid-template-columns:auto auto; gap:6px; }
+    body.role-instructor #cardBp .stepper > button{ min-width:38px; padding:6px 8px; }
   }
   .stepper input{
     flex:1 1 0; width:100%; min-width:48px; background:var(--field); border:1px solid var(--line); color:var(--btn-text);
@@ -3240,7 +3251,7 @@ const GUIDE_STEPS = {
     ...GUIDE_MONITOR_PARTS,
     { text:'Ahora, los controles del instructor.', sub:'Todo lo que cambies aquí lo verá el alumno en su monitor.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
-    { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante…', sub:'…o escribe el valor directamente.' },
+    { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante.', sub:'La cifra grande cambia al momento.' },
     { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
     { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
