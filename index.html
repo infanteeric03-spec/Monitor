@@ -957,6 +957,17 @@
   #gate .gate-btn.secondary{ border-color:#1d2a25; color:#9fb3ac; }
   #gate .gate-status{ color:var(--g-dim); }
   .gate-foot{ position:absolute; left:0; right:0; bottom:max(16px, env(safe-area-inset-bottom)); text-align:center; font-size:10.5px; color:#4f625b; }
+  /* tablet / ordenador: Instructor y Alumno uno al lado del otro. El bloque se centra en la
+     pantalla sin contar la mitad superior del trazo de ECG (margen negativo de medio trazo). */
+  @media (min-width:761px) and (min-height:601px){
+    #gate .gate-box{ max-width:720px; }
+    #gate .gate-ecg{ height:120px; margin-top:-60px; }
+    #gate .gate-box h2.gate-title{ font-size:36px; }
+    #gate .gate-box p{ font-size:14px; margin-bottom:28px; }
+    #gate .role-cards{ flex-direction:row; gap:18px; }
+    #gate .role-card{ flex:1 1 0; padding:18px 18px 18px 22px; }
+    #gate #gateRoomStep{ max-width:400px; margin:0 auto; }
+  }
   @media (max-height:600px){ .gate-ecg{ height:56px; } #gate .gate-box h2.gate-title{ font-size:24px; } .gate-foot{ display:none; } }
   @media (prefers-reduced-motion: reduce){ .gate-ecg path{ animation:none !important; stroke-dashoffset:0; opacity:1; } }
 
