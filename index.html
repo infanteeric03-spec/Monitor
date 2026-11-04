@@ -972,6 +972,17 @@
   @media (prefers-reduced-motion: reduce){ .gate-ecg path{ animation:none !important; stroke-dashoffset:0; opacity:1; } }
 
   .quiz-cat + .csel-btn{ margin-bottom:6px; }
+
+  /* ---------- Ficha del ritmo seleccionado ---------- */
+  .rhythm-info{ margin-top:14px; border:1px solid var(--line); border-left:3px solid var(--ecg); border-radius:6px;
+    padding:12px 14px; background:var(--field); font-size:13px; line-height:1.55; color:var(--text); }
+  .rhythm-info:empty{ display:none; }
+  .rhythm-info h3{ margin:0 0 6px; font-size:14px; font-weight:700; color:var(--text); text-wrap:balance; }
+  .rhythm-info p{ margin:0 0 8px; text-wrap:pretty; }
+  .rhythm-info .ri-k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin:10px 0 3px; }
+  .rhythm-info ul{ margin:0 0 4px; padding-left:18px; }
+  .rhythm-info li{ margin:2px 0; }
+  .rhythm-info .ri-src{ margin:10px 0 0; font-size:11px; color:var(--text-dim); }
 </style>
 </head>
 <body>
@@ -1228,6 +1239,7 @@
                 <button type="button" class="info-btn" id="pulseInfoBtn" onclick="togglePulseInfo(event)" aria-label="Más información sobre el interruptor de pulso">i</button>
               </div>
             </div>
+            <section class="rhythm-info" id="rhythmInfo" aria-live="polite"></section>
           </div>
 
           <div class="tab-pane" id="paneCase">
@@ -2771,7 +2783,7 @@ function restoreCaseBaseline(){
   state.rhythm = b.rhythm; state.hr = b.hr; state.spo2 = b.spo2; state.sys = b.sys; state.dia = b.dia;
   state.rr = b.rr; state.temp = b.temp;
   pulseManuallyDisabled = b.pulseOff;
-  document.getElementById('rhythmSelect').value = state.rhythm;
+  document.getElementById('rhythmSelect').value = state.rhythm; updateRhythmInfo(state.rhythm);
   document.getElementById('inHr').value = state.hr;
   document.getElementById('inSpo2').value = state.spo2;
   document.getElementById('inSys').value = state.sys;
@@ -2805,7 +2817,7 @@ function applyScenarioAtTime(t){
   state.rhythm = a.rhythm;
   scenario.noPulseOverride = !!a.noPulse;
 
-  document.getElementById('rhythmSelect').value = state.rhythm;
+  document.getElementById('rhythmSelect').value = state.rhythm; updateRhythmInfo(state.rhythm);
   document.getElementById('inHr').value = state.hr;
   document.getElementById('inSpo2').value = state.spo2;
   document.getElementById('inSys').value = state.sys;
@@ -2865,6 +2877,7 @@ const AV_BLOCK_RHYTHMS = ['avb1','wenckebach','mobitz2','avb3'];
 function setRhythm(r){
   if(scenario.active || role==='monitor') return;
   state.rhythm = r;
+  updateRhythmInfo(r);
   state.nextPvcIn = null;
   // reinicia el estado de los bloqueos AV al cambiar de ritmo
   av.atrialTimer = 0; av.ventTimer = 0; av.pAge = 999; av.qAge = 999;
@@ -3669,6 +3682,86 @@ document.querySelectorAll('[role="switch"]').forEach(sw=>{
   const tick = ()=>{ if(gate.style.display!=='none') el.textContent = fmt.format(new Date()); };
   tick(); setInterval(tick, 1000);
 })();
+
+
+/* ---------- Ficha informativa de cada ritmo ----------
+   Definición, claves en el ECG y particularidades clínicas. Basada en las guías de práctica
+   clínica de la ESC adoptadas por la Sociedad Española de Cardiología (SEC) y en las
+   recomendaciones de soporte vital (ERC/AHA). Texto formativo, no sustituye a las guías. */
+var RHYTHM_INFO = {
+  nsr:{ t:'Ritmo sinusal normal',
+    d:'Ritmo que nace en el nódulo sinusal y se conduce con normalidad a los ventrículos, con una frecuencia de 60–100 lpm. Es la referencia con la que se compara cualquier otro ritmo.',
+    e:['Onda P positiva en I, II y aVF y negativa en aVR, antes de cada QRS','PR constante entre 120 y 200 ms','QRS estrecho (< 120 ms) y RR regular'],
+    c:'En jóvenes es normal que la frecuencia varíe con la respiración (arritmia sinusal respiratoria). Un ritmo sinusal en el monitor no garantiza pulso: valora siempre al paciente.' },
+  stach:{ t:'Taquicardia sinusal',
+    d:'Ritmo sinusal con frecuencia superior a 100 lpm. En la gran mayoría de los casos es una respuesta del organismo a otra situación, no una arritmia primaria.',
+    e:['P sinusal de morfología normal delante de cada QRS','Comienzo y final progresivos, no bruscos','A frecuencias altas la P puede quedar montada sobre la T previa'],
+    c:'Busca y trata la causa: dolor, fiebre, ansiedad, hipovolemia o sangrado, anemia, hipoxemia, sepsis, TEP, hipertiroidismo o fármacos/estimulantes. No se trata para "bajar la frecuencia". Una taquicardia fija en torno a 150 lpm debe hacer sospechar un flutter 2:1.' },
+  sbrady:{ t:'Bradicardia sinusal',
+    d:'Ritmo sinusal con frecuencia inferior a 60 lpm (las guías de la ESC/SEC usan < 50 lpm para hablar de bradicardia sinusal clínicamente relevante).',
+    e:['P sinusal normal delante de cada QRS','PR normal y constante','QRS estrecho y RR regular'],
+    c:'Puede ser fisiológica en deportistas y durante el sueño. Causas a descartar: fármacos (betabloqueantes, calcioantagonistas, digoxina, amiodarona), hipotiroidismo, hipotermia, hipertensión intracraneal, IAM inferior o disfunción sinusal. Solo se trata si produce síntomas o signos de inestabilidad, siguiendo el algoritmo de bradicardia.' },
+  afib:{ t:'Fibrilación auricular',
+    d:'Taquiarritmia supraventricular con activación eléctrica auricular desorganizada, sin contracción auricular eficaz. Es la arritmia sostenida más frecuente.',
+    e:['RR irregularmente irregular','Ausencia de ondas P; línea de base con ondas "f" irregulares','QRS habitualmente estrecho (ancho si hay bloqueo de rama o aberrancia)','Para el diagnóstico basta un registro de 12 derivaciones o una tira de ≥ 30 s'],
+    c:'Se clasifica en primer diagnóstico, paroxística, persistente, persistente de larga duración y permanente. El riesgo de ictus obliga a valorar la anticoagulación (escala CHA₂DS₂-VA, guía ESC 2024). El manejo combina control de frecuencia o de ritmo y tratamiento de los factores asociados. Si hay inestabilidad hemodinámica: cardioversión eléctrica sincronizada.' },
+  aflutter:{ t:'Flutter auricular',
+    d:'Taquicardia auricular por un circuito de macrorreentrada. En el flutter típico el circuito pasa por el istmo cavotricuspídeo de la aurícula derecha.',
+    e:['Ondas F "en dientes de sierra" a unos 250–350/min, sin línea isoeléctrica','En el típico antihorario, ondas F negativas en II, III y aVF y positivas en V1','Conducción AV fija (2:1 → unos 150 lpm; 4:1 → unos 75 lpm) o variable'],
+    c:'La frecuencia ventricular es más difícil de controlar con fármacos que en la FA. El riesgo tromboembólico y la indicación de anticoagulación se valoran igual que en la FA. La ablación del istmo cavotricuspídeo es muy eficaz en el flutter típico.' },
+  avb1:{ t:'Bloqueo AV de primer grado',
+    d:'Retraso en la conducción auriculoventricular: todas las ondas P se conducen, pero más despacio de lo normal.',
+    e:['PR > 200 ms y constante','Cada P va seguida de un QRS','QRS habitualmente estrecho'],
+    c:'Suele ser benigno y no necesita tratamiento: aparece en deportistas, por tono vagal o por fármacos frenadores. Conviene vigilarlo si el PR es muy largo (> 300 ms) con síntomas o si se asocia a QRS ancho.' },
+  wenckebach:{ t:'BAV de 2º grado Mobitz I (Wenckebach)',
+    d:'Bloqueo AV en el que algunas P no se conducen, precedido de un alargamiento progresivo de la conducción. El nivel del bloqueo suele ser el nódulo AV.',
+    e:['El PR se alarga latido a latido hasta que una P no va seguida de QRS','Tras la P bloqueada, el PR vuelve a acortarse y el ciclo se repite','Los RR se acortan progresivamente; la pausa dura menos de dos RR'],
+    c:'Suele ser benigno: tono vagal, deportistas, sueño, fármacos o IAM inferior (a menudo transitorio). Rara vez necesita marcapasos, salvo que produzca síntomas o el bloqueo sea infranodal.' },
+  mobitz2:{ t:'BAV de 2º grado Mobitz II',
+    d:'Bloqueo AV en el que ondas P aisladas dejan de conducirse de forma súbita, sin alargamiento previo del PR. Suele ser un bloqueo por debajo del nódulo AV (sistema His-Purkinje).',
+    e:['PR constante en los latidos conducidos','P bloqueada de repente, sin aviso','QRS a menudo ancho por enfermedad del sistema de conducción','Con 2 o más P seguidas sin conducir (p. ej. 3:1) se habla de BAV de alto grado o avanzado'],
+    c:'Tiene riesgo de progresar a BAV completo y asistolia, por lo que es indicación de marcapasos aunque no haya síntomas (guía ESC 2021 de estimulación cardiaca). En la urgencia, monitorización y preparación de marcapasos transcutáneo; la atropina puede ser poco eficaz.' },
+  avb3:{ t:'BAV completo (3er grado)',
+    d:'Ningún impulso auricular llega a los ventrículos: aurículas y ventrículos laten de forma independiente (disociación AV) y el ritmo depende de un escape.',
+    e:['Ondas P regulares y QRS regulares, pero sin relación entre ellos','Frecuencia auricular mayor que la ventricular','Escape nodal: QRS estrecho a 40–60 lpm; escape ventricular: QRS ancho a 20–40 lpm'],
+    c:'Puede causar síncope (crisis de Stokes-Adams), insuficiencia cardiaca o parada. Tratamiento de soporte con atropina o fármacos cronotrópicos y marcapasos transcutáneo/transvenoso como puente al marcapasos definitivo. En el IAM inferior puede ser transitorio.' },
+  brihh:{ t:'Bloqueo de rama izquierda (BRIHH)',
+    d:'Trastorno de la conducción intraventricular en el que el ventrículo izquierdo se activa tarde y de forma anómala, a través del ventrículo derecho.',
+    e:['QRS ≥ 120 ms','QS o rS en V1','R ancha y mellada en I, aVL, V5–V6, sin onda q','Repolarización (ST-T) opuesta al QRS'],
+    c:'Suele asociarse a cardiopatía estructural (hipertensiva, isquémica, miocardiopatías), por lo que se recomienda estudio con ecocardiograma. Dificulta reconocer un infarto: con dolor torácico y sospecha de isquemia se maneja como un SCACEST (guía ESC 2023 de síndrome coronario agudo); los criterios de Sgarbossa ayudan.' },
+  brdhh:{ t:'Bloqueo de rama derecha (BRDHH)',
+    d:'Trastorno de la conducción en el que el ventrículo derecho se activa tarde, después del izquierdo.',
+    e:['QRS ≥ 120 ms (incompleto si 110–119 ms)','rSR\' en V1–V2 (morfología "en M")','S ancha y empastada en I, aVL y V6'],
+    c:'Puede verse en personas sanas. También aparece en el TEP agudo, la cardiopatía congénita (comunicación interauricular) o la isquemia, y debe diferenciarse del patrón de Brugada. A diferencia del BRIHH, no impide reconocer la elevación del ST en un infarto.' },
+  pvcs:{ t:'Extrasístoles ventriculares',
+    d:'Latidos prematuros que nacen en los ventrículos antes del siguiente latido sinusal.',
+    e:['QRS adelantado, ancho (≥ 120 ms) y sin P previa','ST-T opuesta al QRS','Pausa compensadora completa tras el latido','Pueden ser monomorfas o polimorfas, aisladas, en bigeminismo, trigeminismo o parejas'],
+    c:'Son frecuentes en personas sanas. Importan si hay cardiopatía estructural, si son muy frecuentes (carga > 10–20 %), polimorfas, en salvas o con fenómeno de R sobre T. Corrige potasio y magnesio y descarta isquemia o toxicidad farmacológica.' },
+  vtach:{ t:'Taquicardia ventricular (con pulso)',
+    d:'Tres o más latidos ventriculares seguidos a más de 100 lpm. Es sostenida si dura más de 30 s o produce inestabilidad.',
+    e:['QRS ancho (≥ 120 ms), regular y monomorfo','Disociación AV: P sin relación con el QRS','Latidos de captura y de fusión','Concordancia de los QRS en las precordiales'],
+    c:'Toda taquicardia regular de QRS ancho debe tratarse como TV mientras no se demuestre lo contrario. Con pulso y signos adversos (shock, síncope, isquemia, insuficiencia cardiaca): cardioversión eléctrica sincronizada. Si está estable: tratamiento antiarrítmico según guías y consulta con Cardiología. Sin pulso se trata como un ritmo desfibrilable de parada.' },
+  vfib:{ t:'Fibrilación ventricular',
+    d:'Actividad eléctrica ventricular caótica y desorganizada, sin contracción eficaz: el corazón no bombea y el paciente está en parada cardiaca.',
+    e:['Ondas irregulares de amplitud y frecuencia variables','No se identifican QRS, ondas P ni T','FV "gruesa" o "fina": la fina puede confundirse con asistolia'],
+    c:'Ritmo desfibrilable. Lo que más influye en la supervivencia es la RCP de alta calidad y la desfibrilación precoz: cada minuto de retraso la reduce. Sigue el algoritmo de soporte vital avanzado (descargas, adrenalina y amiodarona en los momentos indicados) y busca causas reversibles (4H y 4T).' },
+  asystole:{ t:'Asistolia',
+    d:'Ausencia completa de actividad eléctrica ventricular. Es un ritmo de parada cardiaca.',
+    e:['Línea prácticamente plana, sin QRS','Pueden verse ondas P aisladas (asistolia con ondas P o "asistolia ventricular")'],
+    c:'Ritmo no desfibrilable: RCP de alta calidad y adrenalina lo antes posible. Antes de confirmarla comprueba electrodos, cables, ganancia y al menos dos derivaciones, para no confundirla con una FV fina. Busca y trata causas reversibles (4H y 4T). Si hay ondas P, valora la estimulación con marcapasos.' }
+};
+function updateRhythmInfo(r){
+  const el = document.getElementById('rhythmInfo');
+  if(!el) return;
+  const i = RHYTHM_INFO && RHYTHM_INFO[r];
+  if(!RHYTHM_INFO) return;
+  if(!i){ el.innerHTML = ''; return; }
+  el.innerHTML = '<h3>'+escapeHtml(i.t)+'</h3><p>'+escapeHtml(i.d)+'</p>'
+    + '<div class="ri-k">Claves en el ECG</div><ul>'+i.e.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>'
+    + '<div class="ri-k">A tener en cuenta</div><p>'+escapeHtml(i.c)+'</p>'
+    + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
+}
+updateRhythmInfo(document.getElementById('rhythmSelect').value || 'nsr');
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
