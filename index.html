@@ -500,7 +500,8 @@
     display:flex; align-items:flex-start; gap:8px; width:100%; text-align:left; background:none; border:none;
     color:var(--text); font-family:inherit; font-size:13px; line-height:1.35; padding:8px 10px; border-radius:5px; cursor:pointer;
   }
-  .csel-opt:hover, .csel-opt:focus{ background:var(--hover); outline:none; }
+  .csel-opt:hover, .csel-opt:focus{ background:var(--hover); }
+  .csel-opt:focus:not(:focus-visible){ outline:none; }
   .csel-opt.sel{ color:var(--ecg); font-weight:600; }
   .csel-opt .csel-check{ width:14px; flex-shrink:0; visibility:hidden; }
   .csel-opt.sel .csel-check{ visibility:visible; }
@@ -866,6 +867,25 @@
     }
   }
 
+
+  /* ---------- Pautas de interfaz: foco, táctil, movimiento reducido, números ---------- */
+  :root{ color-scheme:dark; }
+  html.light-root{ color-scheme:light; }
+  html{ -webkit-tap-highlight-color:transparent; }
+  button, [role="button"], [role="switch"], a, input, select, textarea, label, .csel-btn{ touch-action:manipulation; }
+  :where(button, [role="button"], [role="switch"], a, input, select, textarea, .csel-btn, .csel-opt):focus-visible{
+    outline:2px solid var(--ecg); outline-offset:2px;
+  }
+  .csel-opt:focus-visible{ outline-offset:-2px; }
+  #quizOverlay, #infoOverlay, #guide, body .waves.expanded{ overscroll-behavior:contain; }
+  .vital-value, .wx-val, .wave-clock, .case-time, #caseTimeTop{ font-variant-numeric:tabular-nums; }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ transition-duration:.01ms !important; scroll-behavior:auto !important; }
+    .guide-hand svg, .guide-hand *{ animation:none !important; }
+    /* la alarma no parpadea pero sigue siendo evidente */
+    .vital-card.alarm, .wx-card.alarm{ animation:none !important; box-shadow:0 0 0 2px var(--alarm) inset; }
+    .btn-send-now.has-pending .pending-dot{ animation:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -878,13 +898,13 @@
 </script>
 
 <div id="gate">
-  <button type="button" class="theme-btn gate-theme themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">☀</button>
+  <button type="button" class="theme-btn gate-theme themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
   <div class="gate-box">
     <div id="gateRoleStep">
       <h2>Simulador · Monitor</h2>
       <p>Elige cómo vas a usar este dispositivo. El Instructor controla el caso; el Monitor solo lo muestra, como un monitor real de paciente.</p>
       <div class="role-cards">
-        <div class="role-card" id="cardRoleInstructor" onclick="selectRole('instructor')">
+        <div class="role-card" id="cardRoleInstructor" role="button" tabindex="0" onclick="selectRole('instructor')">
           <span class="emoji role-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Consola del instructor">
               <defs>
@@ -942,7 +962,7 @@
           <div class="name">Instructor</div>
           <div class="desc">Controla ritmo, constantes y casos clínicos</div>
         </div>
-        <div class="role-card" id="cardRoleMonitor" onclick="selectRole('monitor')">
+        <div class="role-card" id="cardRoleMonitor" role="button" tabindex="0" onclick="selectRole('monitor')">
           <span class="emoji role-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Monitor de constantes">
               <defs>
@@ -1000,7 +1020,7 @@
       <h2 id="roomStepTitle">Código de sala</h2>
       <p id="roomStepDesc">Comparte este código con el otro dispositivo para conectarlo al mismo monitor.</p>
       <div class="code-row">
-        <input id="roomCodeInput" maxlength="4" inputmode="numeric" placeholder="0000">
+        <input id="roomCodeInput" maxlength="4" inputmode="numeric" placeholder="0000" aria-label="Código de sala" autocomplete="off" spellcheck="false">
       </div>
       <button class="gate-btn" id="btnConnect" onclick="connectRoom()">Conectar</button>
       <button class="gate-btn secondary" onclick="backToRoleStep()">← Cambiar de rol</button>
@@ -1015,16 +1035,16 @@
     <div class="header-row">
       <h1>Simulador<span class="title-role"> · Monitor</span></h1>
       <div class="header-right">
-        <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText">sin conectar</span></span>
+        <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText" role="status" aria-live="polite">sin conectar</span></span>
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
-        <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro">☀</button>
+        <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
         <div class="sync-toggle instructor-only">
           <span class="sync-label" id="syncLabel">Sinc</span>
-          <div class="sync-switch on" id="syncSwitch" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo">
+          <div class="sync-switch on" id="syncSwitch" role="switch" tabindex="0" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo">
             <div class="knob"></div>
           </div>
-          <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()">
-            <span id="btnSendNowLabel">📨<span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
+          <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()" aria-label="Enviar cambios al monitor">
+            <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
         </div>
       </div>
@@ -1108,7 +1128,7 @@
 
               <div class="sync-toggle" id="pulseToggleWrap">
                 <span class="sync-label" id="pulseToggleLabel">Pulso del paciente</span>
-                <div class="sync-switch on" id="pulseSwitch" onclick="togglePulse()" title="Simular pérdida de pulso manteniendo el ritmo en el monitor (AESP)">
+                <div class="sync-switch on" id="pulseSwitch" role="switch" tabindex="0" aria-checked="true" aria-label="Pulso presente" onclick="togglePulse()" title="Simular pérdida de pulso manteniendo el ritmo en el monitor (AESP)">
                   <div class="knob"></div>
                 </div>
                 <button type="button" class="info-btn" id="pulseInfoBtn" onclick="togglePulseInfo(event)" aria-label="Más información sobre el interruptor de pulso">i</button>
@@ -1132,11 +1152,11 @@
                   </select>
                 </div>
                 <div class="case-player">
-                  <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior">⏮</button>
-                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled>▶<span class="play-lbl"> Iniciar</span></button>
-                  <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente">⏭</button>
-                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso">⟲<span class="lbl"> Reiniciar</span></button>
-                  <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled title="Salir del caso (modo manual)">✕<span class="lbl"> Salir</span></button>
+                  <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior" aria-label="Fase anterior"><span aria-hidden="true">⏮</span></button>
+                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled aria-label="Iniciar caso"><span aria-hidden="true">▶</span><span class="play-lbl"> Iniciar</span></button>
+                  <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente" aria-label="Fase siguiente"><span aria-hidden="true">⏭</span></button>
+                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso" aria-label="Reiniciar el caso"><span aria-hidden="true">⟲</span><span class="lbl"> Reiniciar</span></button>
+                  <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled title="Salir del caso (modo manual)" aria-label="Salir del caso"><span aria-hidden="true">✕</span><span class="lbl"> Salir</span></button>
                   <!-- velocidad del caso (en el móvil en vertical; en pantallas grandes está junto a "Cronología") -->
                   <select id="speedSelect" class="speed-select" data-popw="130" onchange="setCaseSpeed(parseFloat(this.value))" disabled aria-label="Velocidad del caso">
                     <option value="0.5">x0,5</option>
@@ -1147,8 +1167,8 @@
                 </div>
               </div>
               <div class="casebtns case-edit-btns">
-                <button class="casebtn" id="btnEditCase" onclick="editSelectedCase()" style="display:none;">✎ Editar</button>
-                <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;">🗑 Eliminar</button>
+                <button class="casebtn" id="btnEditCase" onclick="editSelectedCase()" style="display:none;"><span aria-hidden="true">✎</span> Editar</button>
+                <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;"><span aria-hidden="true">🗑</span> Eliminar</button>
               </div>
               <div id="caseBox">
                 <div class="case-time">
@@ -1186,8 +1206,8 @@
                   <div class="quiz-answer-status" id="cprAnswerStatus"></div>
                 </div>
                 <div class="casebtns" style="margin-top:8px;">
-                  <button class="casebtn primary" id="cprBtnSend" onclick="sendQuestion('cpr')" disabled>📨 Enviar al monitor</button>
-                  <button class="casebtn" id="cprBtnClear" onclick="clearQuestion('cpr')" disabled>✕ Retirar</button>
+                  <button class="casebtn primary" id="cprBtnSend" onclick="sendQuestion('cpr')" disabled><span aria-hidden="true">📨</span> Enviar al monitor</button>
+                  <button class="casebtn" id="cprBtnClear" onclick="clearQuestion('cpr')" disabled><span aria-hidden="true">✕</span> Retirar</button>
                 </div>
                 </div>
               </div>
@@ -1195,15 +1215,15 @@
 
             <div id="caseBuilder">
               <div class="kf-head-row">
-                <input type="text" class="kf-title-input" id="kfTitle" placeholder="Título del caso (ej. Shock séptico con deterioro progresivo)">
+                <input type="text" class="kf-title-input" id="kfTitle" aria-label="Título del caso" autocomplete="off" placeholder="Título del caso (ej. Shock séptico con deterioro progresivo)">
               </div>
               <div class="kf-scroll" id="builderRows"></div>
               <div class="kf-actions">
                 <button class="casebtn" id="btnAddKf" onclick="addBuilderKeyframe()">+ Añadir fase</button>
-                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()">💾 Guardar</button>
-                <button class="casebtn" id="btnCancelCase" onclick="cancelCaseBuilder()">✕ Cancelar</button>
+                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()"><span aria-hidden="true">💾</span> Guardar</button>
+                <button class="casebtn" id="btnCancelCase" onclick="cancelCaseBuilder()"><span aria-hidden="true">✕</span> Cancelar</button>
               </div>
-              <div class="kf-status" id="kfStatus"></div>
+              <div class="kf-status" id="kfStatus" role="status" aria-live="polite"></div>
             </div>
           </div>
 
@@ -1227,8 +1247,8 @@
                 </select>
               </div>
               <div class="casebtns">
-                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled>📨 Enviar al monitor</button>
-                <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion('quiz')" disabled>✕ Retirar</button>
+                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled><span aria-hidden="true">📨</span> Enviar al monitor</button>
+                <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion('quiz')" disabled><span aria-hidden="true">✕</span> Retirar</button>
               </div>
             </div>
             <div class="quiz-preview" id="quizPreview" style="display:none;">
@@ -1238,8 +1258,8 @@
             </div>
             <div class="quiz-edit-bar" id="quizEditBar">
               <button class="casebtn" id="btnNewQ" onclick="openQuestionEditor(null)">+ Nueva pregunta</button>
-              <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled>✎ Editar</button>
-              <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled>🗑 Eliminar</button>
+              <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled><span aria-hidden="true">✎</span> Editar</button>
+              <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled><span aria-hidden="true">🗑</span> Eliminar</button>
             </div>
             <button type="button" class="quiz-restore-link" id="btnRestoreHidden" onclick="restoreHiddenQuestions()" style="display:none;"></button>
            </div>
@@ -1272,9 +1292,9 @@
             <div class="qe-opts-label">Respuestas <span>· marca la correcta</span></div>
             <div id="qeOptions"></div>
             <div class="kf-actions">
-              <button class="casebtn" id="qeRevert" onclick="revertQuestion()">↺ Original</button>
-              <button class="casebtn primary" onclick="saveQuestion()">💾 Guardar</button>
-              <button class="casebtn" onclick="closeQuestionEditor()">✕ Cancelar</button>
+              <button class="casebtn" id="qeRevert" onclick="revertQuestion()"><span aria-hidden="true">↺</span> Original</button>
+              <button class="casebtn primary" onclick="saveQuestion()"><span aria-hidden="true">💾</span> Guardar</button>
+              <button class="casebtn" onclick="closeQuestionEditor()"><span aria-hidden="true">✕</span> Cancelar</button>
             </div>
             <div class="kf-status" id="qeStatus"></div>
            </div>
@@ -1290,9 +1310,9 @@
         <div class="vital-value c-hr" id="valHr">75</div>
         <div class="vital-sub" id="subHr">Sinusal normal</div>
         <div class="stepper">
-          <button onclick="adjustHR(-5)">−5</button>
-          <input id="inHr" type="number" value="75" min="0" max="260" onchange="setHR(this.value)">
-          <button onclick="adjustHR(5)">+5</button>
+          <button onclick="adjustHR(-5)" aria-label="Bajar FC 5">−5</button>
+          <input id="inHr" type="number" inputmode="decimal" aria-label="Frecuencia cardiaca" value="75" min="0" max="260" onchange="setHR(this.value)">
+          <button onclick="adjustHR(5)" aria-label="Subir FC 5">+5</button>
         </div>
       </div>
 
@@ -1301,9 +1321,9 @@
         <div class="vital-value c-spo2" id="valSpo2">98</div>
         <div class="vital-sub">Saturación</div>
         <div class="stepper">
-          <button onclick="adjustSpo2(-2)">−2</button>
-          <input id="inSpo2" type="number" value="98" min="0" max="100" onchange="setSpo2(this.value)">
-          <button onclick="adjustSpo2(2)">+2</button>
+          <button onclick="adjustSpo2(-2)" aria-label="Bajar SpO₂ 2">−2</button>
+          <input id="inSpo2" type="number" inputmode="decimal" aria-label="Saturación de oxígeno" value="98" min="0" max="100" onchange="setSpo2(this.value)">
+          <button onclick="adjustSpo2(2)" aria-label="Subir SpO₂ 2">+2</button>
         </div>
       </div>
 
@@ -1312,9 +1332,9 @@
         <div class="vital-value c-resp" id="valResp">16</div>
         <div class="vital-sub">Frecuencia respiratoria</div>
         <div class="stepper">
-          <button onclick="adjustRR(-2)">−2</button>
-          <input id="inRr" type="number" value="16" min="0" max="60" onchange="setRR(this.value)">
-          <button onclick="adjustRR(2)">+2</button>
+          <button onclick="adjustRR(-2)" aria-label="Bajar FR 2">−2</button>
+          <input id="inRr" type="number" inputmode="decimal" aria-label="Frecuencia respiratoria" value="16" min="0" max="60" onchange="setRR(this.value)">
+          <button onclick="adjustRR(2)" aria-label="Subir FR 2">+2</button>
         </div>
       </div>
 
@@ -1323,9 +1343,9 @@
         <div class="vital-value c-temp" id="valTemp">36.6</div>
         <div class="vital-sub">Temperatura</div>
         <div class="stepper">
-          <button onclick="adjustTemp(-0.2)">−0,2</button>
-          <input id="inTemp" type="number" step="0.1" value="36.6" onchange="setTemp(this.value)">
-          <button onclick="adjustTemp(0.2)">+0,2</button>
+          <button onclick="adjustTemp(-0.2)" aria-label="Bajar temperatura 0,2">−0,2</button>
+          <input id="inTemp" type="number" inputmode="decimal" aria-label="Temperatura" step="0.1" value="36.6" onchange="setTemp(this.value)">
+          <button onclick="adjustTemp(0.2)" aria-label="Subir temperatura 0,2">+0,2</button>
         </div>
       </div>
 
@@ -1334,12 +1354,12 @@
         <div class="vital-value c-bp" id="valBp">120/78</div>
         <div class="vital-sub" id="subBp">TAM 92</div>
         <div class="stepper">
-          <button onclick="adjustSys(-5)">−5</button>
-          <input id="inSys" type="number" value="120" min="0" max="300" style="flex:1" onchange="setBP()">
-          <button onclick="adjustSys(5)">+5</button>
-          <button onclick="adjustDia(-5)">−5</button>
-          <input id="inDia" type="number" value="78" min="0" max="200" style="flex:1" onchange="setBP()">
-          <button onclick="adjustDia(5)">+5</button>
+          <button onclick="adjustSys(-5)" aria-label="Bajar TA sistólica 5">−5</button>
+          <input id="inSys" type="number" inputmode="decimal" aria-label="TA sistólica" value="120" min="0" max="300" style="flex:1" onchange="setBP()">
+          <button onclick="adjustSys(5)" aria-label="Subir TA sistólica 5">+5</button>
+          <button onclick="adjustDia(-5)" aria-label="Bajar TA diastólica 5">−5</button>
+          <input id="inDia" type="number" inputmode="decimal" aria-label="TA diastólica" value="78" min="0" max="200" style="flex:1" onchange="setBP()">
+          <button onclick="adjustDia(5)" aria-label="Subir TA diastólica 5">+5</button>
         </div>
       </div>
     </div>
@@ -1377,7 +1397,7 @@
   </div>
 </div>
 
-<div id="quizOverlay">
+<div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
   <div class="quiz-card">
     <div class="qtext" id="quizCardText"></div>
     <div id="quizCardOptions"></div>
@@ -1385,7 +1405,7 @@
   </div>
 </div>
 
-<div id="infoOverlay" onclick="if(event.target===this) togglePulseInfo()">
+<div id="infoOverlay" role="dialog" aria-modal="true" aria-label="Información" onclick="if(event.target===this) togglePulseInfo()">
   <div class="info-card">
     <button type="button" class="info-card-close" onclick="togglePulseInfo()" aria-label="Cerrar">×</button>
     En fibrilación ventricular y asistolia el paciente nunca tiene pulso: el interruptor queda bloqueado sin efecto. En el resto de ritmos, apagarlo simula una actividad eléctrica sin pulso (AESP) — el trazado sigue viéndose organizado, pero no hay pulso ni tensión palpables.
@@ -1618,7 +1638,7 @@ function currentStateSnapshot(){
 
 // El texto del botón va en un <span class="lbl"> que se oculta en móvil (queda solo el icono)
 function setSendLabel(icon, text){
-  document.getElementById('btnSendNowLabel').innerHTML = icon + '<span class="lbl"> ' + text + '</span>';
+  document.getElementById('btnSendNowLabel').innerHTML = '<span aria-hidden="true">' + icon + '</span><span class="lbl"> ' + text + '</span>';
 }
 
 function resetSendButton(){
@@ -1953,7 +1973,7 @@ function renderQeOptions(options, correct){
     '<label class="qe-opt'+(i===correct?' is-correct':'')+'">'
     + '<input type="radio" name="qeCorrect" value="'+i+'"'+(i===correct?' checked':'')+' onchange="markQeCorrect('+i+')">'
     + '<span class="quiz-opt-letter">'+L+'</span>'
-    + '<input type="text" id="qeOpt'+i+'" value="'+escapeHtml(options[i]||'')+'" placeholder="Respuesta '+L+'">'
+    + '<input type="text" id="qeOpt'+i+'" value="'+escapeHtml(options[i]||'')+'" placeholder="Respuesta '+L+'" aria-label="Respuesta '+L+'" autocomplete="off">'
     + '</label>'
   ).join('');
 }
@@ -2210,7 +2230,9 @@ function setCaseSpeed(v){
 // Botón de iniciar/pausar: el texto va en un <span> que en el móvil en vertical se oculta (solo icono)
 function setPlayLabel(mode){
   const m = { start:['▶','Iniciar'], resume:['▶','Continuar'], pause:['⏸','Pausar'] }[mode];
-  document.getElementById('btnPlay').innerHTML = m[0]+'<span class="play-lbl"> '+m[1]+'</span>';
+  const b = document.getElementById('btnPlay');
+  b.innerHTML = '<span aria-hidden="true">'+m[0]+'</span><span class="play-lbl"> '+m[1]+'</span>';
+  b.setAttribute('aria-label', m[1]+' caso');
 }
 
 /* ---------- Casos clínicos personalizados (guardados en Supabase) ---------- */
@@ -2418,15 +2440,15 @@ function renderBuilderRows(){
     row.className = 'kf-row' + (builderOpen.has(kf) ? ' open' : '');
     const rhythmOptsHtml = RHYTHM_OPTIONS.map(o=>`<option value="${o.v}" ${o.v===kf.rhythm?'selected':''}>${escapeHtml(o.l)}</option>`).join('');
     const num = (f, label, attrs, cls) =>
-      `<div class="kf-field ${cls||''}"><label>${label}</label><input type="number" inputmode="decimal" data-f="${f}" ${attrs} value="${escapeHtml(kf[f])}" onchange="updateBuilderField(${idx},'${f}',this.value)"></div>`;
+      `<div class="kf-field ${cls||''}"><label>${label}</label><input type="number" inputmode="decimal" aria-label="${label}" data-f="${f}" ${attrs} value="${escapeHtml(kf[f])}" onchange="updateBuilderField(${idx},'${f}',this.value)"></div>`;
     row.innerHTML = `
-      <div class="kf-row-head" onclick="toggleBuilderRow(${idx})">
+      <div class="kf-row-head" role="button" tabindex="0" aria-label="Abrir o cerrar fase ${idx+1}" onclick="toggleBuilderRow(${idx})">
         <span class="kf-caret">▶</span>
         <div class="kf-row-title"><b>Fase ${idx+1}</b><span class="kf-sum"></span></div>
         <div class="kf-row-actions" onclick="event.stopPropagation()">
-          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},-1)" ${idx===0?'disabled':''} title="Subir">↑</button>
-          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},1)" ${idx===n-1?'disabled':''} title="Bajar">↓</button>
-          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${n<=2?'disabled':''} title="Eliminar fase">🗑</button>
+          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},-1)" ${idx===0?'disabled':''} title="Subir" aria-label="Subir fase">↑</button>
+          <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},1)" ${idx===n-1?'disabled':''} title="Bajar" aria-label="Bajar fase">↓</button>
+          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${n<=2?'disabled':''} title="Eliminar fase" aria-label="Eliminar fase">🗑</button>
         </div>
       </div>
       <div class="kf-body">
@@ -2441,7 +2463,7 @@ function renderBuilderRows(){
           ${num('dia','TA diastólica','min="0" max="200"','span2')}
         </div>
         <label class="kf-pulse-check"><input type="checkbox" ${kf.noPulse?'checked':''} onchange="updateBuilderField(${idx},'noPulse',this.checked)"> Sin pulso en esta fase (AESP / PCR)</label>
-        <textarea class="kf-narrative" rows="3" placeholder="Texto que verá el instructor durante esta fase..." oninput="updateBuilderField(${idx},'label',this.value)">${escapeHtml(kf.label)}</textarea>
+        <textarea class="kf-narrative" rows="3" aria-label="Narrativa de la fase" placeholder="Texto que verá el instructor durante esta fase…" oninput="updateBuilderField(${idx},'label',this.value)">${escapeHtml(kf.label)}</textarea>
       </div>
     `;
     wrap.appendChild(row);
@@ -2475,7 +2497,7 @@ async function saveCaseBuilder(){
     statusEl.className = 'kf-status err';
     return;
   }
-  statusEl.textContent = 'Guardando...';
+  statusEl.textContent = 'Guardando…';
   statusEl.className = 'kf-status';
   const payload = { title, keyframes: builderKfs.map(k=>({ ...k })) };
   try{
@@ -3302,6 +3324,7 @@ function refreshThemeUI(){
   document.querySelectorAll('.themeToggle').forEach(b=>{
     b.textContent = light ? '☾' : '☀';
     b.title = light ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro';
+    b.setAttribute('aria-label', b.title);
   });
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', light ? '#eef2f3' : '#02163c');
@@ -3478,6 +3501,10 @@ function toggleWavesExpand(force){
     w.parentNode.insertBefore(wavesPlaceholder, w);
   } else if(wavesPlaceholder){ wavesPlaceholder.remove(); wavesPlaceholder = null; }
   w.classList.toggle('expanded', open);
+  if(open){ w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-label','Monitor ampliado'); }
+  else { w.removeAttribute('role'); w.removeAttribute('aria-modal'); w.removeAttribute('aria-label'); }
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if(open || document.activeElement===btn || w.contains(document.activeElement)) btn.focus({ preventScroll:true });
   document.body.classList.toggle('waves-open', open);
   document.getElementById('wavesBackdrop').classList.toggle('open', open);
   const lbl = open ? 'Reducir monitor' : 'Ampliar monitor';
@@ -3502,6 +3529,20 @@ function syncWxVitals(){
 })();
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape' && document.querySelector('.waves.expanded')) toggleWavesExpand(false);
+});
+
+
+/* ---------- Accesibilidad: elementos "botón" que no son <button> ----------
+   Enter / Espacio los activan y los interruptores anuncian si están encendidos. */
+document.addEventListener('keydown', e=>{
+  const el = e.target;
+  if(!(el instanceof HTMLElement) || el.tagName==='BUTTON') return;
+  const r = el.getAttribute('role');
+  if((r==='button' || r==='switch') && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); el.click(); }
+});
+document.querySelectorAll('[role="switch"]').forEach(sw=>{
+  const upd = ()=>sw.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false');
+  upd(); new MutationObserver(upd).observe(sw, { attributes:true, attributeFilter:['class'] });
 });
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
