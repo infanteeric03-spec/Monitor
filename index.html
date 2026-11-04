@@ -344,12 +344,21 @@
 
   .stepper{ display:flex; gap:4px; margin-top:6px; }
   .stepper button{
-    flex:1; background:var(--field); border:1px solid var(--line); color:var(--btn-text);
-    font-size:14px; padding:4px 0; border-radius:4px; cursor:pointer;
+    flex:0 0 auto; min-width:44px; background:var(--field); border:1px solid var(--line); color:var(--btn-text);
+    font-size:14px; padding:5px 10px; border-radius:4px; cursor:pointer; white-space:nowrap;
   }
   .stepper button:active{ background:var(--hover); }
+  .stepper button:hover:not(:disabled){ border-color:var(--text-dim); }
+  /* tablet / ordenador: la TA usa dos filas (sistólica arriba, diastólica abajo) para que
+     botones y casillas tengan aire a los lados */
+  @media (min-width:761px) and (min-height:561px){
+    #cardBp .stepper{ flex-wrap:wrap; gap:4px; }
+    #cardBp .stepper > *{ box-sizing:border-box; }
+    #cardBp .stepper > button{ flex:0 0 44px; }
+    #cardBp .stepper > input{ flex:1 1 calc(100% - 96px); }
+  }
   .stepper input{
-    width:100%; background:var(--field); border:1px solid var(--line); color:var(--btn-text);
+    flex:1 1 0; width:100%; min-width:48px; background:var(--field); border:1px solid var(--line); color:var(--btn-text);
     font-family:var(--font-num); font-size:13px; text-align:center; border-radius:4px; padding:4px 0;
   }
 
@@ -1416,10 +1425,10 @@
         <div class="vital-sub" id="subBp">TAM 92</div>
         <div class="stepper">
           <button onclick="adjustSys(-5)" aria-label="Bajar TA sistólica 5">−5</button>
-          <input id="inSys" type="number" inputmode="decimal" aria-label="TA sistólica" value="120" min="0" max="300" style="flex:1" onchange="setBP()">
+          <input id="inSys" type="number" inputmode="decimal" aria-label="TA sistólica" value="120" min="0" max="300" onchange="setBP()">
           <button onclick="adjustSys(5)" aria-label="Subir TA sistólica 5">+5</button>
           <button onclick="adjustDia(-5)" aria-label="Bajar TA diastólica 5">−5</button>
-          <input id="inDia" type="number" inputmode="decimal" aria-label="TA diastólica" value="78" min="0" max="200" style="flex:1" onchange="setBP()">
+          <input id="inDia" type="number" inputmode="decimal" aria-label="TA diastólica" value="78" min="0" max="200" onchange="setBP()">
           <button onclick="adjustDia(5)" aria-label="Subir TA diastólica 5">+5</button>
         </div>
       </div>
