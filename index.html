@@ -959,6 +959,8 @@
   .gate-foot{ position:absolute; left:0; right:0; bottom:max(16px, env(safe-area-inset-bottom)); text-align:center; font-size:10.5px; color:#4f625b; }
   @media (max-height:600px){ .gate-ecg{ height:56px; } #gate .gate-box h2.gate-title{ font-size:24px; } .gate-foot{ display:none; } }
   @media (prefers-reduced-motion: reduce){ .gate-ecg path{ animation:none !important; stroke-dashoffset:0; opacity:1; } }
+
+  .quiz-cat + .csel-btn{ margin-bottom:6px; }
 </style>
 </head>
 <body>
@@ -1320,10 +1322,13 @@
             <div class="quiz-row">
               <div style="flex:1; min-width:200px;">
                 <div class="quiz-label-row">
-                  <label for="quizSelect">Banco de preguntas</label>
+                  <label for="quizCat">Banco de preguntas</label>
                   <button type="button" class="theme-btn quiz-more-btn" id="btnQuizMore" onclick="toggleQuizEditBar()" title="Crear, editar o eliminar preguntas" aria-expanded="false"><span>+</span></button>
                 </div>
-                <select id="quizSelect" onchange="previewQuestion(this.value,'quiz')" style="width:100%; min-width:0;">
+                <select id="quizCat" class="quiz-cat" data-popw="240" aria-label="Categoría de preguntas" onchange="setQuizCat(this.value)" style="width:100%; min-width:0;">
+                  <option value="all">Todas las preguntas del banco</option>
+                </select>
+                <select id="quizSelect" onchange="previewQuestion(this.value,'quiz')" aria-label="Pregunta" style="width:100%; min-width:0;">
                   <option value="">— Elige una pregunta —</option>
                 </select>
               </div>
@@ -1909,11 +1914,29 @@ function fillOptions(sel, groups, keep){
   if(keep && [...sel.options].some(o=>o.value===keep)) sel.value = keep;
 }
 
+/* categoría elegida en el primer desplegable de "Preguntas" ('all' = todo el banco) */
+let quizCat = 'all';
+try{ quizCat = localStorage.getItem('monitor-quiz-cat') || 'all'; }catch(e){}
+function setQuizCat(c){
+  quizCat = c || 'all';
+  try{ localStorage.setItem('monitor-quiz-cat', quizCat); }catch(e){}
+  populateQuizSelect();
+}
 function populateQuizSelect(){
   const sel = document.getElementById('quizSelect');
   const keep = sel.value;
-  const groups = [{ label:'Ritmos y bloqueos', items:QUESTION_BANK }];
-  ['general','shock','noshock','post'].forEach(c=>groups.push({ label:'RCP ('+cprAlgo+') · '+CPR_CTX_LABEL[c], items:cprQuestionsFor(cprAlgo,[c]) }));
+  const all = [{ key:'ritmos', label:'Ritmos y bloqueos', items:QUESTION_BANK }];
+  ['general','shock','noshock','post'].forEach(c=>all.push({ key:'rcp_'+c, label:'RCP ('+cprAlgo+') · '+CPR_CTX_LABEL[c], items:cprQuestionsFor(cprAlgo,[c]) }));
+  // desplegable de categorías (con el número de preguntas de cada una)
+  const cat = document.getElementById('quizCat');
+  if(cat){
+    const total = all.reduce((n,g)=>n+g.items.length, 0);
+    if(quizCat!=='all' && !all.some(g=>g.key===quizCat && g.items.length)) quizCat = 'all';
+    cat.innerHTML = '<option value="all">Todas las preguntas del banco ('+total+')</option>'
+      + all.filter(g=>g.items.length).map(g=>'<option value="'+g.key+'">'+escapeHtml(g.label)+' ('+g.items.length+')</option>').join('');
+    cat.value = quizCat;
+  }
+  const groups = quizCat==='all' ? all : all.filter(g=>g.key===quizCat);
   fillOptions(sel, groups, keep);
   if(keep && sel.value!==keep) previewQuestion('', 'quiz');
 }
