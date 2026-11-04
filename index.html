@@ -983,6 +983,32 @@
   .rhythm-info ul{ margin:0 0 4px; padding-left:18px; }
   .rhythm-info li{ margin:2px 0; }
   .rhythm-info .ri-src{ margin:10px 0 0; font-size:11px; color:var(--text-dim); }
+
+  /* ---------- ECG de 12 derivaciones (miniatura en la ficha + vista ampliada) ---------- */
+  .ri-thumb{ float:right; margin:0 0 8px 12px; width:clamp(120px,32%,220px); padding:0; border:1px solid var(--line);
+    border-radius:6px; overflow:hidden; background:#fff; cursor:zoom-in; position:relative; display:block; }
+  .ri-thumb img{ display:block; width:100%; height:auto; }
+  .ri-thumb .ri-thumb-tag{ position:absolute; left:4px; bottom:4px; display:flex; align-items:center; gap:4px;
+    background:rgba(20,24,26,.78); color:#fff; font-size:10px; font-weight:700; letter-spacing:.04em; padding:2px 6px; border-radius:4px; }
+  .ri-thumb .ri-thumb-tag svg{ width:10px; height:10px; }
+  .ri-thumb:hover{ border-color:var(--text-dim); }
+  .rhythm-info::after{ content:""; display:block; clear:both; }
+  #ecg12Overlay{ position:fixed; inset:0; z-index:95; background:rgba(0,0,0,.72); display:none; overscroll-behavior:contain; }
+  #ecg12Overlay.open{ display:block; }
+  .ecg12-box{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:min(96vw,1300px); height:min(92vh, calc(min(96vw,1300px) * 0.56)); background:#fbfbfb; color:#222;
+    border-radius:10px; box-shadow:0 14px 48px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; }
+  .ecg12-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-bottom:1px solid #e3d4d4; }
+  .ecg12-k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b2444b; margin-right:8px; }
+  .ecg12-t{ font-size:14px; font-weight:700; }
+  .ecg12-close{ width:34px; height:34px; border-radius:6px; border:1px solid #d9caca; background:#fff; color:#333; font-size:15px; cursor:pointer; flex-shrink:0; }
+  .ecg12-paper{ flex:1; min-height:0; position:relative; }
+  .ecg12-paper canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .ecg12-foot{ font-size:10.5px; color:#7a6a6a; padding:4px 12px 6px; }
+  /* móvil en vertical: se gira para verse en horizontal */
+  @media (max-width:760px) and (orientation:portrait){
+    .ecg12-box{ width:94dvh; height:94vw; transform:translate(-50%,-50%) rotate(90deg); }
+  }
 </style>
 </head>
 <body>
@@ -1506,6 +1532,16 @@
   </div>
 </div>
 
+<div id="ecg12Overlay" role="dialog" aria-modal="true" aria-labelledby="ecg12Title" onclick="if(event.target===this) closeEcg12()">
+  <div class="ecg12-box" id="ecg12Box">
+    <div class="ecg12-head">
+      <div><span class="ecg12-k">ECG de 12 derivaciones</span><span id="ecg12Title" class="ecg12-t"></span></div>
+      <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
+    </div>
+    <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas></div>
+    <div class="ecg12-foot">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
+  </div>
+</div>
 <div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
   <div class="quiz-card">
     <div class="qtext" id="quizCardText"></div>
@@ -3684,6 +3720,198 @@ document.querySelectorAll('[role="switch"]').forEach(sw=>{
 })();
 
 
+
+/* ---------- ECG de 12 derivaciones esquemático por ritmo ----------
+   Se genera por síntesis: cada onda (P, QRS, T…) es una suma de campanas gaussianas con una
+   amplitud propia en cada derivación. Para las derivaciones de miembros solo se definen I y II;
+   III, aVR, aVL y aVF se calculan con las leyes de Einthoven/Goldberger, así el eje es coherente.
+   Formato estándar: 25 mm/s, 10 mm/mV, 3×4 (2,5 s por derivación) + tira de ritmo de II (10 s). */
+const ECG12_LEADS = ['I','II','III','aVR','aVL','aVF','V1','V2','V3','V4','V5','V6'];
+function e12vec(I, II, V){ // → amplitudes en las 12 derivaciones
+  return [I, II, II-I, -(I+II)/2, I-II/2, II-I/2].concat(V);
+}
+// componentes: [desplazamiento (s), sigma (s), vector de 12 amplitudes en mV]
+const E12_P = [[0,0.022,e12vec(0.08,0.15,[0.06,0.07,0.08,0.08,0.08,0.07])]];
+const E12_MORPH = {
+  normal:[
+    [-0.024,0.007,e12vec(-0.05,-0.08,[0,0,0,-0.03,-0.08,-0.07])],
+    [0,0.010,e12vec(0.7,1.1,[0.2,0.45,0.8,1.3,1.4,1.1])],
+    [0.022,0.009,e12vec(-0.1,-0.2,[-1.0,-1.3,-0.8,-0.4,-0.2,-0.1])],
+    [0.27,0.05,e12vec(0.2,0.3,[0.05,0.35,0.45,0.4,0.3,0.22])]
+  ],
+  lbbb:[
+    [-0.03,0.017,e12vec(0.5,0.3,[0.08,0.1,0.15,0.55,0.7,0.65])],
+    [0.03,0.019,e12vec(0.7,0.45,[-1.4,-1.9,-1.4,0.65,0.95,0.8])],
+    [0.13,0.05,e12vec(-0.12,-0.08,[0.18,0.25,0.18,0,-0.12,-0.12])],
+    [0.3,0.06,e12vec(-0.3,-0.2,[0.35,0.45,0.35,-0.2,-0.3,-0.3])]
+  ],
+  rbbb:[
+    [-0.024,0.007,e12vec(-0.05,-0.06,[0,0,0,-0.03,-0.08,-0.07])],
+    [0,0.010,e12vec(0.7,1.0,[0.28,0.35,0.7,1.2,1.3,1.0])],
+    [0.024,0.009,e12vec(-0.1,-0.15,[-0.45,-0.55,-0.5,-0.3,-0.15,-0.1])],
+    [0.062,0.019,e12vec(-0.3,-0.1,[0.75,0.6,0.2,-0.2,-0.3,-0.35])],
+    [0.29,0.05,e12vec(0.2,0.25,[-0.2,-0.15,0.1,0.3,0.28,0.2])]
+  ],
+  vt:[  // TV monomorfa: eje superior y concordancia positiva en precordiales
+    [0,0.036,e12vec(-0.75,-0.9,[0.7,1.0,1.1,1.1,0.9,0.7])],
+    [0.29,0.07,e12vec(0.3,0.36,[-0.28,-0.4,-0.44,-0.44,-0.36,-0.28])]
+  ],
+  pvc:[ // extrasístole de tracto de salida de VD: morfología de BRIHH y eje inferior
+    [0,0.034,e12vec(0.2,1.2,[-1.0,-1.1,-0.4,0.5,1.0,1.1])],
+    [0.3,0.07,e12vec(-0.08,-0.45,[0.38,0.42,0.15,-0.2,-0.38,-0.42])]
+  ],
+  escape:[ // escape ventricular lento
+    [0,0.038,e12vec(0.6,0.2,[-0.9,-1.0,-0.5,0.4,0.8,0.9])],
+    [0.32,0.08,e12vec(-0.22,-0.08,[0.33,0.36,0.18,-0.15,-0.3,-0.33])]
+  ]
+};
+function e12rand(seed){ let x = seed>>>0 || 1; return ()=>{ x^=x<<13; x>>>=0; x^=x>>17; x^=x<<5; x>>>=0; return (x%100000)/100000; }; }
+
+// línea de tiempo de 10 s: ondas P y complejos QRS (con su morfología) para cada ritmo
+function e12Timeline(r){
+  const rnd = e12rand(r.length*977 + 13), P=[], Q=[], T=10.6;
+  const sinus = (rr, pr, morph)=>{ for(let t=0.35; t<T; t+=rr){ P.push(t-pr); Q.push([t,morph]); } };
+  switch(r){
+    case 'nsr': sinus(0.80,0.16,'normal'); break;
+    case 'stach': sinus(60/130,0.14,'normal'); break;
+    case 'sbrady': sinus(60/42,0.17,'normal'); break;
+    case 'avb1': sinus(0.80,0.32,'normal'); break;
+    case 'brihh': sinus(0.75,0.17,'lbbb'); break;
+    case 'brdhh': sinus(0.75,0.16,'rbbb'); break;
+    case 'afib': { let t=0.3; while(t<T){ Q.push([t,'normal']); t += 0.42 + rnd()*0.42; } break; }
+    case 'aflutter': for(let t=0.4; t<T; t+=0.40) Q.push([t,'normal']); break;
+    case 'wenckebach': { const pp=60/90, prs=[0.16,0.26,0.34]; let i=0;
+      for(let t=0.2; t<T; t+=pp){ P.push(t); if(i<3){ Q.push([t+prs[i],'normal']); i++; } else i=0; } break; }
+    case 'mobitz2': { const pp=60/90; let i=0;
+      for(let t=0.2; t<T; t+=pp){ P.push(t); if(i===0) Q.push([t+0.16,'normal']); i=(i+1)%3; } break; }
+    case 'avb3': { for(let t=0.15; t<T; t+=60/90) P.push(t); for(let t=0.6; t<T; t+=60/35) Q.push([t,'escape']); break; }
+    case 'pvcs': { const rr=60/78; let t=0.35, n=0;
+      while(t<T){ n++;
+        // cada 4º latido: extrasístole precoz (al 55 % del RR) y pausa compensadora completa,
+        // de modo que el siguiente latido sinusal llega a su hora (2 RR después del previo)
+        if(n%4===0) Q.push([t-rr*0.45,'pvc']);
+        else { P.push(t-0.16); Q.push([t,'normal']); }
+        t += rr; } break; }
+    case 'vtach': { for(let t=0.2; t<T; t+=60/180) Q.push([t,'vt']); for(let t=0.5; t<T; t+=60/80) P.push(t); break; }
+  }
+  return { P, Q };
+}
+
+function e12Signal(r, tl, li, t, seedPhase){
+  let v = 0;
+  if(r==='vfib'){
+    const g = [0.45,0.7,0.55,0.55,0.4,0.6,0.8,1.0,0.9,0.75,0.6,0.5][li];
+    v = g*(0.32*Math.sin(2*Math.PI*4.7*t+seedPhase[li]) + 0.22*Math.sin(2*Math.PI*6.3*t+seedPhase[li]*1.7)
+          + 0.12*Math.sin(2*Math.PI*2.1*t+seedPhase[li]*0.6))*(0.75+0.25*Math.sin(2*Math.PI*0.35*t));
+    return v;
+  }
+  if(r==='asystole') return 0.008*Math.sin(2*Math.PI*0.4*t+li);
+  for(const tp of tl.P){ const d=t-tp; if(d>-0.1 && d<0.1){ for(const c of E12_P) v += c[2][li]*Math.exp(-0.5*((d-c[0])/c[1])**2); } }
+  for(const [tq,m] of tl.Q){ const d=t-tq; if(d>-0.2 && d<0.65){ for(const c of E12_MORPH[m]) v += c[2][li]*Math.exp(-0.5*((d-c[0])/c[1])**2); } }
+  if(r==='afib'){
+    const g = e12vec(0.02,0.05,[0.1,0.06,0.04,0.03,0.03,0.02])[li];
+    v += g*(Math.sin(2*Math.PI*6.1*t+li) + 0.7*Math.sin(2*Math.PI*7.7*t+li*2.3) + 0.5*Math.sin(2*Math.PI*4.9*t+li*0.7));
+  }
+  if(r==='aflutter'){
+    // dientes de sierra a 300/min: negativos en cara inferior y positivos en V1
+    const g = e12vec(0.04,-0.3,[0.18,0.08,0.05,0.04,0.04,0.04])[li];
+    const f = ((t*5)%1+1)%1, saw = f<0.75 ? (f/0.75) : (1-(f-0.75)/0.25);
+    v += g*(saw-0.5)*2*0.6;
+  }
+  return v;
+}
+
+const e12Cache = {};
+function renderEcg12(canvas, r, W, H, dpr){
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  // papel: 264 mm × 128 mm (calibración + 10 s, 4 filas)
+  const MMW = 264, MMH = 128, mm = Math.min(W/MMW, H/MMH);
+  const ox = (W - MMW*mm)/2, oy = (H - MMH*mm)/2;
+  ctx.fillStyle = '#fffafa'; ctx.fillRect(0,0,W,H);
+  const grid = (step, color, lw)=>{
+    ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
+    for(let x=0; x<=MMW+0.01; x+=step){ const X=ox+x*mm; ctx.moveTo(X,oy); ctx.lineTo(X,oy+MMH*mm); }
+    for(let y=0; y<=MMH+0.01; y+=step){ const Y=oy+y*mm; ctx.moveTo(ox,Y); ctx.lineTo(ox+MMW*mm,Y); }
+    ctx.stroke();
+  };
+  if(mm>=1.6) grid(1,'rgba(238,120,120,.22)',Math.max(0.5,mm*0.06));
+  grid(5,'rgba(220,70,70,.42)',Math.max(0.6,mm*0.12));
+  const tl = e12Timeline(r), seed = ECG12_LEADS.map((_,i)=>i*1.37+0.4);
+  const layout = [['I','aVR','V1','V4'],['II','aVL','V2','V5'],['III','aVF','V3','V6']];
+  const x0 = 8, rowH = 30, segW = 62.5; // mm
+  ctx.strokeStyle = '#141414'; ctx.lineJoin='round'; ctx.lineCap='round';
+  ctx.lineWidth = Math.max(0.8, mm*0.28);
+  const drawTrace = (li, t0, t1, xmm, ymm)=>{
+    ctx.beginPath();
+    const n = Math.max(40, Math.round((t1-t0)*25*mm*1.5));
+    for(let k=0; k<=n; k++){
+      const t = t0 + (t1-t0)*k/n, v = e12Signal(r, tl, li, t, seed);
+      const X = ox + (xmm + (t-t0)*25)*mm, Y = oy + (ymm - v*10)*mm;
+      k ? ctx.lineTo(X,Y) : ctx.moveTo(X,Y);
+    }
+    ctx.stroke();
+  };
+  const calib = (ymm)=>{ // pulso de calibración 1 mV
+    ctx.beginPath();
+    const X=(a)=>ox+a*mm, Y=(b)=>oy+b*mm;
+    ctx.moveTo(X(1.5),Y(ymm)); ctx.lineTo(X(3),Y(ymm)); ctx.lineTo(X(3),Y(ymm-10)); ctx.lineTo(X(6),Y(ymm-10)); ctx.lineTo(X(6),Y(ymm)); ctx.lineTo(X(7.5),Y(ymm));
+    ctx.stroke();
+  };
+  const label = (txt, xmm, ymm)=>{
+    ctx.fillStyle = '#141414'; ctx.font = '600 '+Math.max(7, mm*3.4)+'px system-ui, sans-serif';
+    ctx.fillText(txt, ox+xmm*mm, oy+ymm*mm);
+  };
+  for(let row=0; row<4; row++){
+    const base = 6 + row*rowH + 17;
+    calib(base);
+    if(row<3){
+      layout[row].forEach((lead,col)=>{
+        const li = ECG12_LEADS.indexOf(lead), t0 = col*2.5;
+        drawTrace(li, t0, t0+2.5, x0 + col*segW, base);
+        if(col>0){ // marca de cambio de derivación
+          ctx.beginPath(); const X=ox+(x0+col*segW)*mm; ctx.moveTo(X,oy+(base-3)*mm); ctx.lineTo(X,oy+(base+3)*mm); ctx.stroke();
+        }
+        if(mm>=0.9) label(lead, x0 + col*segW + 1.2, base - 11);
+      });
+    } else {
+      drawTrace(1, 0, 10, x0, base);
+      if(mm>=0.9) label('II', x0 + 1.2, base - 11);
+    }
+  }
+}
+
+function ecg12Thumb(r){
+  if(e12Cache[r]) return e12Cache[r];
+  const c = document.createElement('canvas');
+  renderEcg12(c, r, 440, 214, 1);
+  return (e12Cache[r] = c.toDataURL('image/png'));
+}
+let ecg12Rhythm = null, ecg12Opener = null;
+function openEcg12(r){
+  ecg12Rhythm = r; ecg12Opener = document.activeElement;
+  document.getElementById('ecg12Title').textContent = (RHYTHM_INFO[r]||{}).t || '';
+  document.getElementById('ecg12Overlay').classList.add('open');
+  document.body.classList.add('waves-open');
+  requestAnimationFrame(drawEcg12Big);
+  document.querySelector('.ecg12-close').focus({ preventScroll:true });
+}
+function drawEcg12Big(){
+  if(!ecg12Rhythm) return;
+  const paper = document.getElementById('ecg12Paper');
+  renderEcg12(document.getElementById('ecg12Canvas'), ecg12Rhythm, paper.clientWidth, paper.clientHeight, Math.min(3, window.devicePixelRatio||1));
+}
+function closeEcg12(){
+  if(!ecg12Rhythm) return;
+  ecg12Rhythm = null;
+  document.getElementById('ecg12Overlay').classList.remove('open');
+  if(!document.querySelector('.waves.expanded')) document.body.classList.remove('waves-open');
+  if(ecg12Opener && ecg12Opener.focus) ecg12Opener.focus({ preventScroll:true });
+}
+window.addEventListener('resize', ()=>{ if(ecg12Rhythm) requestAnimationFrame(drawEcg12Big); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm) closeEcg12(); });
+
 /* ---------- Ficha informativa de cada ritmo ----------
    Definición, claves en el ECG y particularidades clínicas. Basada en las guías de práctica
    clínica de la ESC adoptadas por la Sociedad Española de Cardiología (SEC) y en las
@@ -3756,7 +3984,10 @@ function updateRhythmInfo(r){
   const i = RHYTHM_INFO && RHYTHM_INFO[r];
   if(!RHYTHM_INFO) return;
   if(!i){ el.innerHTML = ''; return; }
-  el.innerHTML = '<h3>'+escapeHtml(i.t)+'</h3><p>'+escapeHtml(i.d)+'</p>'
+  el.innerHTML = '<button type="button" class="ri-thumb" onclick="openEcg12(\''+r+'\')" aria-label="Ver ECG de 12 derivaciones de '+escapeHtml(i.t)+'">'
+    + '<img src="'+ecg12Thumb(r)+'" alt="" width="440" height="214">'
+    + '<span class="ri-thumb-tag"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>12 D</span></button>'
+    + '<h3>'+escapeHtml(i.t)+'</h3><p>'+escapeHtml(i.d)+'</p>'
     + '<div class="ri-k">Claves en el ECG</div><ul>'+i.e.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>'
     + '<div class="ri-k">A tener en cuenta</div><p>'+escapeHtml(i.c)+'</p>'
     + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
