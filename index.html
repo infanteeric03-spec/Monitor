@@ -886,6 +886,59 @@
     .vital-card.alarm, .wx-card.alarm{ animation:none !important; box-shadow:0 0 0 2px var(--alarm) inset; }
     .btn-send-now.has-pending .pending-dot{ animation:none !important; }
   }
+
+  /* ---------- Bienvenida estilo "monitor de box" (opción A) ----------
+     Siempre oscura (es la pantalla del monitor), también con el tema claro. */
+  #gate{
+    --g-ecg:#35ff6b; --g-spo2:#21d4fd; --g-red:#ff4d5e; --g-dim:#6f8a80; --g-text:#e6f2ee;
+    background-color:#05080a; color:var(--g-text);
+    background-image:linear-gradient(rgba(53,255,107,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(53,255,107,.06) 1px,transparent 1px);
+    background-size:18px 18px; flex-direction:column;
+  }
+  .gate-bar{
+    position:absolute; top:max(16px, env(safe-area-inset-top)); left:18px; right:64px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-num); font-size:11px; letter-spacing:.06em; color:var(--g-dim);
+  }
+  .gate-clock{ display:flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums; }
+  .gate-clock i{ width:7px; height:7px; border-radius:50%; background:var(--g-ecg); box-shadow:0 0 6px var(--g-ecg); }
+  #gate .gate-theme{ top:max(9px, calc(env(safe-area-inset-top) - 7px)); background:rgba(10,16,14,.85); border-color:#1d2a25; color:#9fb3ac; }
+  #gate .gate-box{ max-width:400px; }
+  .gate-ecg{ display:block; width:calc(100% + 40px); margin:0 -20px 6px; height:90px; overflow:visible; }
+  .gate-ecg path{ fill:none; stroke:var(--g-ecg); stroke-width:2.4; stroke-linejoin:round; stroke-linecap:round;
+    filter:drop-shadow(0 0 5px var(--g-ecg)); stroke-dasharray:1; stroke-dashoffset:0; animation:gateEcg 3.2s linear infinite; }
+  @keyframes gateEcg{ 0%{ stroke-dashoffset:1; opacity:1; } 70%{ stroke-dashoffset:0; opacity:1; } 88%{ stroke-dashoffset:0; opacity:1; } 100%{ stroke-dashoffset:0; opacity:0; } }
+  .gate-kicker{ font-size:11px; letter-spacing:.22em; color:var(--g-red); font-weight:700; }
+  #gate .gate-box h2{ color:var(--g-text); }
+  #gate .gate-box h2.gate-title{ font-size:30px; font-weight:800; letter-spacing:-.01em; line-height:1.1; margin:4px 0 0; text-wrap:balance; }
+  #gate .gate-box p{ color:#8aa39a; font-size:13px; margin:8px 0 24px; }
+  #gate .role-cards{ gap:14px; }
+  #gate .role-card{
+    position:relative; overflow:hidden; display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto auto;
+    column-gap:10px; row-gap:2px; padding:14px 16px 14px 20px; text-align:left;
+    background:rgba(10,16,14,.85); border:1px solid #1d2a25; border-radius:10px; color:var(--g-text);
+    transition:border-color .15s, background-color .15s;
+  }
+  #gate .role-card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent); }
+  #gate #cardRoleInstructor{ --accent:var(--g-ecg); }
+  #gate #cardRoleMonitor{ --accent:var(--g-spo2); }
+  #gate .role-card:hover{ border-color:var(--accent); background:rgba(14,22,19,.95); }
+  #gate .role-card .role-icon{ display:none; }
+  #gate .role-card .role-num{ grid-column:1; font-size:10px; letter-spacing:.14em; color:var(--g-dim); font-weight:700; }
+  #gate .role-card .name{ grid-column:1; font-family:var(--font-num); font-size:24px; font-weight:700; letter-spacing:.02em;
+    color:var(--accent); text-shadow:0 0 10px color-mix(in srgb, var(--accent) 50%, transparent); align-self:auto; }
+  #gate .role-card .desc{ grid-column:1; font-size:12.5px; color:#9fb3ac; margin:0; align-self:auto; }
+  #gate .role-card .role-go{ grid-column:2; grid-row:1 / 4; align-self:center; font-size:24px; color:#41544d; transition:color .15s, transform .15s; }
+  #gate .role-card:hover .role-go{ color:var(--accent); transform:translateX(2px); }
+  #gate .role-card:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  /* paso del código de sala con el mismo estilo */
+  #gate .code-row input{ background:rgba(10,16,14,.85); border-color:#1d2a25; color:var(--g-ecg); text-shadow:0 0 8px rgba(53,255,107,.45); }
+  #gate .gate-btn{ background:rgba(10,16,14,.85); border-color:var(--g-ecg); color:var(--g-ecg); }
+  #gate .gate-btn.secondary{ border-color:#1d2a25; color:#9fb3ac; }
+  #gate .gate-status{ color:var(--g-dim); }
+  .gate-foot{ position:absolute; left:0; right:0; bottom:max(16px, env(safe-area-inset-bottom)); text-align:center; font-size:10.5px; color:#4f625b; }
+  @media (max-height:600px){ .gate-ecg{ height:56px; } #gate .gate-box h2.gate-title{ font-size:24px; } .gate-foot{ display:none; } }
+  @media (prefers-reduced-motion: reduce){ .gate-ecg path{ animation:none !important; stroke-dashoffset:0; opacity:1; } }
 </style>
 </head>
 <body>
@@ -898,11 +951,14 @@
 </script>
 
 <div id="gate">
+  <div class="gate-bar" aria-hidden="true"><span>BOX 3 · URG</span><span class="gate-clock"><i></i><span id="gateClock">--:--:--</span></span></div>
   <button type="button" class="theme-btn gate-theme themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
   <div class="gate-box">
     <div id="gateRoleStep">
-      <h2>Simulador · Monitor</h2>
-      <p>Elige cómo vas a usar este dispositivo. El Instructor controla el caso; el Monitor solo lo muestra, como un monitor real de paciente.</p>
+      <svg class="gate-ecg" viewBox="0 0 344 90" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M0 55 H40 l6-5 6 5 H70 l4 6 6-48 6 58 5-11 H120 q12-16 24 0 H170 l6-5 6 5 H200 l4 6 6-48 6 58 5-11 H250 q12-16 24 0 H344"/></svg>
+      <div class="gate-kicker">SIMULACIÓN · URGENCIAS</div>
+      <h2 class="gate-title">Monitor de constantes</h2>
+      <p>Elige tu papel en esta sesión de práctica.</p>
       <div class="role-cards">
         <div class="role-card" id="cardRoleInstructor" role="button" tabindex="0" onclick="selectRole('instructor')">
           <span class="emoji role-icon">
@@ -959,8 +1015,10 @@
               <circle cx="93.5" cy="79.5" r="2.4" fill="#ff4d5e"/>
             </svg>
           </span>
-          <div class="name">Instructor</div>
-          <div class="desc">Controla ritmo, constantes y casos clínicos</div>
+          <div class="role-num">ROL 01</div>
+          <div class="name">INSTRUCTOR</div>
+          <div class="desc">Controla ritmos, constantes y casos</div>
+          <span class="role-go" aria-hidden="true">›</span>
         </div>
         <div class="role-card" id="cardRoleMonitor" role="button" tabindex="0" onclick="selectRole('monitor')">
           <span class="emoji role-icon">
@@ -1010,8 +1068,10 @@
               <text x="40" y="90.5" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="8.5" fill="#ff6b78">ECG</text>
             </svg>
           </span>
-          <div class="name">Monitor</div>
-          <div class="desc">Solo visualización, para el alumno</div>
+          <div class="role-num">ROL 02</div>
+          <div class="name">ALUMNO</div>
+          <div class="desc">Ve el monitor y responde preguntas</div>
+          <span class="role-go" aria-hidden="true">›</span>
         </div>
       </div>
     </div>
@@ -1027,6 +1087,7 @@
       <div class="gate-status" id="gateStatus"></div>
     </div>
   </div>
+  <div class="gate-foot">Uso formativo · no apto para diagnóstico</div>
 </div>
 
 <div class="wrap" id="appWrap" style="display:none;">
@@ -1475,7 +1536,7 @@ function selectRole(r){
   const input = document.getElementById('roomCodeInput');
   if(r==='instructor'){
     document.getElementById('roomStepTitle').textContent = 'Crea una sala';
-    document.getElementById('roomStepDesc').textContent = 'Este será el código que debes compartir con el dispositivo Monitor. Puedes cambiarlo si quieres.';
+    document.getElementById('roomStepDesc').textContent = 'Este será el código que debes compartir con el dispositivo del alumno. Puedes cambiarlo si quieres.';
     input.value = String(Math.floor(1000+Math.random()*9000));
   } else {
     document.getElementById('roomStepTitle').textContent = 'Únete a una sala';
@@ -3544,6 +3605,16 @@ document.querySelectorAll('[role="switch"]').forEach(sw=>{
   const upd = ()=>sw.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false');
   upd(); new MutationObserver(upd).observe(sw, { attributes:true, attributeFilter:['class'] });
 });
+
+
+/* reloj de la barra de estado de la bienvenida */
+(function(){
+  const el = document.getElementById('gateClock'), gate = document.getElementById('gate');
+  if(!el || !gate) return;
+  const fmt = new Intl.DateTimeFormat('es-ES', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+  const tick = ()=>{ if(gate.style.display!=='none') el.textContent = fmt.format(new Date()); };
+  tick(); setInterval(tick, 1000);
+})();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
