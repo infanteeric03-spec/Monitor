@@ -1446,6 +1446,30 @@
   #appDialog .ad-ok{ background:var(--ecg); color:#04140b; border:1px solid var(--ecg); }
   #appDialog.danger .ad-ok{ background:var(--alarm); border-color:var(--alarm); color:#fff; }
   @media (prefers-reduced-motion: reduce){ #appDialog .ad-card{ animation:none; } }
+
+  /* ---------- Alumno: aviso llamativo de pérdida de pulso (también sobre el monitor ampliado) ---------- */
+  #noPulseAlert{ position:fixed; inset:0; z-index:92; display:none; align-items:center; justify-content:center; padding:20px;
+    background:rgba(40,0,6,.45); cursor:pointer; }
+  #noPulseAlert.open{ display:flex; animation:npFlash 1s ease-in-out 3; }
+  @keyframes npFlash{ 0%,100%{ background:rgba(40,0,6,.45); } 50%{ background:rgba(255,30,50,.35); } }
+  #noPulseAlert .np-card{ text-align:center; padding:22px 30px; border-radius:14px; background:rgba(10,2,4,.92);
+    border:2px solid #ff4d5e; box-shadow:0 0 0 4px rgba(255,77,94,.25), 0 0 40px rgba(255,77,94,.55); max-width:min(90vw,460px); }
+  #noPulseAlert .np-title{ font-family:var(--font-num); font-weight:800; font-size:clamp(30px,8vw,52px); letter-spacing:.08em; color:#ff4d5e;
+    text-shadow:0 0 18px rgba(255,77,94,.8); animation:alarmPulse 1s infinite; }
+  #noPulseAlert .np-sub{ margin-top:6px; font-size:clamp(14px,3.6vw,18px); color:#ffd2d6; font-weight:600; }
+  #noPulseAlert .np-hint{ margin-top:10px; font-size:11px; color:#c48b92; letter-spacing:.06em; }
+  @media (max-width:760px) and (orientation:portrait){ body.waves-expanded #noPulseAlert .np-card{ transform:rotate(90deg); } }
+  @media (prefers-reduced-motion: reduce){ #noPulseAlert.open, #noPulseAlert .np-title{ animation:none; } }
+  body.role-instructor #noPulseAlert{ display:none !important; }
+
+  /* ---------- ECG ampliado: barra de anotación superpuesta y centrada ---------- */
+  .ecg12-box{ --e12-head:50px; }
+  .ecg12-tools{ position:absolute; top:calc(var(--e12-head) + 8px); left:50%; transform:translateX(-50%); z-index:4;
+    justify-content:center; flex-wrap:nowrap; max-width:calc(100% - 16px); border:1px solid rgba(160,120,120,.35) !important;
+    border-radius:10px; padding:5px 8px !important; background:rgba(255,255,255,.78); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    box-shadow:0 4px 14px rgba(0,0,0,.12); }
+  .ecg12-tools .ecg12-b{ display:inline-flex; align-items:center; justify-content:center; gap:4px; }
+  .ecg12-tools .ecg12-b svg{ width:16px; height:16px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -2011,6 +2035,13 @@
     </div>
   </div>
 </div>
+<div id="noPulseAlert" role="alert" aria-live="assertive" onclick="hideNoPulseAlert()">
+  <div class="np-card">
+    <div class="np-title">⚠ SIN PULSO</div>
+    <div class="np-sub" id="npSub"></div>
+    <div class="np-hint">Toca para cerrar</div>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="joinNote" role="status" aria-live="polite"></div>
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
@@ -2081,8 +2112,8 @@
       <button type="button" class="ecg12-sw" data-c="#1f6fe0" style="--c:#1f6fe0" onclick="setInkColor(this)" aria-label="Color azul"></button>
       <button type="button" class="ecg12-sw" data-c="#13a05a" style="--c:#13a05a" onclick="setInkColor(this)" aria-label="Color verde"></button>
       <span class="ecg12-sep"></span>
-      <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer">↶</button>
-      <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><span aria-hidden="true">🗑</span><span class="lbl"> Borrar</span></button>
+      <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5 3.5 9l4 4"/><path d="M3.8 9H12a4.5 4.5 0 0 1 0 9h-2"/></svg></button>
+      <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.5 8.5v5M11.5 8.5v5"/></svg><span class="lbl"> Borrar</span></button>
     </div>
     <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas><canvas id="ecg12Ink"></canvas></div>
     <div class="ecg12-foot"><span id="ecg12Hint">Pellizca con dos dedos para ampliar y arrastra para moverte · </span>Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
@@ -2470,8 +2501,11 @@ function applyRemoteState(p){
   }
   state.rhythm = p.rhythm; state.hr = p.hr; state.spo2 = p.spo2;
   state.sys = p.sys; state.dia = p.dia; state.rr = p.rr; state.temp = p.temp;
+  const hadPulse = monitorPulsePresent !== false;
   monitorPulsePresent = p.pulsePresent;
   syncInputs();
+  if(p.pulsePresent === false && hadPulse) showNoPulseAlert(p.rhythm);
+  else if(p.pulsePresent !== false) hideNoPulseAlert();
 }
 
 /* ---------- Banco de preguntas (tipo test, 4 opciones) ---------- */
@@ -4550,6 +4584,7 @@ function openEcg12(r, opts){
   document.getElementById('ecg12Overlay').classList.add('open');
   document.body.classList.add('waves-open');
   updateWakeLock();
+  requestAnimationFrame(syncEcg12HeadH);
   e12DrawnZ = 0;
   requestAnimationFrame(drawEcg12Big);
   if(!opts.keepFocus) document.querySelector('.ecg12-close').focus({ preventScroll:true });
@@ -4736,7 +4771,7 @@ function toggleInkBar(force){
   btn.setAttribute('aria-pressed', open?'true':'false');
   if(open){ if(!inkTool) setInkTool('pen'); }
   else { setInkTool(null); removeInkText(); }
-  requestAnimationFrame(()=>{ if(ecg12Rhythm) drawEcg12Big(); });
+  syncEcg12HeadH();
 }
 /* nombre del ritmo visible para el alumno (desmarcado al abrir cada ECG) */
 let ecg12ShowName = false;
@@ -4891,6 +4926,7 @@ function closeRemoteEcgView(){ if(ecg12Rhythm && ecg12Remote) closeEcg12(); }
 window.addEventListener('resize', ()=>{
   if(!ecg12Rhythm) return;
   requestAnimationFrame(()=>{
+    syncEcg12HeadH();
     if(ecg12Remote && e12LastRect) Object.assign(e12View, viewForRect(e12LastRect));
     drawEcg12Big();
     if(ecg12Mirror) sendEcg12View(true); // si cambia la forma de la pantalla del instructor, se reenvía la zona
@@ -5449,6 +5485,21 @@ function appConfirm(msg, opts){
     d.onclick = (e)=>{ if(e.target===d) done(false); };
     document.addEventListener('keydown', onKey, true);
   });
+}
+
+
+function showNoPulseAlert(r){
+  if(role!=='monitor') return;
+  const sub = r==='vfib' ? 'Fibrilación ventricular — inicia RCP' : r==='asystole' ? 'Asistolia — inicia RCP' : 'Comprueba al paciente: posible AESP — inicia RCP';
+  document.getElementById('npSub').textContent = sub;
+  const a = document.getElementById('noPulseAlert');
+  a.classList.remove('open'); void a.offsetWidth; a.classList.add('open');
+}
+function hideNoPulseAlert(){ const a = document.getElementById('noPulseAlert'); if(a) a.classList.remove('open'); }
+/* altura de la cabecera del ECG ampliado: la barra de anotación flota justo debajo */
+function syncEcg12HeadH(){
+  const box = document.getElementById('ecg12Box'), head = box && box.querySelector('.ecg12-head');
+  if(head) box.style.setProperty('--e12-head', head.offsetHeight+'px');
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
