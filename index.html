@@ -1472,6 +1472,28 @@
   .ecg12-tools .ecg12-b svg{ width:16px; height:16px; flex-shrink:0; }
 
   body.pref-no-flash #noPulseAlert.open, body.pref-no-flash #noPulseAlert .np-title{ animation:none; }
+
+  .no-pulse-tag{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:5; display:none; pointer-events:none;
+    font-family:var(--font-num); font-size:12px; font-weight:700; letter-spacing:.04em; white-space:nowrap;
+    color:#ff4d5e; background:rgba(40,4,8,.85); border:1px solid #ff4d5e; border-radius:6px; padding:3px 10px;
+    box-shadow:0 0 10px rgba(255,77,94,.35); }
+  body.role-monitor .no-pulse-tag.on{ display:block; }
+  body .waves.expanded .no-pulse-tag{ font-size:min(14px,3.4cqh); }
+  .case-label-row .case-name-chk, .case-name-chk{ display:inline-flex; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:var(--text-dim);
+    text-transform:none; letter-spacing:0; cursor:pointer; white-space:nowrap; font-weight:500; }
+  .case-name-chk input{ width:15px; height:15px; margin:0; accent-color:var(--ecg); cursor:pointer; }
+  .case-label-row{ display:flex; align-items:center; gap:8px; }
+  .cs-title:empty{ display:none; }
+
+  /* Alumno en tablet horizontal / ordenador: el monitor ocupa toda la altura de la columna de constantes */
+  @media (min-width:761px) and (min-height:561px){
+    body.role-monitor .monitor > .monitor-left{ align-self:stretch; display:flex; flex-direction:column; }
+    body.role-monitor .monitor > .monitor-left > .waves{ flex:1 1 auto; }
+    body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row{ height:auto !important; min-height:50px; flex:1 1 0; }
+    body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row:nth-child(1){ flex-grow:5; }
+    body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row:nth-child(2){ flex-grow:3; }
+    body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row:nth-child(3){ flex-grow:2.4; }
+  }
 </style>
 </head>
 <body>
@@ -1682,6 +1704,7 @@
           <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
         </div>
+        <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true">⚠ Sin pulso — RCP</div>
         <button type="button" class="waves-remote-btn" id="wavesRemoteBtn" onclick="toggleStudentWaves()" aria-pressed="false" aria-label="Ampliar el monitor del alumno" title="Ampliar el monitor del alumno">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="16" height="11" rx="1.6"/><path d="M7 17.5h6M10 14v3.5"/><path d="M11.5 6h3v3M8.5 11.2h-3v-3M14.5 6l-3 3M5.5 11.2l3-3"/></svg>
         </button>
@@ -1744,6 +1767,7 @@
                 <div class="case-select-wrap">
                   <div class="case-label-row">
                     <label for="caseSelect">Caso clínico</label>
+                    <label class="case-name-chk" title="Mostrar al alumno el nombre del caso"><input type="checkbox" id="caseShowName" onchange="sendCaseView(true)"> Nombre al alumno</label>
                     <span class="case-time-top" id="caseTimeTop"></span>
                   </div>
                   <select id="caseSelect" onchange="onCaseSelect(this.value)">
@@ -2067,6 +2091,7 @@
       </section>
       <section class="st-sec"><h3>Casos clínicos</h3>
         <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span>Editor de casos<small>Crear o modificar casos</small></span><span class="st-chev" aria-hidden="true">›</span></button>
+        <div class="st-row"><span>Pausar el caso al llegar a la parada<small>El caso se detiene y espera a que confirmes; el alumno ve el aviso al continuar</small></span><button type="button" class="st-sw" role="switch" data-set="pauseOnArrest" aria-label="Pausar el caso al llegar a la parada"></button></div>
         <div class="st-row"><span>Velocidad por defecto</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
       </section>
       <section class="st-sec"><h3>Pantalla del alumno</h3>
@@ -2508,7 +2533,8 @@ function applyRemoteState(p){
   monitorPulsePresent = p.pulsePresent;
   syncInputs();
   if(p.pulsePresent === false && hadPulse) showNoPulseAlert(p.rhythm);
-  else if(p.pulsePresent !== false) hideNoPulseAlert();
+  else if(p.pulsePresent !== false){ hideNoPulseAlert(); setNoPulseTag(false); }
+  else setNoPulseTag(true);
 }
 
 /* ---------- Banco de preguntas (tipo test, 4 opciones) ---------- */
@@ -2578,7 +2604,7 @@ let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 /* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
-var SETTINGS_DEF = { noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
+var SETTINGS_DEF = { pauseOnArrest:true, noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
 var settings = Object.assign({}, SETTINGS_DEF);
 try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
 let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
@@ -3392,7 +3418,7 @@ function onCaseSelect(key){
   document.getElementById('speedSelect').disabled = false;
   setPlayLabel('start');
   updateCaseActionButtons();
-  scenario.started = false; sendCaseView(true); // un caso nuevo no se muestra al alumno hasta iniciarlo
+  scenario.started = false; scenario.arrestOk = new Set(); sendCaseView(true); // un caso nuevo no se muestra al alumno hasta iniciarlo
   if(!scenario.playing && scenario.t===0 && settings.speed && settings.speed!==scenario.speed) setCaseSpeed(+settings.speed);
   applyScenarioAtTime(0);
   updateStickyMonitor();
@@ -3429,6 +3455,7 @@ function stepScenario(direction){
 
 function resetScenario(){
   if(!scenario.active) return;
+  scenario.arrestOk = new Set();
   scenario.t = 0;
   scenario.playing = false;
   setPlayLabel('start');
@@ -3876,8 +3903,18 @@ function frame(ts){
   if(role!=='monitor'){
     // avance del caso clínico, si hay uno activo y en reproducción (solo decide el Instructor / modo local)
     if(scenario.active && scenario.playing){
-      scenario.t += dtSec * (scenario.speed || 1);
-      applyScenarioAtTime(scenario.t);
+      const nt = scenario.t + dtSec * (scenario.speed || 1);
+      const hold = settings.pauseOnArrest!==false ? arrestAhead(scenario.t, nt) : null;
+      if(hold){
+        // se detiene justo antes de la fase de parada y espera la confirmación del instructor
+        scenario.t = Math.max(0, hold.kf.t - 0.001);
+        scenario.playing = false; setPlayLabel('resume');
+        applyScenarioAtTime(scenario.t); sendCaseView(true);
+        promptArrest(hold);
+      } else {
+        scenario.t = nt;
+        applyScenarioAtTime(scenario.t);
+      }
     }
     // pulso presente según el ritmo (siempre ausente en FV/asistolia), forzado por el caso clínico
     // si hay uno activo (ej. TV sin pulso), o apagado a mano por el Instructor para simular AESP
@@ -5126,7 +5163,8 @@ function sendCaseView(force){
   if(scenario.active && scenario.key && scenario.started){
     const c = getCase(scenario.key), kfs = c.keyframes;
     let idx = 0; for(let i=0;i<kfs.length;i++){ if(kfs[i].t<=scenario.t) idx = i; }
-    p = { active:true, title:c.title || 'Caso clínico', label:kfs[idx].label || '', t:+scenario.t.toFixed(1),
+    const showName = document.getElementById('caseShowName')?.checked;
+    p = { active:true, title: showName ? (c.title || '') : '', label:kfs[idx].label || '', t:+scenario.t.toFixed(1),
           total:kfs[kfs.length-1].t, playing:!!scenario.playing, speed:scenario.speed||1, phase:idx };
   } else p = { active:false };
   const sig = p.active ? [p.title,p.phase,p.playing,p.speed].join('|') : 'off';
@@ -5498,12 +5536,47 @@ function showNoPulseAlert(r){
   document.getElementById('npSub').textContent = sub;
   const a = document.getElementById('noPulseAlert');
   a.classList.remove('open'); void a.offsetWidth; a.classList.add('open');
+  clearTimeout(showNoPulseAlert._t);
+  showNoPulseAlert._t = setTimeout(hideNoPulseAlert, 3000);   // visible 3 s (o hasta que el alumno lo cierre)
+  setNoPulseTag(true);
 }
 function hideNoPulseAlert(){ const a = document.getElementById('noPulseAlert'); if(a) a.classList.remove('open'); }
+// etiqueta discreta "⚠ Sin pulso — RCP" sobre el monitor del alumno mientras dure la parada
+function setNoPulseTag(on){ const t = document.getElementById('noPulseTag'); if(t) t.classList.toggle('on', !!on); }
 /* altura de la cabecera del ECG ampliado: la barra de anotación flota justo debajo */
 function syncEcg12HeadH(){
   const box = document.getElementById('ecg12Box'), head = box && box.querySelector('.ecg12-head');
   if(head) box.style.setProperty('--e12-head', head.offsetHeight+'px');
+}
+
+
+/* ---------- Pausa del caso al entrar en parada ----------
+   Si el caso va a pasar de una fase con pulso a una de parada, se detiene antes y se pide al
+   instructor que confirme; al continuar se aplica la fase (y el alumno recibe el aviso). */
+function arrestAhead(t0, t1){
+  const kfs = getCase(scenario.key).keyframes;
+  scenario.arrestOk = scenario.arrestOk || new Set();
+  for(let i=1;i<kfs.length;i++){
+    const k = kfs[i];
+    if(k.t > t0 && k.t <= t1 && isArrestPhase(k) && !isArrestPhase(kfs[i-1]) && !scenario.arrestOk.has(scenario.key+':'+i)) return { kf:k, idx:i };
+  }
+  return null;
+}
+async function promptArrest(hold){
+  if(promptArrest._open) return; promptArrest._open = true;
+  const ok = await appConfirm('Parada cardiorrespiratoria\n\nEl caso ha llegado a la fase «'+(hold.kf.label||'parada')+'». Se ha detenido la cronología.\nAl continuar, el alumno verá el aviso de pérdida de pulso.', { ok:'Continuar', cancel:'Mantener en pausa', danger:true });
+  promptArrest._open = false;
+  if(!ok || !scenario.active) return;
+  scenario.arrestOk.add(scenario.key+':'+hold.idx);
+  scenario.t = hold.kf.t;
+  applyScenarioAtTime(scenario.t);
+  scenario.playing = true; scenario.started = true; setPlayLabel('pause'); sendCaseView(true);
+}
+
+
+if(window.ResizeObserver){
+  let rt = null; const wv = document.querySelector('.waves');
+  if(wv) new ResizeObserver(()=>{ clearTimeout(rt); rt = setTimeout(()=>{ try{ ecgSweep.resize(); spo2Sweep.resize(); respSweep.resize(); }catch(e){} }, 80); }).observe(wv);
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
