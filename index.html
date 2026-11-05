@@ -1014,7 +1014,7 @@
   .rhythm-pick{ display:flex; gap:8px; align-items:stretch; }
   .rhythm-pick .csel-btn{ flex:1 1 auto; }
   .rhythm-send{ flex:0 0 auto; white-space:nowrap; display:flex; align-items:center; gap:2px; }
-  .rhythm-send.sent{ background:rgba(53,255,107,.12); }
+  .rhythm-send.sharing{ border-color:var(--alarm); color:var(--alarm); background:rgba(255,77,94,.08); }
 
   /* móvil en vertical (instructor): las constantes van justo debajo del monitor y las pestañas
      (Ritmo / Caso clínico / Preguntas) después */
@@ -1712,6 +1712,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'question'}, (msg)=> showQuestionOnMonitor(msg.payload));
     channel.on('broadcast', {event:'question_clear'}, ()=> hideQuestionOnMonitor());
     channel.on('broadcast', {event:'rhythm_name'}, (msg)=> msg.payload && showRhythmShare(msg.payload.key, msg.payload.name));
+    channel.on('broadcast', {event:'rhythm_name_clear'}, ()=> hideRhythmShare());
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -1925,6 +1926,7 @@ function broadcastState(){
 
 // El Monitor aplica lo recibido tal cual, sin volver a decidir nada por su cuenta
 function applyRemoteState(p){
+  if(rhythmShareKey && p.rhythm !== rhythmShareKey) hideRhythmShare();
   if(state.rhythm !== p.rhythm){
     av.atrialTimer=0; av.ventTimer=0; av.pAge=999; av.qAge=999;
     av.wbIndex=0; av.m2Count=0; av.pendingQrsIn=null;
@@ -4062,6 +4064,7 @@ function updateRhythmInfo(r){
   const el = document.getElementById('rhythmInfo');
   if(!el) return;
   if(!RHYTHM_INFO) return;
+  if(typeof onRhythmChangedForShare==='function') onRhythmChangedForShare(r);
   const i = RHYTHM_INFO[r];
   if(!i){ el.innerHTML = ''; return; }
   el.classList.toggle('collapsed', rhythmInfoCollapsed);
@@ -4070,8 +4073,10 @@ function updateRhythmInfo(r){
     + '<div class="ri-body" id="rhythmInfoBody">'+rhythmThumbHTML(r,i,false)+rhythmBodyHTML(i)+'</div>';
 }
 /* vista del alumno: ficha enviada por el instructor, debajo de las constantes */
+var rhythmShareKey = null;
 function showRhythmShare(key, name){
   const el = document.getElementById('rhythmShare'); if(!el) return;
+  rhythmShareKey = key;
   const i = RHYTHM_INFO[key];
   el.innerHTML = '<button type="button" class="rn-close" onclick="hideRhythmShare()" aria-label="Cerrar ficha">×</button>'
     + '<div class="ri-head-k">Ritmo</div><h3 class="rs-title">'+escapeHtml(i ? i.t : (name||''))+'</h3>'
@@ -4079,24 +4084,44 @@ function showRhythmShare(key, name){
   el.classList.add('open');
   el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest' });
 }
-function hideRhythmShare(){ const el=document.getElementById('rhythmShare'); if(el){ el.classList.remove('open'); el.innerHTML=''; } }
+function hideRhythmShare(){ rhythmShareKey = null; const el=document.getElementById('rhythmShare'); if(el){ el.classList.remove('open'); el.innerHTML=''; } }
 updateRhythmInfo(document.getElementById('rhythmSelect').value || 'nsr');
 
 
 /* ---------- Enviar al alumno el nombre del ritmo que se está viendo ---------- */
+/* El botón alterna: "Enviar" muestra la ficha al alumno; mientras está visible pasa a "✕" para
+   retirarla. La ficha también se retira sola en cuanto cambia el ritmo del monitor. */
+var sharedRhythm = null;
+function refreshSendRhythmBtn(){
+  const btn = document.getElementById('btnSendRhythm'); if(!btn) return;
+  const on = !!sharedRhythm;
+  btn.classList.toggle('sharing', on);
+  btn.innerHTML = on ? '<span aria-hidden="true">✕</span><span class="lbl"> Retirar</span>'
+                     : '<span aria-hidden="true">📨</span><span class="lbl"> Enviar</span>';
+  const t = on ? 'Dejar de mostrar la ficha al alumno' : 'Enviar al alumno el nombre y la ficha del ritmo';
+  btn.title = t; btn.setAttribute('aria-label', t); btn.setAttribute('aria-pressed', on?'true':'false');
+}
 function sendRhythmName(){
   const btn = document.getElementById('btnSendRhythm');
-  const sel = document.getElementById('rhythmSelect');
-  const opt = sel.options[sel.selectedIndex];
-  const name = (RHYTHM_INFO[state.rhythm] && RHYTHM_INFO[state.rhythm].t) || (opt && opt.textContent) || '';
-  const lbl = btn.querySelector('.lbl');
   if(role!=='instructor' || !channel){
-    lbl.textContent = ' Sin conexión'; setTimeout(()=>{ lbl.textContent = ' Enviar'; }, 1800); return;
+    const lbl = btn.querySelector('.lbl'); lbl.textContent = ' Sin conexión';
+    setTimeout(refreshSendRhythmBtn, 1800); return;
   }
-  channel.send({ type:'broadcast', event:'rhythm_name', payload:{ key:state.rhythm, name } });
-  btn.classList.add('sent'); lbl.textContent = ' Enviado';
-  clearTimeout(sendRhythmName._t);
-  sendRhythmName._t = setTimeout(()=>{ btn.classList.remove('sent'); lbl.textContent = ' Enviar'; }, 1800);
+  if(sharedRhythm){
+    channel.send({ type:'broadcast', event:'rhythm_name_clear', payload:{} });
+    sharedRhythm = null;
+  } else {
+    const sel = document.getElementById('rhythmSelect');
+    const opt = sel.options[sel.selectedIndex];
+    const name = (RHYTHM_INFO[state.rhythm] && RHYTHM_INFO[state.rhythm].t) || (opt && opt.textContent) || '';
+    channel.send({ type:'broadcast', event:'rhythm_name', payload:{ key:state.rhythm, name } });
+    sharedRhythm = state.rhythm;
+  }
+  refreshSendRhythmBtn();
+}
+// si el ritmo cambia, la ficha del alumno se retira (el monitor lo hace solo al recibir el nuevo ritmo)
+function onRhythmChangedForShare(r){
+  if(sharedRhythm && r !== sharedRhythm){ sharedRhythm = null; refreshSendRhythmBtn(); }
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
