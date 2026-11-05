@@ -999,7 +999,7 @@
     width:min(96vw,1300px); height:min(92vh, calc(min(96vw,1300px) * 0.56)); background:#fbfbfb; color:#222;
     border-radius:10px; box-shadow:0 14px 48px rgba(0,0,0,.6); display:flex; flex-direction:column; overflow:hidden; }
   .ecg12-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-bottom:1px solid #e3d4d4; }
-  .ecg12-k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b2444b; margin-right:8px; }
+  .ecg12-k{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b2444b; margin-right:2px; }
   .ecg12-t{ font-size:14px; font-weight:700; }
   .ecg12-close{ width:34px; height:34px; border-radius:6px; border:1px solid #d9caca; background:#fff; color:#333; font-size:15px; cursor:pointer; flex-shrink:0; }
   .ecg12-paper{ flex:1; min-height:0; position:relative; }
@@ -1007,7 +1007,6 @@
   .ecg12-paper canvas{ position:absolute; left:0; top:0; }
   .ecg12-paper.zoomed{ cursor:grab; }
   .ecg12-paper.zoomed.dragging{ cursor:grabbing; }
-  .ecg12-head > div:first-child{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ecg12-ctrl{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
   .ecg12-b{ height:32px; min-width:32px; padding:0 8px; border-radius:6px; border:1px solid #d9caca; background:#fff; color:#333;
     font-size:15px; font-family:inherit; cursor:pointer; white-space:nowrap; }
@@ -1018,6 +1017,17 @@
   body.role-monitor #ecg12Hint{ display:none; }
   #ecg12Overlay.remote .ecg12-paper{ cursor:default; }
   #ecg12Overlay.remote .ecg12-ctrl, #ecg12Overlay.remote .ecg12-tools{ display:none; }
+  .ecg12-tools[hidden]{ display:none !important; }
+  .ecg12-titlebox{ display:flex; align-items:center; gap:6px; flex:1; min-width:0; overflow:hidden; white-space:nowrap; }
+  .ecg12-titlebox .ecg12-t{ overflow:hidden; text-overflow:ellipsis; }
+  .ecg12-box{ color-scheme:light; }
+  .ecg12-namechk{ display:flex; align-items:center; flex-shrink:0; cursor:pointer; padding:4px; }
+  .ecg12-namechk input{ width:18px; height:18px; accent-color:#b2444b; cursor:pointer; margin:0; }
+  .ecg12-penbtn{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:600; }
+  .ecg12-penbtn svg{ width:16px; height:16px; }
+  .ecg12-penbtn[aria-pressed="true"]{ background:#2b2f33; border-color:#2b2f33; color:#fff; }
+  .ecg12-ctrl .ecg12-sep{ margin:0 2px; }
+  body.role-monitor .ecg12-ctrl .ecg12-sep{ display:none; }
   .ecg12-tools{ display:flex; align-items:center; gap:4px; padding:6px 12px; border-bottom:1px solid #eadede; flex-wrap:wrap; }
   .ecg12-tools .ecg12-b{ height:30px; font-size:13px; }
   .ecg12-tool[aria-pressed="true"]{ background:#2b2f33; border-color:#2b2f33; color:#fff; }
@@ -1028,7 +1038,7 @@
   .ecg12-paper.ink-pen{ cursor:crosshair; } .ecg12-paper.ink-text{ cursor:text; }
   .ecg12-txt{ position:absolute; z-index:2; min-width:120px; font:600 16px system-ui, sans-serif; padding:3px 6px;
     border:1.5px dashed currentColor; border-radius:4px; background:rgba(255,255,255,.92); outline:none; }
-  @media (max-width:600px), (max-height:500px){ .ecg12-tools .lbl{ display:none; } }
+  @media (max-width:600px), (max-height:500px){ .ecg12-tools .lbl, .ecg12-penbtn .lbl{ display:none; } }
   .ecg12-live{ display:none; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:#b2444b; margin-left:8px; }
   #ecg12Overlay.remote .ecg12-live{ display:inline; }
   @media (max-width:600px), (max-height:500px){ .ecg12-mirror .lbl{ display:none; } .ecg12-k{ display:none; } }
@@ -1621,8 +1631,17 @@
 <div id="ecg12Overlay" role="dialog" aria-modal="true" aria-labelledby="ecg12Title" onclick="if(event.target===this) closeEcg12()">
   <div class="ecg12-box" id="ecg12Box">
     <div class="ecg12-head">
-      <div><span class="ecg12-k">ECG de 12 derivaciones</span><span id="ecg12Title" class="ecg12-t"></span><span class="ecg12-live">● EN DIRECTO DEL INSTRUCTOR</span></div>
+      <div class="ecg12-titlebox">
+        <span class="ecg12-k">ECG de 12 derivaciones</span>
+        <label class="ecg12-namechk instructor-only" title="Mostrar el nombre del ritmo al alumno">
+          <input type="checkbox" id="ecg12ShowName" onchange="onEcg12ShowName()" aria-label="Mostrar el nombre del ritmo al alumno">
+        </label><span id="ecg12Title" class="ecg12-t"></span><span class="ecg12-live">● EN DIRECTO DEL INSTRUCTOR</span>
+      </div>
       <div class="ecg12-ctrl">
+        <button type="button" class="ecg12-b ecg12-penbtn instructor-only" id="ecg12PenBtn" onclick="toggleInkBar()" aria-pressed="false" aria-controls="ecg12Tools" title="Anotar sobre el ECG">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 3.5l3 3L7 16H4v-3z"/><path d="M11.5 5.5l3 3"/></svg><span class="lbl"> Anotar</span>
+        </button>
+        <span class="ecg12-sep instructor-only"></span>
         <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
         <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
         <button type="button" class="ecg12-b" onclick="zoomEcg12(1)" aria-label="Ampliar">+</button>
@@ -1631,7 +1650,7 @@
       </div>
       <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
     </div>
-    <div class="ecg12-tools instructor-only" id="ecg12Tools" role="toolbar" aria-label="Anotar sobre el ECG">
+    <div class="ecg12-tools instructor-only" id="ecg12Tools" role="toolbar" aria-label="Anotar sobre el ECG" hidden>
       <button type="button" class="ecg12-b ecg12-tool" data-tool="pen" onclick="setInkTool('pen')" aria-pressed="false" title="Dibujar"><span aria-hidden="true">✏️</span><span class="lbl"> Dibujar</span></button>
       <button type="button" class="ecg12-b ecg12-tool" data-tool="text" onclick="setInkTool('text')" aria-pressed="false" title="Escribir texto"><b aria-hidden="true">T</b><span class="lbl"> Texto</span></button>
       <span class="ecg12-sep"></span>
@@ -4016,6 +4035,11 @@ function openEcg12(r, opts){
   ecg12Remote = !!opts.remote;
   document.getElementById('ecg12Overlay').classList.toggle('remote', ecg12Remote);
   document.getElementById('ecg12Title').textContent = (RHYTHM_INFO[r]||{}).t || '';
+  if(ecg12Remote) setRemoteEcgName(!!opts.showName);
+  if(changed && !ecg12Remote){
+    ecg12ShowName = false; const chk = document.getElementById('ecg12ShowName'); if(chk) chk.checked = false;
+  }
+  if(!ecg12Remote && !document.getElementById('ecg12Overlay').classList.contains('open')) toggleInkBar(false);
   document.getElementById('ecg12Overlay').classList.add('open');
   document.body.classList.add('waves-open');
   e12DrawnZ = 0;
@@ -4141,9 +4165,31 @@ let e12SendT = 0, e12SendTimer = null;
 function sendEcg12View(now){
   if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
   const go = ()=>{ e12SendT = Date.now(); e12SendTimer = null;
-    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy, rect:e12VisibleRect() } }); };
+    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy, rect:e12VisibleRect(), showName:ecg12ShowName } }); };
   clearTimeout(e12SendTimer);
   if(now || Date.now()-e12SendT > 90) go(); else e12SendTimer = setTimeout(go, 90);
+}
+
+
+/* barra de anotación: se despliega con el botón de la pluma */
+function toggleInkBar(force){
+  const bar = document.getElementById('ecg12Tools'), btn = document.getElementById('ecg12PenBtn');
+  if(!bar) return;
+  const open = force===undefined ? bar.hidden : force;
+  bar.hidden = !open;
+  btn.setAttribute('aria-pressed', open?'true':'false');
+  if(open){ if(!inkTool) setInkTool('pen'); }
+  else { setInkTool(null); removeInkText(); }
+  requestAnimationFrame(()=>{ if(ecg12Rhythm) drawEcg12Big(); });
+}
+/* nombre del ritmo visible para el alumno (desmarcado al abrir cada ECG) */
+let ecg12ShowName = false;
+function onEcg12ShowName(){
+  ecg12ShowName = document.getElementById('ecg12ShowName').checked;
+  sendEcg12View(true);
+}
+function setRemoteEcgName(show){
+  document.getElementById('ecg12Title').textContent = show ? ((RHYTHM_INFO[ecg12Rhythm]||{}).t || '') : '';
 }
 
 /* ---------- Anotar sobre el ECG (lápiz y texto) ----------
@@ -4278,9 +4324,9 @@ function applyRemoteEcgView(p){
   e12LastRect = p.rect || null;
   let view = { z:p.z||1, cx:p.cx??0.5, cy:p.cy??0.5 };
   if(p.rect && ecg12Rhythm===p.key && ecg12Remote) view = viewForRect(p.rect);
-  if(ecg12Rhythm===p.key && ecg12Remote){ Object.assign(e12View, view); drawEcg12Big(); }
+  if(ecg12Rhythm===p.key && ecg12Remote){ Object.assign(e12View, view); drawEcg12Big(); setRemoteEcgName(!!p.showName); }
   else {
-    openEcg12(p.key, { remote:true, view, keepFocus:true });
+    openEcg12(p.key, { remote:true, view, keepFocus:true, showName:!!p.showName });
     // ya abierta (y con su tamaño real), se encuadra la zona exacta del instructor
     if(p.rect) requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(ecg12Remote && ecg12Rhythm===p.key){ Object.assign(e12View, viewForRect(p.rect)); drawEcg12Big(); } }));
   }
