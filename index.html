@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Monitor de Constantes — Simulador</title>
 <link rel="manifest" href="manifest.json">
+<script>
+// iPad (incluidos los que se identifican como Mac) con la app abierta desde la pantalla de inicio
+(function(){
+  try{
+    const ipad = /iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+    const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+    if(ipad && standalone) document.documentElement.classList.add('ipad-app');
+  }catch(e){}
+})();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
@@ -1249,6 +1260,14 @@
   #updateBar.open{ opacity:1; transform:translate(-50%,0); pointer-events:auto; }
   #updateBar .ub-go{ background:#35ff6b; color:#04140b; border:none; border-radius:6px; padding:7px 12px; font-weight:700; font-family:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
   #updateBar .ub-x{ background:transparent; border:none; color:#8a979b; font-size:18px; cursor:pointer; padding:0 4px; }
+
+  /* iPad con la app instalada (iPadOS 26, ventanas): el sistema superpone arriba una barra de título
+     translúcida con el nombre de la app y los controles de ventana. Se deja un margen fijo para que
+     la primera línea de la app quede por debajo de ella. */
+  html.ipad-app #appWrap header{ padding-top:max(calc(6px + env(safe-area-inset-top, 0px)), 46px); }
+  html.ipad-app .gate-bar{ top:max(16px, env(safe-area-inset-top, 0px), 48px); }
+  html.ipad-app #gate .gate-theme{ top:max(9px, env(safe-area-inset-top, 0px), 41px); }
+  html.ipad-app .st-head{ padding-top:max(14px, env(safe-area-inset-top, 0px), 48px); }
 </style>
 </head>
 <body>
