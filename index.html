@@ -1479,7 +1479,7 @@
     box-shadow:0 0 10px rgba(255,77,94,.35); }
   body.role-monitor .no-pulse-tag.on{ display:block; }
   body .waves.expanded .no-pulse-tag{ font-size:min(14px,3.4cqh); }
-  .case-label-row .case-name-chk, .case-name-chk{ display:inline-flex; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:var(--text-dim);
+  .case-name-chk-old{ display:inline-flex; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:var(--text-dim);
     text-transform:none; letter-spacing:0; cursor:pointer; white-space:nowrap; font-weight:500; }
   .case-name-chk input{ width:15px; height:15px; margin:0; accent-color:var(--ecg); cursor:pointer; }
   .case-label-row{ display:flex; align-items:center; gap:8px; }
@@ -1494,6 +1494,14 @@
     body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row:nth-child(2){ flex-grow:3; }
     body.role-monitor .monitor > .monitor-left > .waves:not(.expanded) .trace-row:nth-child(3){ flex-grow:2.4; }
   }
+
+  .case-pick{ display:flex; align-items:center; gap:8px; min-width:0; }
+  .case-pick .csel-btn{ flex:1 1 auto; min-width:0; }
+  .case-pick .csel-btn .csel-text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .case-name-box{ flex:0 0 auto; width:20px; height:20px; margin:0; accent-color:var(--ecg); cursor:pointer; }
+  .case-pick .info-btn{ flex:0 0 auto; }
+  .case-name-info{ margin-top:6px; font-size:12px; line-height:1.45; color:var(--text-dim); background:var(--field);
+    border:1px solid var(--line); border-radius:6px; padding:8px 10px; }
 </style>
 </head>
 <body>
@@ -1767,15 +1775,19 @@
                 <div class="case-select-wrap">
                   <div class="case-label-row">
                     <label for="caseSelect">Caso clínico</label>
-                    <label class="case-name-chk" title="Mostrar al alumno el nombre del caso"><input type="checkbox" id="caseShowName" onchange="sendCaseView(true)"> Nombre al alumno</label>
                     <span class="case-time-top" id="caseTimeTop"></span>
                   </div>
+                  <div class="case-pick">
                   <select id="caseSelect" onchange="onCaseSelect(this.value)">
                     <option value="">— Ninguno (modo manual) —</option>
                     <option value="__new__">+ Crear caso nuevo…</option>
                     <option value="iam_pcr">IAM con evolución a PCR (TV sin pulso → FV → ROSC)</option>
                     <option value="avb_progresivo">Bloqueo AV progresivo hasta BAV completo</option>
                   </select>
+                  <input type="checkbox" class="case-name-box" id="caseShowName" onchange="sendCaseView(true)" title="Mostrar al alumno el nombre del caso" aria-label="Mostrar al alumno el nombre del caso" aria-describedby="caseNameInfo">
+                  <button type="button" class="info-btn" onclick="toggleCaseNameInfo()" aria-label="Qué hace esta casilla" aria-expanded="false" aria-controls="caseNameInfo">i</button>
+                  </div>
+                  <div class="case-name-info" id="caseNameInfo" hidden>Marca la casilla para que el alumno vea el <b>nombre del caso</b>. Si está desmarcada, solo verá la descripción de cada fase, el tiempo y los botones del caso.</div>
                 </div>
                 <div class="case-player">
                   <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior" aria-label="Fase anterior"><span aria-hidden="true">⏮</span></button>
@@ -5577,6 +5589,12 @@ async function promptArrest(hold){
 if(window.ResizeObserver){
   let rt = null; const wv = document.querySelector('.waves');
   if(wv) new ResizeObserver(()=>{ clearTimeout(rt); rt = setTimeout(()=>{ try{ ecgSweep.resize(); spo2Sweep.resize(); respSweep.resize(); }catch(e){} }, 80); }).observe(wv);
+}
+
+
+function toggleCaseNameInfo(){
+  const n = document.getElementById('caseNameInfo'), b = document.querySelector('.case-pick .info-btn');
+  n.hidden = !n.hidden; b.setAttribute('aria-expanded', n.hidden ? 'false' : 'true');
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
