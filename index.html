@@ -1268,6 +1268,13 @@
   html.ipad-app .gate-bar{ top:max(16px, env(safe-area-inset-top, 0px), 48px); }
   html.ipad-app #gate .gate-theme{ top:max(9px, env(safe-area-inset-top, 0px), 41px); }
   html.ipad-app .st-head{ padding-top:max(14px, env(safe-area-inset-top, 0px), 48px); }
+
+  /* Franja bajo la barra de estado del sistema (hora, wifi, batería): iOS/iPadOS 26 difumina lo que
+     queda debajo de ella. Con un color liso en esa franja (sin cuadrícula ni contenido) no se ve borroso. */
+  .safe-top{ position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top, 0px); background:#05080a;
+    z-index:120; pointer-events:none; }
+  html.ipad-app .safe-top{ height:max(env(safe-area-inset-top, 0px), 24px); }
+  body.theme-light.role-instructor .safe-top, body.theme-light.role-monitor .safe-top{ background:var(--bg); }
 </style>
 </head>
 <body>
@@ -1279,6 +1286,7 @@
   })();
 </script>
 
+<div class="safe-top" aria-hidden="true"></div>
 <div id="gate">
   <div class="gate-bar" aria-hidden="true"><span>BOX 3 · URG</span><span class="gate-clock"><i></i><span id="gateClock">--:--:--</span></span></div>
   <button type="button" class="theme-btn gate-theme themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
