@@ -1423,6 +1423,29 @@
   .pulse-btn.noflow{ background:color-mix(in srgb, var(--alarm) 12%, transparent); }
   .pulse-btn.locked{ color:var(--text-dim) !important; border-color:var(--line) !important; background:transparent !important; cursor:not-allowed; }
   #paneRhythm .controls > #pulseBadge{ white-space:nowrap; }
+
+  /* ---------- Diálogo de confirmación con el estilo de la app ---------- */
+  #appDialog{ position:fixed; inset:0; z-index:130; display:none; align-items:center; justify-content:center; padding:20px;
+    background:rgba(0,0,0,.6); overscroll-behavior:contain; }
+  #appDialog.open{ display:flex; }
+  #appDialog .ad-card{ width:100%; max-width:380px; background:var(--panel); color:var(--text); border:1px solid var(--line);
+    border-top:3px solid var(--ecg); border-radius:12px; padding:20px 20px 16px; box-shadow:0 18px 50px rgba(0,0,0,.55);
+    animation:adIn .16s ease-out; }
+  #appDialog.danger .ad-card{ border-top-color:var(--alarm); }
+  @keyframes adIn{ from{ transform:translateY(8px) scale(.98); opacity:.4; } to{ transform:none; opacity:1; } }
+  #appDialog .ad-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:12px;
+    background:color-mix(in srgb, var(--ecg) 14%, transparent); color:var(--ecg); }
+  #appDialog.danger .ad-icon{ background:color-mix(in srgb, var(--alarm) 14%, transparent); color:var(--alarm); }
+  #appDialog .ad-icon svg{ width:20px; height:20px; }
+  #appDialog .ad-title{ margin:0; font-size:17px; font-weight:800; line-height:1.3; text-wrap:balance; }
+  #appDialog .ad-text{ margin:8px 0 0; font-size:13.5px; line-height:1.5; color:var(--text-dim); white-space:pre-line; text-wrap:pretty; }
+  #appDialog .ad-text:empty{ display:none; }
+  #appDialog .ad-btns{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+  #appDialog .ad-btn{ min-height:38px; padding:0 16px; border-radius:8px; font-family:inherit; font-size:13.5px; font-weight:700; cursor:pointer; }
+  #appDialog .ad-cancel{ background:transparent; color:var(--text); border:1px solid var(--line); }
+  #appDialog .ad-ok{ background:var(--ecg); color:#04140b; border:1px solid var(--ecg); }
+  #appDialog.danger .ad-ok{ background:var(--alarm); border-color:var(--alarm); color:#fff; }
+  @media (prefers-reduced-motion: reduce){ #appDialog .ad-card{ animation:none; } }
 </style>
 </head>
 <body>
@@ -1977,6 +2000,17 @@
   <button type="button" class="ub-go" onclick="reloadApp()">Actualizar</button>
   <button type="button" class="ub-x" onclick="document.getElementById('updateBar').classList.remove('open')" aria-label="Ahora no">×</button>
 </div>
+<div id="appDialog" role="alertdialog" aria-modal="true" aria-labelledby="adTitle" aria-describedby="adText">
+  <div class="ad-card">
+    <div class="ad-icon" id="adIcon" aria-hidden="true"></div>
+    <h2 class="ad-title" id="adTitle"></h2>
+    <p class="ad-text" id="adText"></p>
+    <div class="ad-btns">
+      <button type="button" class="ad-btn ad-cancel" id="adCancel">Cancelar</button>
+      <button type="button" class="ad-btn ad-ok" id="adOk">Aceptar</button>
+    </div>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="joinNote" role="status" aria-live="polite"></div>
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
@@ -2319,13 +2353,13 @@ function updatePulseBadge(){
   b.title = locked ? (forcedOff ? 'En FV y asistolia no hay pulso' : 'Durante el caso clínico, el pulso lo marca el caso')
                    : (present ? 'Pulsa para quitar el pulso (AESP)' : 'Pulsa para devolver el pulso');
 }
-function onPulseBtn(){
+async function onPulseBtn(){
   if(role!=='instructor') return;
   if(pulseToggleLocked()){
     showToast(scenario.active ? 'Durante el caso clínico, el pulso lo marca el propio caso.' : 'En FV y asistolia el paciente nunca tiene pulso.');
     return;
   }
-  if(!pulseManuallyDisabled && !confirm('¿Quitar el pulso al paciente?\n\nSe simulará una actividad eléctrica sin pulso (AESP): el trazado sigue en el monitor, pero sin pulso ni tensión.')) return;
+  if(!pulseManuallyDisabled && !(await appConfirm('¿Quitar el pulso al paciente?\n\nSe simulará una actividad eléctrica sin pulso (AESP): el trazado sigue en el monitor, pero sin pulso ni tensión.', { ok:'Quitar pulso', danger:true }))) return;
   togglePulse();
 }
 
@@ -2758,7 +2792,7 @@ async function saveQuestion(){
     const msg = qeEditing.origin==='custom'
       ? '¿Guardar los cambios en esta pregunta?'+shared
       : '¿Guardar los cambios en esta pregunta predefinida?\n\nPodrás volver a la versión original con "↺ Original".'+shared;
-    if(!confirm(msg)) return;
+    if(!(await appConfirm(msg, { ok:'Guardar' }))) return;
   }
   const bank = document.getElementById('qeBank').value;
   const row = {
@@ -2797,7 +2831,7 @@ async function saveQuestion(){
 
 async function revertQuestion(){
   if(!qeEditing || qeEditing.origin!=='edited' || !supa) return;
-  if(!confirm('¿Descartar los cambios y volver a la versión original de esta pregunta?')) return;
+  if(!(await appConfirm('¿Descartar los cambios y volver a la versión original de esta pregunta?', { ok:'Restaurar', danger:true }))) return;
   const { error } = await supa.from('quiz_questions').delete().eq('base_id', qeEditing.id);
   if(error) return qeError('No se pudo restaurar: '+error.message);
   const id = qeEditing.id;
@@ -2809,9 +2843,9 @@ async function revertQuestion(){
 async function deleteSelectedQuestion(){
   const q = quizShown.quiz;
   if(!q || role!=='instructor' || !supa) return;
-  if(!confirm('¿Eliminar esta pregunta?\n\n"'+q.q+'"'+(q.origin==='custom'
-      ? '\n\nEs una pregunta creada por un instructor: se borrará para todos y no se podrá recuperar.'
-      : '\n\nEs una pregunta predefinida: podrás volver a mostrarla más adelante.'))) return;
+  if(!(await appConfirm('¿Eliminar esta pregunta?\n\n«'+q.q+'»'+(q.origin==='custom'
+      ? '\nEs una pregunta creada por un instructor: se borrará para todos y no se podrá recuperar.'
+      : '\nEs una pregunta predefinida: podrás volver a mostrarla más adelante.'), { ok:'Eliminar', danger:true }))) return;
   let error;
   if(q.origin==='custom'){
     ({ error } = await supa.from('quiz_questions').delete().eq('id', q.rowId));
@@ -2830,7 +2864,7 @@ async function deleteSelectedQuestion(){
 
 async function restoreHiddenQuestions(){
   if(!supa) return;
-  if(!confirm('¿Volver a mostrar las preguntas predefinidas que se eliminaron?')) return;
+  if(!(await appConfirm('¿Volver a mostrar las preguntas predefinidas que se eliminaron?', { ok:'Mostrar' }))) return;
   const { error } = await supa.from('quiz_questions').delete().eq('deleted', true).not('base_id', 'is', null);
   if(error){ alert('No se pudo restaurar: '+error.message); return; }
   await loadCustomQuestions();
@@ -3095,11 +3129,11 @@ function addBuilderKeyframe(){
   if(el) rows.scrollTop = el.offsetTop - rows.offsetTop;
 }
 
-function removeBuilderKeyframe(idx){
+async function removeBuilderKeyframe(idx){
   if(builderKfs.length<=2){ return; } // mínimo 2 fases
   const kf = builderKfs[idx];
   const hasText = kf.label && kf.label.trim();
-  if(hasText && !confirm('¿Eliminar la fase '+(idx+1)+'?')) return;
+  if(hasText && !(await appConfirm('¿Eliminar la fase '+(idx+1)+'?', { ok:'Eliminar', danger:true }))) return;
   builderKfs.splice(idx,1);
   builderOpen.delete(kf);
   renderBuilderRows();
@@ -3269,7 +3303,7 @@ async function deleteSelectedCase(){
   const key = document.getElementById('caseSelect').value;
   if(!isCustomCase(key)) return;
   const c = customCases[key];
-  if(!confirm('¿Eliminar el caso "'+c.title+'"? Esta acción no se puede deshacer.')) return;
+  if(!(await appConfirm('¿Eliminar el caso «'+c.title+'»?\n\nEsta acción no se puede deshacer.', { ok:'Eliminar', danger:true }))) return;
   if(scenario.active && scenario.key===key){ stopScenario(); }
   try{
     const { error } = await supa.from('clinical_cases').delete().eq('id', key);
@@ -3338,9 +3372,8 @@ function togglePlay(){
   // si no, los cambios que va generando el caso no llegarán al monitor hasta pulsar "Enviar".
   if(scenario.playing && !syncEnabled && !scenario.syncPrompted){
     scenario.syncPrompted = true;
-    if(confirm('El modo "No sincronizado" está activo: los cambios del caso no llegarán al monitor hasta que pulses "Enviar" o actives la sincronización.\n\n¿Activar la sincronización ahora para que el monitor siga el caso en directo?')){
-      toggleSync();
-    }
+    appConfirm('¿Activar la sincronización?\n\n«Sinc» está desactivado: los cambios del caso no llegarán al monitor del alumno hasta que pulses «Enviar». Actívalo para que el monitor siga el caso en directo.', { ok:'Activar Sinc', cancel:'Ahora no' })
+      .then(ok=>{ if(ok && !syncEnabled) toggleSync(); });
   }
 }
 
@@ -5217,9 +5250,9 @@ function manageQuestions(){
   document.getElementById('quizEditBar').scrollIntoView({ block:'nearest', behavior:'smooth' });
 }
 // Salir de la sala: se recarga la app (vuelve a la pantalla de inicio); "Cambiar" va directo a crear otra sala
-function leaveRoom(change){
-  const msg = change ? '¿Cambiar de sala? El alumno quedará desconectado hasta que entre en la nueva.' : '¿Salir al inicio? Se cerrará la sala actual.';
-  if(!confirm(msg)) return;
+async function leaveRoom(change){
+  const msg = change ? '¿Cambiar de sala?\n\nEl alumno quedará desconectado hasta que entre en la nueva.' : '¿Salir al inicio?\n\nSe cerrará la sala actual.';
+  if(!(await appConfirm(msg, { ok: change ? 'Cambiar' : 'Salir', danger:true }))) return;
   try{ if(change) sessionStorage.setItem('monitor-change-room', role||'instructor'); }catch(e){}
   try{ if(channel) channel.unsubscribe(); }catch(e){}
   location.reload();
@@ -5381,6 +5414,41 @@ function warnIfNoStudents(){
   if(role!=='instructor') return;
   if(!channel){ showToast('No estás conectado a ninguna sala: el alumno no recibirá nada.'); return; }
   if(studentCount===0) showToast('⚠ No hay alumnos conectados a la sala '+roomCode+'. Comparte el código para que se unan.');
+}
+
+
+/* ---------- Diálogo de confirmación propio (sustituye a confirm() del navegador) ----------
+   appConfirm('Pregunta\n\nExplicación', { ok:'Quitar pulso', danger:true }) → Promise<boolean>.
+   El primer párrafo es el título y el resto, el texto. */
+const AD_ICONS = {
+  warn:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 18 17H2z"/><path d="M10 8v4M10 14.6v.1"/></svg>',
+  ask:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M7.8 7.6a2.3 2.3 0 0 1 4.4.9c0 1.6-2.2 1.9-2.2 3.3M10 14.6v.1"/></svg>'
+};
+function appConfirm(msg, opts){
+  opts = opts || {};
+  const parts = String(msg).split(/\n\s*\n/);
+  const d = document.getElementById('appDialog');
+  document.getElementById('adTitle').textContent = parts.shift();
+  document.getElementById('adText').textContent = parts.join('\n\n');
+  document.getElementById('adIcon').innerHTML = opts.danger ? AD_ICONS.warn : AD_ICONS.ask;
+  const ok = document.getElementById('adOk'), cancel = document.getElementById('adCancel');
+  ok.textContent = opts.ok || 'Aceptar'; cancel.textContent = opts.cancel || 'Cancelar';
+  d.classList.toggle('danger', !!opts.danger);
+  const opener = document.activeElement;
+  d.classList.add('open');
+  (opts.danger ? cancel : ok).focus({ preventScroll:true });
+  return new Promise(resolve=>{
+    const done = (v)=>{
+      d.classList.remove('open');
+      ok.onclick = cancel.onclick = d.onclick = null; document.removeEventListener('keydown', onKey, true);
+      if(opener && opener.focus && document.body.contains(opener)) opener.focus({ preventScroll:true });
+      resolve(v);
+    };
+    const onKey = (e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done(false); } };
+    ok.onclick = ()=>done(true); cancel.onclick = ()=>done(false);
+    d.onclick = (e)=>{ if(e.target===d) done(false); };
+    document.addEventListener('keydown', onKey, true);
+  });
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
