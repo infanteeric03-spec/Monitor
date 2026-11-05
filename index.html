@@ -1275,6 +1275,11 @@
     z-index:120; pointer-events:none; }
   html.ipad-app .safe-top{ height:max(env(safe-area-inset-top, 0px), 24px); }
   body.theme-light.role-instructor .safe-top, body.theme-light.role-monitor .safe-top{ background:var(--bg); }
+
+  /* Mientras se ve la pantalla de inicio (siempre oscura), el fondo de la página también lo es aunque
+     el tema sea claro: así no asoman franjas claras por los bordes (zona de la barra de estado o del
+     indicador de inicio del iPad/iPhone). */
+  html:not(.light-root), body.theme-light:not(.role-instructor):not(.role-monitor){ background:#05080a !important; }
 </style>
 </head>
 <body>
