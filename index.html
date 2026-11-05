@@ -1781,6 +1781,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'ecg_view'}, (msg)=> applyRemoteEcgView(msg.payload));
     channel.on('broadcast', {event:'ecg_view_close'}, ()=> closeRemoteEcgView());
     channel.on('broadcast', {event:'ecg_ink'}, (msg)=> applyRemoteInk(msg.payload));
+    channel.on('broadcast', {event:'waves_expand'}, (msg)=> toggleWavesExpand(!!(msg.payload && msg.payload.open)));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -3798,12 +3799,14 @@ function toggleWavesExpand(force){
   if(open){ w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-label','Monitor ampliado'); }
   else { w.removeAttribute('role'); w.removeAttribute('aria-modal'); w.removeAttribute('aria-label'); }
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  if(open || document.activeElement===btn || w.contains(document.activeElement)) btn.focus({ preventScroll:true });
+  if((open && role!=='monitor') || document.activeElement===btn || w.contains(document.activeElement)) btn.focus({ preventScroll:true });
   document.body.classList.toggle('waves-open', open);
   document.getElementById('wavesBackdrop').classList.toggle('open', open);
   const lbl = open ? 'Reducir monitor' : 'Ampliar monitor';
   btn.setAttribute('aria-label', lbl); btn.title = lbl;
   if(open) syncWxVitals();
+  // el instructor amplía/reduce también el monitor del alumno (mismo formato horizontal preestablecido)
+  if(role==='instructor' && channel) channel.send({ type:'broadcast', event:'waves_expand', payload:{ open } });
   requestAnimationFrame(()=>{ [ecgSweep, spo2Sweep, respSweep].forEach(s=>s && s.resize && s.resize()); });
 }
 // copia de las constantes (valor + alarma) en la ventana ampliada
