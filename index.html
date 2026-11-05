@@ -4141,7 +4141,7 @@ let e12SendT = 0, e12SendTimer = null;
 function sendEcg12View(now){
   if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
   const go = ()=>{ e12SendT = Date.now(); e12SendTimer = null;
-    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy } }); };
+    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy, rect:e12VisibleRect() } }); };
   clearTimeout(e12SendTimer);
   if(now || Date.now()-e12SendT > 90) go(); else e12SendTimer = setTimeout(go, 90);
 }
@@ -4250,14 +4250,50 @@ function applyRemoteInk(p){
   drawInk();
 }
 
+/* Zona del papel (en mm) que el instructor tiene a la vista. Se envía al alumno además del zoom:
+   así, aunque su pantalla tenga otra forma, se encuadra para mostrar exactamente esa zona. */
+function e12VisibleRect(){
+  const paper = document.getElementById('ecg12Paper'), cv = document.getElementById('ecg12Canvas'), g = cv._geo;
+  if(!g) return null;
+  const W = paper.clientWidth, H = paper.clientHeight, L = parseFloat(cv.style.left)||0, T = parseFloat(cv.style.top)||0;
+  const r = { x0:(-L - g.ox)/g.mm, y0:(-T - g.oy)/g.mm, x1:(W - L - g.ox)/g.mm, y1:(H - T - g.oy)/g.mm };
+  r.x0 = Math.max(0, r.x0); r.y0 = Math.max(0, r.y0); r.x1 = Math.min(264, r.x1); r.y1 = Math.min(128, r.y1);
+  return r;
+}
+function viewForRect(r){
+  const paper = document.getElementById('ecg12Paper');
+  const W = paper.clientWidth, H = paper.clientHeight;
+  if(!W || !H) return { z:1, cx:0.5, cy:0.5 };
+  const mm1 = Math.min(W/264, H/128), ox1 = (W - 264*mm1)/2, oy1 = (H - 128*mm1)/2;
+  const rw = Math.max(5, r.x1 - r.x0), rh = Math.max(5, r.y1 - r.y0);
+  let z = Math.min(W/rw, H/rh) / mm1;
+  z = Math.round(Math.max(1, Math.min(6, z))*1000)/1000;
+  const mm = mm1*z, mx = (r.x0 + r.x1)/2, my = (r.y0 + r.y1)/2;
+  return { z, cx:(ox1*z + mx*mm)/(W*z), cy:(oy1*z + my*mm)/(H*z) };
+}
+let e12LastRect = null;
 // alumno: recibe la vista del instructor
 function applyRemoteEcgView(p){
   if(!p || !p.key || !RHYTHM_INFO[p.key]) return;
-  const view = { z:p.z||1, cx:p.cx??0.5, cy:p.cy??0.5 };
+  e12LastRect = p.rect || null;
+  let view = { z:p.z||1, cx:p.cx??0.5, cy:p.cy??0.5 };
+  if(p.rect && ecg12Rhythm===p.key && ecg12Remote) view = viewForRect(p.rect);
   if(ecg12Rhythm===p.key && ecg12Remote){ Object.assign(e12View, view); drawEcg12Big(); }
-  else openEcg12(p.key, { remote:true, view, keepFocus:true });
+  else {
+    openEcg12(p.key, { remote:true, view, keepFocus:true });
+    // ya abierta (y con su tamaño real), se encuadra la zona exacta del instructor
+    if(p.rect) requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(ecg12Remote && ecg12Rhythm===p.key){ Object.assign(e12View, viewForRect(p.rect)); drawEcg12Big(); } }));
+  }
 }
 function closeRemoteEcgView(){ if(ecg12Rhythm && ecg12Remote) closeEcg12(); }
+window.addEventListener('resize', ()=>{
+  if(!ecg12Rhythm) return;
+  requestAnimationFrame(()=>{
+    if(ecg12Remote && e12LastRect) Object.assign(e12View, viewForRect(e12LastRect));
+    drawEcg12Big();
+    if(ecg12Mirror) sendEcg12View(true); // si cambia la forma de la pantalla del instructor, se reenvía la zona
+  });
+});
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm && !e.target.classList.contains('ecg12-txt')) closeEcg12(); });
 
 /* ---------- Ficha informativa de cada ritmo ----------
