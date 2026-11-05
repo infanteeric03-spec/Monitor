@@ -1280,6 +1280,15 @@
      el tema sea claro: así no asoman franjas claras por los bordes (zona de la barra de estado o del
      indicador de inicio del iPad/iPhone). */
   html:not(.light-root), body.theme-light:not(.role-instructor):not(.role-monitor){ background:#05080a !important; }
+
+  /* Instructor: la TA va primero y después la FC */
+  body.role-instructor .vitals #cardBp{ order:-2; }
+  body.role-instructor .vitals #cardHr{ order:-1; }
+  /* Tablet / ordenador: la tarjeta de pestañas tiene la misma altura en Ritmo, Caso y Preguntas, y la
+     columna de constantes termina justo a la altura de su borde inferior (ver syncInstructorColumns) */
+  @media (min-width:761px) and (min-height:561px){
+    body.role-instructor .vitals.col-synced .vital-card{ flex:1 1 auto; align-content:center; }
+  }
 </style>
 </head>
 <body>
@@ -1948,6 +1957,7 @@ function switchTab(name){
   });
   currentTab = name;
   updateStickyMonitor();
+  if(typeof syncInstructorColumns==='function') syncInstructorColumns();
 }
 let currentTab = 'rhythm';
 // Altura de la barra superior fija, para que la pantalla del monitor (cuando también va fija) quede justo debajo
@@ -2054,7 +2064,7 @@ function connectRoom(){
       document.getElementById('gate').style.display = 'none';
       document.getElementById('appWrap').style.display = 'block';
       // los canvas se crearon con el panel oculto (ancho/alto 0): hay que remedirlos ahora que se ve
-      requestAnimationFrame(()=>{ ecgSweep.resize(); spo2Sweep.resize(); respSweep.resize(); });
+      requestAnimationFrame(()=>{ ecgSweep.resize(); spo2Sweep.resize(); respSweep.resize(); syncInstructorColumns(); });
       if(!connectRoom._guided){ connectRoom._guided = true; maybeAutoGuide(); }
       if(role==='instructor'){
         // primer aviso inmediato + late-joiners: late arrivals reciben el siguiente latido del heartbeat
@@ -4707,6 +4717,7 @@ function toggleRhythmInfo(){
   const el = document.getElementById('rhythmInfo');
   el.classList.toggle('collapsed', rhythmInfoCollapsed);
   const h = el.querySelector('.ri-head'); if(h) h.setAttribute('aria-expanded', rhythmInfoCollapsed?'false':'true');
+  syncInstructorColumns();
 }
 function updateRhythmInfo(r){
   const el = document.getElementById('rhythmInfo');
@@ -5045,6 +5056,38 @@ setInterval(checkForUpdate, 10*60*1000);
     selectRole(j.role); document.getElementById('roomCodeInput').value = j.room; connectRoom(); };
   setTimeout(go, 0);
 })();
+
+
+/* Alinea la columna de constantes con la tarjeta de pestañas (tablet/ordenador, instructor).
+   La altura de referencia es la de la pestaña Ritmo con la ficha contraída: las otras pestañas se
+   igualan a ella y las tarjetas de constantes se reparten esa misma altura. Si después se despliega
+   algo (un caso, una pregunta, la ficha), la tarjeta de pestañas crece y las constantes se quedan igual. */
+function syncInstructorColumns(){
+  const tp = document.querySelector('.tabs-panel'), v = document.querySelector('.vitals'), w = document.querySelector('.monitor .waves');
+  if(!tp || !v || !w) return;
+  const on = role==='instructor' && matchMedia('(min-width:761px) and (min-height:561px)').matches
+           && !document.querySelector('.waves.expanded');
+  if(!on){ tp.style.minHeight=''; v.style.height=''; v.classList.remove('col-synced'); return; }
+  const fichaClosed = document.getElementById('rhythmInfo')?.classList.contains('collapsed');
+  if(currentTab==='rhythm' && fichaClosed){
+    const prev = tp.style.minHeight; tp.style.minHeight = '';
+    syncInstructorColumns.ref = tp.offsetHeight;
+    tp.style.minHeight = prev;
+  }
+  const ref = syncInstructorColumns.ref; if(!ref) return;
+  tp.style.minHeight = ref+'px';
+  // la columna de constantes termina donde termina la tarjeta de pestañas en el estado de referencia
+  const top = w.getBoundingClientRect().top, vTop = v.getBoundingClientRect().top;
+  const gap = parseFloat(getComputedStyle(document.querySelector('.monitor-left')).rowGap) || 10;
+  v.style.height = (w.offsetHeight + gap + ref - (vTop - top))+'px';
+  v.classList.add('col-synced');
+}
+window.addEventListener('resize', ()=>requestAnimationFrame(syncInstructorColumns));
+if(window.ResizeObserver){
+  let t = null; const ro = new ResizeObserver(()=>{ clearTimeout(t); t = setTimeout(syncInstructorColumns, 60); });
+  ['#paneRhythm','.monitor .waves'].forEach(q=>{ const el = document.querySelector(q); if(el) ro.observe(el); });
+}
+setTimeout(syncInstructorColumns, 0);
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
