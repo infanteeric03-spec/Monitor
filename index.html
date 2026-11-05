@@ -1128,6 +1128,22 @@
   #ecg12Overlay.remote .ecg12-titlebox .ecg12-live{ order:1; margin-left:2px; }
   #ecg12Overlay.remote .ecg12-titlebox #ecg12Title{ order:2; }
   #ecg12Overlay.remote #ecg12Title:not(:empty)::before{ content:"•"; color:#000; font-weight:700; margin:0 8px 0 2px; }
+
+  /* Preguntas: "Q. RCP" + AHA/ERC encima de los botones de envío; × para cerrar la pregunta */
+  .quiz-row{ align-items:stretch; }
+  .quiz-right{ display:flex; flex-direction:column; gap:8px; }
+  .quiz-right .quiz-algo-row{ margin:0; justify-content:flex-end; }
+  .quiz-right .casebtns{ margin:auto 0; }
+  #quizPreview{ position:relative; }
+  #quizPreview #quizPreviewText{ padding-right:34px; }
+  .qp-close{ position:absolute; top:6px; right:6px; width:28px; height:28px; border-radius:6px; background:transparent;
+    border:1px solid var(--line); color:var(--text-dim); font-size:17px; line-height:1; cursor:pointer; }
+  .qp-close:hover{ color:var(--text); border-color:var(--text-dim); }
+  @media (max-width:760px){
+    .quiz-right{ width:100%; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .quiz-right .casebtns{ margin:0; }
+    .quiz-right .quiz-algo-row{ order:2; }
+  }
 </style>
 </head>
 <body>
@@ -1483,13 +1499,6 @@
 
           <div class="tab-pane" id="paneQuiz">
            <div id="quizNormalView">
-            <div class="quiz-algo-row">
-              <span>Preguntas de RCP según</span>
-              <div class="algo-seg" role="group" aria-label="Algoritmo de RCP">
-                <button type="button" data-algo="AHA" onclick="setCprAlgo('AHA')">AHA</button>
-                <button type="button" data-algo="ERC" onclick="setCprAlgo('ERC')">ERC</button>
-              </div>
-            </div>
             <div class="quiz-row">
               <div style="flex:1; min-width:200px;">
                 <div class="quiz-label-row">
@@ -1503,12 +1512,22 @@
                   <option value="">— Elige una pregunta —</option>
                 </select>
               </div>
+              <div class="quiz-right">
+              <div class="quiz-algo-row">
+                <span>Q. RCP</span>
+                <div class="algo-seg" role="group" aria-label="Algoritmo de las preguntas de RCP">
+                  <button type="button" data-algo="AHA" onclick="setCprAlgo('AHA')">AHA</button>
+                  <button type="button" data-algo="ERC" onclick="setCprAlgo('ERC')">ERC</button>
+                </div>
+              </div>
               <div class="casebtns">
                 <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled><span aria-hidden="true">📨</span> Enviar al monitor</button>
                 <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion('quiz')" disabled><span aria-hidden="true">✕</span> Retirar</button>
               </div>
+              </div>
             </div>
             <div class="quiz-preview" id="quizPreview" style="display:none;">
+              <button type="button" class="qp-close" onclick="closeQuizPreview()" aria-label="Cerrar la pregunta" title="Cerrar">×</button>
               <div id="quizPreviewText"></div>
               <div id="quizPreviewOptions"></div>
               <div class="quiz-answer-status" id="quizAnswerStatus">Aún no se ha enviado al monitor.</div>
@@ -4619,6 +4638,17 @@ function onRemoteCaseCmd(p){
     togglePlay();
   }
   sendCaseView(true);
+}
+
+
+/* cierra la pregunta desplegada y devuelve los desplegables a su estado inicial */
+function closeQuizPreview(){
+  const cat = document.getElementById('quizCat');
+  if(cat && cat.value!=='all'){ cat.value = 'all'; setQuizCat('all'); }
+  const sel = document.getElementById('quizSelect');
+  sel.value = '';
+  previewQuestion('', 'quiz');
+  const btn = sel._cselBtn; if(btn) btn.focus({ preventScroll:true });
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
