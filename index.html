@@ -1361,7 +1361,6 @@
     body.role-instructor .rhythm-send{ padding-left:10px; padding-right:10px; }
     body.role-instructor #paneRhythm .controls{ gap:8px; }
     body.role-instructor #paneRhythm .controls > div:first-child{ flex:1 1 100%; min-width:0; }
-    body.role-instructor #paneRhythm .controls > #pulseBadge{ display:none; }
     body.role-instructor .rhythm-info{ margin-top:8px; padding:8px 10px; }
     body.role-instructor .rhythm-info .ri-head-k{ display:none; }
     body.role-instructor .rhythm-info .ri-head-t{ font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1414,6 +1413,16 @@
   #paneRhythm .rhythm-pick .csel-btn .csel-text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #paneRhythm .rhythm-pick .rhythm-send{ flex:0 0 auto; }
   @media (max-width:760px){ #paneRhythm .controls > div:first-child{ flex-basis:100%; max-width:none; } }
+
+  /* botón de pulso: el interruptor anterior se oculta (queda solo el botón ⓘ) */
+  #pulseToggleWrap #pulseSwitch, #pulseToggleWrap #pulseToggleLabel{ display:none !important; }
+  #pulseToggleWrap{ gap:0; }
+  .pulse-btn{ cursor:pointer; font-family:var(--font-num); transition:background .15s, border-color .15s, color .15s; }
+  .pulse-btn.live{ background:color-mix(in srgb, var(--ecg) 10%, transparent); }
+  .pulse-btn.live:hover{ background:color-mix(in srgb, var(--ecg) 18%, transparent); }
+  .pulse-btn.noflow{ background:color-mix(in srgb, var(--alarm) 12%, transparent); }
+  .pulse-btn.locked{ color:var(--text-dim) !important; border-color:var(--line) !important; background:transparent !important; cursor:not-allowed; }
+  #paneRhythm .controls > #pulseBadge{ white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -1667,7 +1676,7 @@
                 <button type="button" class="casebtn primary rhythm-send" id="btnSendRhythm" onclick="sendRhythmName()" title="Enviar al alumno el nombre del ritmo" aria-label="Enviar al alumno el nombre del ritmo"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></button>
                 </div>
               </div>
-              <span class="badge" id="pulseBadge">— pulso presente —</span>
+              <button type="button" class="badge pulse-btn live" id="pulseBadge" onclick="onPulseBtn()" aria-pressed="true" title="Pulsa para quitar el pulso (AESP)">● pulso presente</button>
 
               <div class="sync-toggle" id="pulseToggleWrap">
                 <span class="sync-label" id="pulseToggleLabel">Pulso del paciente</span>
@@ -2056,7 +2065,7 @@
 <div id="infoOverlay" role="dialog" aria-modal="true" aria-label="Información" onclick="if(event.target===this) togglePulseInfo()">
   <div class="info-card">
     <button type="button" class="info-card-close" onclick="togglePulseInfo()" aria-label="Cerrar">×</button>
-    En fibrilación ventricular y asistolia el paciente nunca tiene pulso: el interruptor queda bloqueado sin efecto. En el resto de ritmos, apagarlo simula una actividad eléctrica sin pulso (AESP) — el trazado sigue viéndose organizado, pero no hay pulso ni tensión palpables.
+    Pulsa el botón de pulso para quitarlo (pide confirmación) y simular una actividad eléctrica sin pulso (AESP): el trazado sigue viéndose organizado, pero no hay pulso ni tensión palpables. Vuelve a pulsarlo para devolver el pulso. En fibrilación ventricular y asistolia el paciente nunca tiene pulso, y durante un caso clínico lo decide el propio caso: en esas situaciones el botón queda bloqueado (gris).
   </div>
 </div>
 
@@ -2288,6 +2297,36 @@ function refreshPulseToggleUI(){
   sw.classList.toggle('off', !showOn);
   sw.classList.toggle('locked', locked);
   document.getElementById('pulseToggleLabel').textContent = showOn ? 'Pulso presente' : 'Sin pulso (AESP)';
+  updatePulseBadge();
+}
+/* Botón de pulso (sustituye al interruptor): verde = pulso presente; rojo = sin pulso (AESP);
+   gris y bloqueado en FV/asistolia (nunca hay pulso) y durante un caso clínico (lo decide el caso). */
+function updatePulseBadge(){
+  const b = document.getElementById('pulseBadge'); if(!b) return;
+  const forcedOff = state.rhythm==='vfib' || state.rhythm==='asystole';
+  const locked = role==='instructor' && pulseToggleLocked();
+  const present = !!state.pulsePresent;
+  let txt;
+  if(forcedOff) txt = '⚠ sin pulso — RCP';
+  else if(present) txt = '● pulso presente';
+  else txt = scenario.active ? '⚠ sin pulso — RCP' : '● sin pulso (AESP)';
+  if(locked) txt = '🔒 ' + txt.replace(/^[●⚠]\s*/, '');
+  if(b.textContent !== txt) b.textContent = txt;
+  const cls = 'badge pulse-btn ' + (present ? 'live' : 'noflow') + (locked ? ' locked' : '');
+  if(b.className !== cls) b.className = cls;
+  b.setAttribute('aria-pressed', present ? 'true' : 'false');
+  b.setAttribute('aria-disabled', locked ? 'true' : 'false');
+  b.title = locked ? (forcedOff ? 'En FV y asistolia no hay pulso' : 'Durante el caso clínico, el pulso lo marca el caso')
+                   : (present ? 'Pulsa para quitar el pulso (AESP)' : 'Pulsa para devolver el pulso');
+}
+function onPulseBtn(){
+  if(role!=='instructor') return;
+  if(pulseToggleLocked()){
+    showToast(scenario.active ? 'Durante el caso clínico, el pulso lo marca el propio caso.' : 'En FV y asistolia el paciente nunca tiene pulso.');
+    return;
+  }
+  if(!pulseManuallyDisabled && !confirm('¿Quitar el pulso al paciente?\n\nSe simulará una actividad eléctrica sin pulso (AESP): el trazado sigue en el monitor, pero sin pulso ni tensión.')) return;
+  togglePulse();
 }
 
 // ---------- Interruptor "Sincronizado / No sincronizado" ----------
@@ -3526,9 +3565,7 @@ function syncInputs(){
   setAlarm('cardResp', state.rr<8 || state.rr>28);
   setAlarm('cardTemp', state.temp<35 || state.temp>38.5);
 
-  const badge = document.getElementById('pulseBadge');
-  badge.textContent = state.pulsePresent ? '● pulso presente' : '⚠ sin pulso — RCP';
-  badge.className = 'badge ' + (state.pulsePresent ? 'live' : 'noflow');
+  updatePulseBadge();
 }
 function setAlarm(id, on){
   const el = document.getElementById(id);
@@ -3880,7 +3917,7 @@ const GUIDE_STEPS = {
     { sel:'#wavesRemoteBtn', text:'📺 amplía el monitor del alumno; ⤢ amplía solo el tuyo.', sub:'Mientras el alumno lo tiene ampliado, el botón 📺 se queda encendido.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#btnSendRhythm', text:'Con «Enviar» el alumno ve el nombre del ritmo y su ficha.', sub:'Vuelve a pulsarlo (✕ Retirar) para quitárselo; también se retira solo al cambiar de ritmo.', before:()=>switchTab('rhythm') },
-    { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
+    { sel:'#pulseBadge', text:'Pulsa aquí para quitar el pulso y simular una AESP.', sub:'Pide confirmación. En FV, asistolia y durante los casos queda bloqueado.', before:()=>switchTab('rhythm') },
     { sel:'#rhythmInfo', hand:false, text:'La ficha del ritmo y su ECG de 12 derivaciones.', sub:'Toca la miniatura para ampliarlo: puedes hacer zoom, anotar y mostrarlo en directo al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#caseSelect + .csel-btn', alt:'#tabBtnCase', text:'Lanza un caso clínico paso a paso.', sub:'El alumno ve la evolución del caso, el tiempo y, si lo permites, sus botones.', before:()=>switchTab('case') },
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
