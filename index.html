@@ -1081,6 +1081,7 @@
   .rhythm-share .rs-title{ font-size:20px; margin:2px 40px 10px 0; }
   .rhythm-share .rn-close{ position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:6px;
     background:transparent; border:1px solid var(--line); color:var(--text-dim); font-size:18px; cursor:pointer; line-height:1; }
+  .rhythm-share .ri-thumb{ width:clamp(100px,30%,180px); margin-top:2px; }
   .ri-thumb.ri-thumb-big{ float:none; width:100%; max-width:560px; margin:0 0 12px; }
   .ri-thumb.ri-thumb-big .ri-thumb-tag{ font-size:10.5px; padding:2px 7px; left:6px; bottom:6px; }
   .ri-thumb.ri-thumb-big .ri-thumb-tag svg{ width:10px; height:10px; }
@@ -4450,7 +4451,7 @@ function showRhythmShare(key, name){
   const i = RHYTHM_INFO[key];
   el.innerHTML = '<button type="button" class="rn-close" onclick="hideRhythmShare()" aria-label="Cerrar ficha">×</button>'
     + '<div class="ri-head-k">Ritmo</div><h3 class="rs-title">'+escapeHtml(i ? i.t : (name||''))+'</h3>'
-    + (i ? rhythmThumbHTML(key,i,true) + rhythmBodyHTML(i) : '');
+    + (i ? rhythmThumbHTML(key,i,false) + rhythmBodyHTML(i) : '');
   el.classList.add('open');
   el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'nearest' });
 }
