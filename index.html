@@ -1003,7 +1003,24 @@
   .ecg12-t{ font-size:14px; font-weight:700; }
   .ecg12-close{ width:34px; height:34px; border-radius:6px; border:1px solid #d9caca; background:#fff; color:#333; font-size:15px; cursor:pointer; flex-shrink:0; }
   .ecg12-paper{ flex:1; min-height:0; position:relative; }
-  .ecg12-paper canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .ecg12-paper{ overflow:hidden; touch-action:none; }
+  .ecg12-paper canvas{ position:absolute; left:0; top:0; }
+  .ecg12-paper.zoomed{ cursor:grab; }
+  .ecg12-paper.zoomed.dragging{ cursor:grabbing; }
+  .ecg12-head > div:first-child{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ecg12-ctrl{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
+  .ecg12-b{ height:32px; min-width:32px; padding:0 8px; border-radius:6px; border:1px solid #d9caca; background:#fff; color:#333;
+    font-size:15px; font-family:inherit; cursor:pointer; white-space:nowrap; }
+  .ecg12-b:hover{ border-color:#b9a3a3; }
+  .ecg12-z{ min-width:46px; text-align:center; font-size:12px; font-variant-numeric:tabular-nums; color:#555; }
+  .ecg12-mirror{ font-size:12.5px; font-weight:600; margin-left:4px; }
+  .ecg12-mirror.on{ background:#b2444b; border-color:#b2444b; color:#fff; }
+  body.role-monitor #ecg12Hint{ display:none; }
+  #ecg12Overlay.remote .ecg12-paper{ cursor:default; }
+  #ecg12Overlay.remote .ecg12-ctrl{ display:none; }
+  .ecg12-live{ display:none; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:#b2444b; margin-left:8px; }
+  #ecg12Overlay.remote .ecg12-live{ display:inline; }
+  @media (max-width:600px), (max-height:500px){ .ecg12-mirror .lbl{ display:none; } .ecg12-k{ display:none; } }
   .ecg12-foot{ font-size:10.5px; color:#7a6a6a; padding:4px 12px 6px; }
   /* móvil en vertical: se gira para verse en horizontal */
   @media (max-width:760px) and (orientation:portrait){
@@ -1593,11 +1610,18 @@
 <div id="ecg12Overlay" role="dialog" aria-modal="true" aria-labelledby="ecg12Title" onclick="if(event.target===this) closeEcg12()">
   <div class="ecg12-box" id="ecg12Box">
     <div class="ecg12-head">
-      <div><span class="ecg12-k">ECG de 12 derivaciones</span><span id="ecg12Title" class="ecg12-t"></span></div>
+      <div><span class="ecg12-k">ECG de 12 derivaciones</span><span id="ecg12Title" class="ecg12-t"></span><span class="ecg12-live">● EN DIRECTO DEL INSTRUCTOR</span></div>
+      <div class="ecg12-ctrl">
+        <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
+        <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
+        <button type="button" class="ecg12-b" onclick="zoomEcg12(1)" aria-label="Ampliar">+</button>
+        <button type="button" class="ecg12-b" onclick="resetEcg12View()" aria-label="Ver completo" title="Ver completo">⟲</button>
+        <button type="button" class="ecg12-b ecg12-mirror instructor-only" id="ecg12MirrorBtn" onclick="toggleEcg12Mirror()" aria-pressed="false"><span aria-hidden="true">📺</span><span class="lbl"> Mostrar al alumno</span></button>
+      </div>
       <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
     </div>
     <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas></div>
-    <div class="ecg12-foot">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
+    <div class="ecg12-foot"><span id="ecg12Hint">Arrastra para moverte cuando esté ampliado · </span>Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
   </div>
 </div>
 <div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
@@ -1713,6 +1737,8 @@ function connectRoom(){
     channel.on('broadcast', {event:'question_clear'}, ()=> hideQuestionOnMonitor());
     channel.on('broadcast', {event:'rhythm_name'}, (msg)=> msg.payload && showRhythmShare(msg.payload.key, msg.payload.name));
     channel.on('broadcast', {event:'rhythm_name_clear'}, ()=> hideRhythmShare());
+    channel.on('broadcast', {event:'ecg_view'}, (msg)=> applyRemoteEcgView(msg.payload));
+    channel.on('broadcast', {event:'ecg_view_close'}, ()=> closeRemoteEcgView());
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -1927,6 +1953,7 @@ function broadcastState(){
 // El Monitor aplica lo recibido tal cual, sin volver a decidir nada por su cuenta
 function applyRemoteState(p){
   if(rhythmShareKey && p.rhythm !== rhythmShareKey) hideRhythmShare();
+  if(ecg12Remote && ecg12Rhythm && p.rhythm !== ecg12Rhythm) closeRemoteEcgView();
   if(state.rhythm !== p.rhythm){
     av.atrialTimer=0; av.ventTimer=0; av.pAge=999; av.qAge=999;
     av.wbIndex=0; av.m2Count=0; av.pendingQrsIn=null;
@@ -3950,27 +3977,145 @@ function ecg12Thumb(r){
   return (e12Cache[r] = c.toDataURL('image/png'));
 }
 let ecg12Rhythm = null, ecg12Opener = null;
-function openEcg12(r){
-  ecg12Rhythm = r; ecg12Opener = document.activeElement;
+/* Vista del ECG ampliado: zoom (1–4) y centro visible (cx, cy de 0 a 1 sobre el papel).
+   Al ser relativa, la misma vista se reproduce igual en pantallas de distinto tamaño. */
+const E12_ZOOMS = [1, 1.5, 2, 3, 4];
+let e12View = { z:1, cx:0.5, cy:0.5 }, e12DrawnZ = 0, ecg12Mirror = false, ecg12Remote = false;
+function openEcg12(r, opts){
+  opts = opts || {};
+  const changed = ecg12Rhythm !== r;
+  ecg12Rhythm = r;
+  if(!opts.keepFocus) ecg12Opener = document.activeElement;
+  if(changed && !opts.view) e12View = { z:1, cx:0.5, cy:0.5 };
+  if(opts.view) e12View = Object.assign({}, opts.view);
+  ecg12Remote = !!opts.remote;
+  document.getElementById('ecg12Overlay').classList.toggle('remote', ecg12Remote);
   document.getElementById('ecg12Title').textContent = (RHYTHM_INFO[r]||{}).t || '';
   document.getElementById('ecg12Overlay').classList.add('open');
   document.body.classList.add('waves-open');
+  e12DrawnZ = 0;
   requestAnimationFrame(drawEcg12Big);
-  document.querySelector('.ecg12-close').focus({ preventScroll:true });
+  if(!opts.keepFocus) document.querySelector('.ecg12-close').focus({ preventScroll:true });
+  refreshEcg12MirrorBtn();
 }
 function drawEcg12Big(){
   if(!ecg12Rhythm) return;
-  const paper = document.getElementById('ecg12Paper');
-  renderEcg12(document.getElementById('ecg12Canvas'), ecg12Rhythm, paper.clientWidth, paper.clientHeight, Math.min(3, window.devicePixelRatio||1));
+  const paper = document.getElementById('ecg12Paper'), cv = document.getElementById('ecg12Canvas');
+  const W = paper.clientWidth, H = paper.clientHeight, z = e12View.z;
+  if(e12DrawnZ !== z || cv._w !== W || cv._h !== H || cv._r !== ecg12Rhythm){
+    const dpr = Math.min(3, window.devicePixelRatio||1, 8000/(W*z), 8000/(H*z));
+    renderEcg12(cv, ecg12Rhythm, W*z, H*z, dpr);
+    cv.style.width = (W*z)+'px'; cv.style.height = (H*z)+'px';
+    cv._w = W; cv._h = H; cv._r = ecg12Rhythm; e12DrawnZ = z;
+  }
+  positionEcg12();
 }
+function positionEcg12(){
+  const paper = document.getElementById('ecg12Paper'), cv = document.getElementById('ecg12Canvas');
+  const W = paper.clientWidth, H = paper.clientHeight, z = e12View.z, h = 0.5/z;
+  e12View.cx = Math.min(1-h, Math.max(h, e12View.cx));
+  e12View.cy = Math.min(1-h, Math.max(h, e12View.cy));
+  cv.style.left = (W/2 - e12View.cx*W*z)+'px';
+  cv.style.top  = (H/2 - e12View.cy*H*z)+'px';
+  paper.classList.toggle('zoomed', z>1 && !ecg12Remote);
+  document.getElementById('ecg12Zoom').textContent = Math.round(z*100)+' %';
+}
+function setEcg12View(v, send){
+  Object.assign(e12View, v);
+  drawEcg12Big();
+  if(send!==false) sendEcg12View();
+}
+function zoomEcg12(dir, fx, fy){
+  if(ecg12Remote) return;
+  const i = E12_ZOOMS.indexOf(e12View.z), ni = Math.max(0, Math.min(E12_ZOOMS.length-1, (i<0?0:i)+dir));
+  const nz = E12_ZOOMS[ni]; if(nz===e12View.z) return;
+  let { cx, cy } = e12View;
+  if(fx!==undefined){ // zoom hacia el punto señalado (fx, fy en 0–1 de la ventana)
+    const z = e12View.z;
+    const px = cx + (fx-0.5)/z, py = cy + (fy-0.5)/z;
+    cx = px - (fx-0.5)/nz; cy = py - (fy-0.5)/nz;
+  }
+  setEcg12View({ z:nz, cx, cy });
+}
+function resetEcg12View(){ if(!ecg12Remote) setEcg12View({ z:1, cx:0.5, cy:0.5 }); }
 function closeEcg12(){
   if(!ecg12Rhythm) return;
-  ecg12Rhythm = null;
-  document.getElementById('ecg12Overlay').classList.remove('open');
+  if(ecg12Mirror) stopEcg12Mirror();
+  ecg12Rhythm = null; ecg12Remote = false;
+  document.getElementById('ecg12Overlay').classList.remove('open','remote');
   if(!document.querySelector('.waves.expanded')) document.body.classList.remove('waves-open');
   if(ecg12Opener && ecg12Opener.focus) ecg12Opener.focus({ preventScroll:true });
 }
-window.addEventListener('resize', ()=>{ if(ecg12Rhythm) requestAnimationFrame(drawEcg12Big); });
+// arrastrar para mover y rueda para ampliar (solo quien controla la vista)
+(function(){
+  const paper = document.getElementById('ecg12Paper'); if(!paper) return;
+  const rotated = ()=>matchMedia('(max-width:760px) and (orientation:portrait)').matches;
+  let drag = null;
+  paper.addEventListener('pointerdown', e=>{
+    if(ecg12Remote || e12View.z<=1) return;
+    drag = { x:e.clientX, y:e.clientY, cx:e12View.cx, cy:e12View.cy };
+    paper.setPointerCapture(e.pointerId); paper.classList.add('dragging');
+  });
+  paper.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    let dx = e.clientX-drag.x, dy = e.clientY-drag.y;
+    if(rotated()){ const t = dx; dx = dy; dy = -t; } // la ventana está girada 90°
+    const W = paper.clientWidth*e12View.z, H = paper.clientHeight*e12View.z;
+    setEcg12View({ cx:drag.cx - dx/W, cy:drag.cy - dy/H });
+  });
+  const end = ()=>{ if(drag){ drag=null; paper.classList.remove('dragging'); sendEcg12View(true); } };
+  paper.addEventListener('pointerup', end); paper.addEventListener('pointercancel', end);
+  paper.addEventListener('wheel', e=>{
+    if(ecg12Remote || rotated()) return;
+    e.preventDefault();
+    const r = paper.getBoundingClientRect();
+    zoomEcg12(e.deltaY<0 ? 1 : -1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
+  }, { passive:false });
+  paper.addEventListener('dblclick', e=>{
+    if(ecg12Remote || rotated()) return;
+    const r = paper.getBoundingClientRect();
+    if(e12View.z>=4) resetEcg12View(); else zoomEcg12(1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
+  });
+})();
+
+/* ---------- Mostrar el ECG ampliado en la pantalla del alumno ----------
+   Con "Mostrar al alumno" activo, la vista del instructor (zoom y zona) se replica en directo. */
+function refreshEcg12MirrorBtn(){
+  const b = document.getElementById('ecg12MirrorBtn'); if(!b) return;
+  b.classList.toggle('on', ecg12Mirror);
+  b.setAttribute('aria-pressed', ecg12Mirror?'true':'false');
+  b.innerHTML = ecg12Mirror ? '<span aria-hidden="true">✕</span><span class="lbl"> Dejar de mostrar</span>'
+                            : '<span aria-hidden="true">📺</span><span class="lbl"> Mostrar al alumno</span>';
+  const t = ecg12Mirror ? 'Dejar de mostrar el ECG al alumno' : 'Mostrar este ECG en grande al alumno';
+  b.title = t; b.setAttribute('aria-label', t);
+}
+function toggleEcg12Mirror(){
+  if(role!=='instructor') return;
+  if(ecg12Mirror){ stopEcg12Mirror(); return; }
+  if(!channel){ const l=document.querySelector('#ecg12MirrorBtn .lbl'); if(l){ l.textContent=' Sin conexión'; setTimeout(refreshEcg12MirrorBtn,1800); } return; }
+  ecg12Mirror = true; refreshEcg12MirrorBtn(); sendEcg12View(true);
+}
+function stopEcg12Mirror(){
+  if(!ecg12Mirror) return;
+  ecg12Mirror = false; refreshEcg12MirrorBtn();
+  if(channel) channel.send({ type:'broadcast', event:'ecg_view_close', payload:{} });
+}
+let e12SendT = 0, e12SendTimer = null;
+function sendEcg12View(now){
+  if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
+  const go = ()=>{ e12SendT = Date.now(); e12SendTimer = null;
+    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy } }); };
+  clearTimeout(e12SendTimer);
+  if(now || Date.now()-e12SendT > 90) go(); else e12SendTimer = setTimeout(go, 90);
+}
+// alumno: recibe la vista del instructor
+function applyRemoteEcgView(p){
+  if(!p || !p.key || !RHYTHM_INFO[p.key]) return;
+  const view = { z:p.z||1, cx:p.cx??0.5, cy:p.cy??0.5 };
+  if(ecg12Rhythm===p.key && ecg12Remote){ Object.assign(e12View, view); drawEcg12Big(); }
+  else openEcg12(p.key, { remote:true, view, keepFocus:true });
+}
+function closeRemoteEcgView(){ if(ecg12Rhythm && ecg12Remote) closeEcg12(); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm) closeEcg12(); });
 
 /* ---------- Ficha informativa de cada ritmo ----------
@@ -4110,6 +4255,7 @@ function sendRhythmName(){
   if(sharedRhythm){
     channel.send({ type:'broadcast', event:'rhythm_name_clear', payload:{} });
     sharedRhythm = null;
+    stopEcg12Mirror();
   } else {
     const sel = document.getElementById('rhythmSelect');
     const opt = sel.options[sel.selectedIndex];
@@ -4122,6 +4268,7 @@ function sendRhythmName(){
 // si el ritmo cambia, la ficha del alumno se retira (el monitor lo hace solo al recibir el nuevo ritmo)
 function onRhythmChangedForShare(r){
   if(sharedRhythm && r !== sharedRhythm){ sharedRhythm = null; refreshSendRhythmBtn(); }
+  if(typeof ecg12Mirror!=='undefined' && ecg12Mirror && ecg12Rhythm && r !== ecg12Rhythm) stopEcg12Mirror();
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
