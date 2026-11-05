@@ -1289,6 +1289,17 @@
   @media (min-width:761px) and (min-height:561px){
     body.role-instructor .vitals.col-synced .vital-card{ flex:1 1 auto; align-content:center; }
   }
+
+  /* Pantalla de inicio: sin título "Monitor de constantes"; "SIMULACIÓN · URGENCIAS" hace de título
+     (mismo rojo) y la barra "BOX 3 · URG / hora" baja 1 cm */
+  #gate .gate-box h2.gate-kicker{ margin:2px 0 0; color:var(--g-red); font-weight:800; line-height:1.15; letter-spacing:.14em;
+    font-size:clamp(17px, 5.5vw, 30px); text-shadow:0 0 14px rgba(255,77,94,.35); }
+  #gate .gate-box h2.gate-kicker span{ white-space:nowrap; }
+  @media (max-width:480px){ #gate .gate-box h2.gate-kicker{ letter-spacing:.08em; } }
+  @media (min-width:761px) and (min-height:601px){ #gate .gate-box h2.gate-kicker{ font-size:40px; letter-spacing:.16em; } }
+  @media (max-height:600px){ #gate .gate-box h2.gate-kicker{ font-size:22px; } }
+  .gate-bar{ top:calc(max(16px, env(safe-area-inset-top, 0px)) + 1cm); right:18px; }
+  html.ipad-app .gate-bar{ top:calc(max(16px, env(safe-area-inset-top, 0px), 48px) + 1cm); }
 </style>
 </head>
 <body>
@@ -1303,12 +1314,10 @@
 <div class="safe-top" aria-hidden="true"></div>
 <div id="gate">
   <div class="gate-bar" aria-hidden="true"><span>BOX 3 · URG</span><span class="gate-clock"><i></i><span id="gateClock">--:--:--</span></span></div>
-  <button type="button" class="theme-btn gate-theme themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
   <div class="gate-box">
     <div id="gateRoleStep">
       <svg class="gate-ecg" viewBox="0 0 344 90" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M0 55 H40 l6-5 6 5 H70 l4 6 6-48 6 58 5-11 H120 q12-16 24 0 H170 l6-5 6 5 H200 l4 6 6-48 6 58 5-11 H250 q12-16 24 0 H344"/></svg>
-      <div class="gate-kicker">SIMULACIÓN · URGENCIAS</div>
-      <h2 class="gate-title">Monitor de constantes</h2>
+      <h2 class="gate-kicker"><span>SIMULACIÓN ·</span> <span>URGENCIAS</span></h2>
       <p>Elige tu papel en esta sesión de práctica.</p>
       <div class="role-cards">
         <div class="role-card" id="cardRoleInstructor" role="button" tabindex="0" onclick="selectRole('instructor')">
