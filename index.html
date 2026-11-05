@@ -2546,7 +2546,7 @@ function answerQuestion(id, optionIndex){
   if(channel) channel.send({ type:'broadcast', event:'answer', payload:{ id, optionIndex }});
   // una vez contestada, el panel de la pregunta se cierra solo
   clearTimeout(answerQuestion._t);
-  answerQuestion._t = setTimeout(hideQuestionOnMonitor, 1400);
+  answerQuestion._t = setTimeout(hideQuestionOnMonitor, 3000);
 }
 
 /* ---------- Motor de casos clínicos ---------- */
