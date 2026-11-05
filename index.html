@@ -681,7 +681,6 @@
   body.role-monitor .tabs-panel{ display:none !important; }
 
   /* En modo Instructor, el título no lleva "Monitor": quien lo ve es quien lo controla, no el monitor en sí */
-  body.role-instructor .title-role{ display:none; }
 
   /* ---- Panel del banco de preguntas (Instructor) ---- */
   .quiz-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
@@ -1325,6 +1324,24 @@
     #gate #gateRoomStep{ max-width:400px; margin:0 auto; }
     .gate-foot{ display:block; bottom:max(8px, env(safe-area-inset-bottom, 0px)); font-size:10px; }
   }
+
+  /* el rol ya figura junto a "SIMULADOR": no se repite en la etiqueta de la sala */
+  body.role-instructor .room-badge .badge-role{ display:none; }
+  .title-role{ color:var(--text-dim); font-weight:600; }
+  /* iPad con la app instalada: todo medio centímetro más abajo */
+  html.ipad-app #appWrap header{ padding-top:calc(max(calc(6px + env(safe-area-inset-top, 0px)), 46px) + 0.5cm); }
+
+  /* móvil (instructor): si no cabe "SIMULADOR · INSTRUCTOR", se muestra solo el rol */
+  @media (max-width:480px){
+    body.role-instructor header .title-main, body.role-instructor header .title-sep{ display:none; }
+    body.role-instructor header .title-role{ color:var(--title); }
+  }
+  @media (max-width:380px){
+    body.role-instructor .header-row > h1{ font-size:13px; letter-spacing:.02em; flex-shrink:0; }
+    body.role-instructor .header-row .room-badge{ font-size:10px; padding:3px 4px; gap:3px; }
+    body.role-instructor .badge-count{ margin-left:3px; padding-left:3px; }
+    body.role-instructor .header-row .sync-label{ display:none; }
+  }
 </style>
 </head>
 <body>
@@ -1480,7 +1497,7 @@
 
   <header>
     <div class="header-row">
-      <h1>Simulador<span class="title-role"> · Monitor</span></h1>
+      <h1><span class="title-main">Simulador</span><span class="title-role" id="titleRole"></span></h1>
       <div class="header-right">
         <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText" role="status" aria-live="polite">sin conectar</span></span>
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
@@ -1494,8 +1511,8 @@
             <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
         </div>
-        <button type="button" class="theme-btn settings-btn instructor-only" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Configuración" aria-label="Configuración">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="2.6"/><path d="M10 1.8v2.3M10 15.9v2.3M18.2 10h-2.3M4.1 10H1.8M15.8 4.2l-1.6 1.6M5.8 14.2l-1.6 1.6M15.8 15.8l-1.6-1.6M5.8 5.8 4.2 4.2"/></svg>
+        <button type="button" class="theme-btn settings-btn instructor-only" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Menú de configuración" aria-label="Menú de configuración">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12"/></svg>
         </button>
       </div>
     </div>
@@ -2091,6 +2108,7 @@ function connectRoom(){
   channel.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       document.body.classList.add(role==='monitor' ? 'role-monitor' : 'role-instructor');
+      document.getElementById('titleRole').innerHTML = '<span class="title-sep"> · </span>'+(role==='monitor' ? 'Alumno' : 'Instructor');
       refreshThemeUI();
       document.getElementById('roomBadgeText').innerHTML = (role==='instructor' ? '<span class="badge-role">Instructor · </span>' : '') + 'Sala '+escapeHtml(roomCode)
         + (role==='instructor' ? '<span class="badge-count" id="badgeCount" title="Alumnos conectados"></span>' : '');
