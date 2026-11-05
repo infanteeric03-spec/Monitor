@@ -1470,6 +1470,8 @@
     box-shadow:0 4px 14px rgba(0,0,0,.12); }
   .ecg12-tools .ecg12-b{ display:inline-flex; align-items:center; justify-content:center; gap:4px; }
   .ecg12-tools .ecg12-b svg{ width:16px; height:16px; flex-shrink:0; }
+
+  body.pref-no-flash #noPulseAlert.open, body.pref-no-flash #noPulseAlert .np-title{ animation:none; }
 </style>
 </head>
 <body>
@@ -2071,6 +2073,7 @@
         <div class="st-row"><span>Ver el caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
         <div class="st-row"><span>Puede usar los botones del caso<small>⏮ ▶ ⏭ ⟲</small></span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
         <div class="st-row"><span>Nombre del ritmo en el ECG proyectado<small>Valor inicial de la casilla al abrir un ECG</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
+        <div class="st-row"><span>Parpadeo rojo al perder el pulso<small>Si se desactiva, el aviso «SIN PULSO» aparece sin parpadear</small></span><button type="button" class="st-sw" role="switch" data-set="noPulseFlash" aria-label="Parpadeo rojo al perder el pulso"></button></div>
         <div class="st-row"><span>Mostrar temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
       </section>
       <section class="st-sec"><h3>Este dispositivo</h3>
@@ -2575,7 +2578,7 @@ let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 /* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
-var SETTINGS_DEF = { notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
+var SETTINGS_DEF = { noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
 var settings = Object.assign({}, SETTINGS_DEF);
 try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
 let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
@@ -5275,7 +5278,7 @@ document.getElementById('settingsPanel').addEventListener('click', e=>{
     const key = sw.dataset.set; settings[key] = settings[key]===false; saveSettings();
     if(key==='wake') updateWakeLock();
     if(key==='showFicha' || key==='showEcg12'){ updateRhythmInfo(state.rhythm); syncInstructorColumns(); }
-    if(['showCase','caseButtons','showTemp'].includes(key)) sendStudentPrefs();
+    if(['showCase','caseButtons','showTemp','noPulseFlash'].includes(key)) sendStudentPrefs();
     refreshSettingsUI();
   }
 });
@@ -5302,7 +5305,7 @@ var studentPrefs = { showCase:true, caseButtons:true, showTemp:true, quizCloseS:
 function sendStudentPrefs(){
   if(role!=='instructor' || !channel) return;
   channel.send({ type:'broadcast', event:'student_prefs', payload:{ showCase:settings.showCase!==false, caseButtons:settings.caseButtons!==false,
-    showTemp:settings.showTemp!==false, quizCloseS:settings.quizCloseS||3 } });
+    showTemp:settings.showTemp!==false, noPulseFlash:settings.noPulseFlash!==false, quizCloseS:settings.quizCloseS||3 } });
 }
 setInterval(sendStudentPrefs, 5000);
 function applyStudentPrefs(p){
@@ -5311,6 +5314,7 @@ function applyStudentPrefs(p){
   document.body.classList.toggle('pref-no-case', p.showCase===false);
   document.body.classList.toggle('pref-no-case-btns', p.caseButtons===false);
   document.body.classList.toggle('pref-no-temp', p.showTemp===false);
+  document.body.classList.toggle('pref-no-flash', p.noPulseFlash===false);
 }
 // estado inicial de la interfaz según las preferencias guardadas
 document.querySelectorAll('.algo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.algo===cprAlgo));
