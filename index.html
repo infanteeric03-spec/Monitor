@@ -1505,6 +1505,103 @@
   .case-pick .info-btn{ flex:0 0 auto; }
   .case-name-info{ margin-top:6px; font-size:12px; line-height:1.45; color:var(--text-dim); background:var(--field);
     border:1px solid var(--line); border-radius:6px; padding:8px 10px; }
+
+  /* ===================== Banco de ECG ===================== */
+  #csel-pop{ z-index:140; }
+  .ad-input{ width:100%; margin-top:12px; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:var(--field);
+    color:var(--text); font-size:16px; font-family:var(--font-num); letter-spacing:.2em; }
+  body:not(.ecg-admin) .admin-only{ display:none !important; }
+  #ecg12Box:not(.is-bank) .bank-only{ display:none !important; }
+  .bank-open-btn{ display:flex; align-items:center; gap:8px; width:100%; margin-top:10px; padding:10px 12px; border-radius:6px;
+    background:transparent; border:1px dashed var(--line); color:var(--text); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; text-align:left; }
+  .bank-open-btn svg{ width:18px; height:18px; color:var(--ecg); flex-shrink:0; }
+  .bank-open-btn .st-chev{ margin-left:auto; }
+  .bank-open-btn:hover{ border-color:var(--text-dim); }
+
+  #ecgBankOverlay, #ecgEditorOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:16px;
+    background:rgba(0,0,0,.6); overscroll-behavior:contain; }
+  #ecgBankOverlay{ z-index:94; } #ecgEditorOverlay{ z-index:97; }
+  #ecgBankOverlay.open, #ecgEditorOverlay.open{ display:flex; }
+  .eb-box, .ee-box{ width:min(1100px,100%); max-height:min(92dvh,900px); display:flex; flex-direction:column; overflow:hidden;
+    background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:12px; box-shadow:0 18px 50px rgba(0,0,0,.55); }
+  .eb-head{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line); }
+  .eb-head h2{ margin:0; font-size:16px; font-weight:800; flex:1; }
+  .eb-admin{ font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ecg);
+    border:1px solid color-mix(in srgb, var(--ecg) 45%, transparent); border-radius:4px; padding:2px 7px; }
+  .eb-filters{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--line); }
+  .eb-filters input{ flex:1 1 220px; min-width:0; padding:8px 10px; border-radius:6px; border:1px solid var(--line); background:var(--field); color:var(--text); font-size:13px; }
+  .eb-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .eb-chip{ padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--text-dim);
+    font-family:inherit; font-size:12px; cursor:pointer; white-space:nowrap; }
+  .eb-chip.on{ background:color-mix(in srgb, var(--ecg) 14%, transparent); border-color:var(--ecg); color:var(--ecg); font-weight:700; }
+  .eb-grid{ flex:1; overflow-y:auto; padding:14px; display:grid; gap:12px; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); align-content:start; }
+  .eb-card{ position:relative; display:flex; flex-direction:column; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--field); }
+  .eb-open{ display:block; padding:0; border:none; background:#fff; cursor:zoom-in; aspect-ratio:2/1; overflow:hidden; }
+  .eb-open img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .eb-meta{ padding:8px 10px; display:flex; flex-direction:column; gap:3px; }
+  .eb-t{ font-size:13px; font-weight:700; line-height:1.3; }
+  .eb-c{ font-size:11px; color:var(--text-dim); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .eb-c .eb-cal{ color:var(--ecg); }
+  .eb-acts{ display:flex; gap:6px; padding:0 10px 10px; }
+  .eb-acts button{ flex:1; padding:5px 8px; border-radius:5px; border:1px solid var(--line); background:transparent; color:var(--text); font-family:inherit; font-size:12px; cursor:pointer; }
+  .eb-acts button.del{ color:var(--alarm); border-color:color-mix(in srgb, var(--alarm) 45%, transparent); }
+  .eb-empty{ grid-column:1/-1; text-align:center; padding:40px 10px; color:var(--text-dim); font-size:13px; line-height:1.6; }
+  @media (max-width:520px){ .eb-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; padding:10px; } .eb-t{ font-size:12px; } #ecgBankOverlay, #ecgEditorOverlay{ padding:0; } .eb-box, .ee-box{ max-height:100dvh; height:100dvh; border-radius:0; } }
+
+  .ee-body{ flex:1; overflow-y:auto; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr); gap:14px; padding:14px; }
+  @media (max-width:820px){ .ee-body{ grid-template-columns:1fr; } }
+  .ee-src{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+  .ee-file{ position:relative; display:inline-flex; align-items:center; gap:4px; cursor:pointer; }
+  .ee-file input{ position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+  .ee-page{ font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
+  .ee-page select{ padding:4px 6px; background:var(--field); color:var(--text); border:1px solid var(--line); border-radius:5px; }
+  .ee-stage{ position:relative; background:#111; border:1px solid var(--line); border-radius:8px; min-height:240px; display:flex; align-items:center; justify-content:center; overflow:hidden; touch-action:none; }
+  .ee-stage canvas{ display:block; max-width:100%; max-height:52dvh; cursor:crosshair; }
+  .ee-empty{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; color:#8a979b; font-size:13px; }
+  .ee-stage.has-img .ee-empty{ display:none; }
+  .ee-tools{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+  .ee-tools .ecg12-b{ background:var(--field); color:var(--text); border-color:var(--line); }
+  .ee-sl{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); }
+  .ee-sl input{ width:110px; accent-color:var(--ecg); }
+  .ee-hint{ margin:8px 0 0; font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .ee-field{ display:flex; flex-direction:column; gap:4px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px; }
+  .ee-field input, .ee-field textarea{ font-family:inherit; font-size:14px; font-weight:400; letter-spacing:0; text-transform:none; color:var(--text);
+    background:var(--field); border:1px solid var(--line); border-radius:6px; padding:8px 10px; resize:vertical; }
+  .ee-check{ display:flex; gap:8px; align-items:flex-start; font-size:13px; line-height:1.45; margin:6px 0; cursor:pointer; }
+  .ee-check input{ width:18px; height:18px; margin:1px 0 0; accent-color:var(--ecg); flex-shrink:0; }
+  .ee-consent{ padding:8px 10px; border:1px solid color-mix(in srgb, var(--alarm) 40%, transparent); border-radius:6px; background:color-mix(in srgb, var(--alarm) 6%, transparent); }
+  .ee-err{ min-height:18px; font-size:12.5px; color:var(--alarm); margin:6px 0; }
+  .ee-actions{ display:flex; justify-content:flex-end; gap:8px; }
+
+  /* visor: barras flotantes de compás, calibración e interpretación */
+  .ecg12-float{ position:absolute; z-index:5; left:50%; transform:translateX(-50%); max-width:calc(100% - 16px);
+    background:rgba(255,255,255,.88); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); color:#222;
+    border:1px solid rgba(160,120,120,.35); border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.14); padding:6px 10px; }
+  .ecg12-float[hidden]{ display:none !important; }
+  .ecg12-calbar, .ecg12-calibbar{ bottom:34px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; }
+  .cb-read{ font-family:var(--font-num); font-size:13px; font-weight:700; color:#b2444b; white-space:nowrap; }
+  .cb-btns, .cbb-btns{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .ecg12-calbar .ecg12-b[aria-pressed="true"]{ background:#2b2f33; color:#fff; border-color:#2b2f33; }
+  .ecg12-calibbar{ flex-direction:column; max-width:min(560px, calc(100% - 16px)); }
+  .cbb-msg{ font-size:13px; line-height:1.4; text-align:center; }
+  .cbb-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; font-size:12px; color:#555; }
+  .cbb-row label{ display:flex; align-items:center; gap:4px; }
+  .cbb-row input, .cbb-row select{ width:auto; padding:3px 5px; border:1px solid #d9caca; border-radius:5px; background:#fff; color:#222; font-size:13px; }
+  .cbb-row input{ width:56px; }
+  @media (max-width:760px) and (orientation:portrait), (max-height:520px){
+    .ecg12-calibbar{ flex-direction:row; max-width:calc(100% - 12px); gap:4px 8px; padding:4px 8px; bottom:26px; }
+    .cbb-msg{ flex:1 1 260px; font-size:11.5px; line-height:1.3; text-align:left; }
+    .cbb-msg .cbb-long{ display:none; }
+    .cbb-row{ gap:6px; font-size:11px; }
+    .ecg12-calibbar .ecg12-b{ padding:4px 8px; }
+  }
+  .cbb-save:not(:disabled){ background:#13a05a; color:#fff; border-color:#13a05a; }
+  .ecg12-notes{ top:calc(var(--e12-head) + 8px); left:auto; right:8px; transform:none; width:min(360px, calc(100% - 16px));
+    max-height:45%; overflow:auto; font-size:13px; line-height:1.5; white-space:pre-wrap; }
+  .ecg12-notes b{ display:block; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#b2444b; margin-bottom:4px; }
+  #ecg12Box.is-bank #ecg12Tools:not([hidden]) ~ .ecg12-notes{ top:calc(var(--e12-head) + 56px); }
+  .ecg12-paper.measuring{ cursor:ew-resize; }
+  .ecg12-paper.calibrating{ cursor:crosshair; }
 </style>
 </head>
 <body>
@@ -1770,6 +1867,7 @@
               </div>
             </div>
             <section class="rhythm-info" id="rhythmInfo" aria-live="polite"></section>
+            <button type="button" class="bank-open-btn" id="bankOpenBtn" onclick="openEcgBank()"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="15" height="12" rx="1.5"/><path d="M4.5 11h2l1.2-3 2 6 1.3-4.5 1 1.5h3.5"/></svg>Banco de ECG<span class="st-chev" aria-hidden="true">›</span></button>
           </div>
 
           <div class="tab-pane" id="paneCase">
@@ -2070,6 +2168,7 @@
     <div class="ad-icon" id="adIcon" aria-hidden="true"></div>
     <h2 class="ad-title" id="adTitle"></h2>
     <p class="ad-text" id="adText"></p>
+    <input class="ad-input" id="adInput" hidden autocomplete="off" spellcheck="false">
     <div class="ad-btns">
       <button type="button" class="ad-btn ad-cancel" id="adCancel">Cancelar</button>
       <button type="button" class="ad-btn ad-ok" id="adOk">Aceptar</button>
@@ -2099,6 +2198,11 @@
         <div class="st-row"><span>Avisar cuando se conecte un alumno<small>Notificación discreta en la esquina</small></span><button type="button" class="st-sw" role="switch" data-set="notifyJoin" aria-label="Avisar cuando se conecte un alumno"></button></div>
         <div class="st-row"><span>Salir al inicio<small>Para cambiar de rol o de sala</small></span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
       </section>
+      <section class="st-sec instructor-only"><h3>Banco de ECG</h3>
+        <button type="button" class="st-row st-link" onclick="closeSettings(); openEcgBank();"><span>Abrir el banco de ECG<small>ECG reales anonimizados para mostrar y medir</small></span><span class="st-chev" aria-hidden="true">›</span></button>
+        <div class="st-row"><span>Administrador<small id="stAdmin">Desbloquea con el PIN para subir, editar y calibrar</small></span><button type="button" class="st-go" id="stAdminBtn" onclick="adminToggle()">Desbloquear</button></div>
+        <div class="st-row admin-only"><span>PIN de administrador</span><button type="button" class="st-go" onclick="adminChangePin()">Cambiar PIN</button></div>
+      </section>
       <section class="st-sec instructor-only"><h3>Preguntas</h3>
         <div class="st-row" id="settingsAlgo"><span>Algoritmo de RCP<small>Preguntas y barra «Q. RCP»</small></span><div class="st-seg" data-set="cprAlgo" role="group" aria-label="Algoritmo de RCP"><button type="button" data-v="AHA">AHA</button><button type="button" data-v="ERC">ERC</button></div></div>
         <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span>Gestionar preguntas<small>Crear, editar o eliminar</small></span><span class="st-chev" aria-hidden="true">›</span></button>
@@ -2125,11 +2229,67 @@
     </div>
   </aside>
 </div>
+<div id="ecgBankOverlay" role="dialog" aria-modal="true" aria-labelledby="ebTitle" onclick="if(event.target===this) closeEcgBank()">
+  <div class="eb-box">
+    <div class="eb-head">
+      <h2 id="ebTitle">Banco de ECG</h2>
+      <span class="eb-admin admin-only">Administrador</span>
+      <button type="button" class="casebtn primary admin-only" onclick="openEcgEditor(null)">+ Subir ECG</button>
+      <button type="button" class="st-x" onclick="closeEcgBank()" aria-label="Cerrar el banco de ECG">✕</button>
+    </div>
+    <div class="eb-filters">
+      <input type="search" id="ebSearch" placeholder="Buscar por título o interpretación…" aria-label="Buscar ECG" autocomplete="off" oninput="ecgBankQuery=this.value; renderEcgBank()">
+      <div class="eb-chips" id="ebChips" role="group" aria-label="Categoría"></div>
+    </div>
+    <div class="eb-grid" id="ebGrid" aria-live="polite"></div>
+  </div>
+</div>
+<div id="ecgEditorOverlay" role="dialog" aria-modal="true" aria-labelledby="eeTitle">
+  <div class="ee-box">
+    <div class="eb-head">
+      <h2 id="eeTitle">Subir ECG</h2>
+      <button type="button" class="st-x" onclick="closeEcgEditor()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="ee-body">
+      <div class="ee-left">
+        <div class="ee-src">
+          <label class="casebtn ee-file"><input type="file" accept="image/*" capture="environment" onchange="eeLoadFile(this.files[0]); this.value=''"><span aria-hidden="true">📷</span> Hacer foto</label>
+          <label class="casebtn ee-file"><input type="file" accept="image/*,application/pdf" onchange="eeLoadFile(this.files[0]); this.value=''"><span aria-hidden="true">📁</span> Imagen o PDF</label>
+          <label class="ee-page" id="eePageWrap" hidden>Página <select id="eePage" data-native onchange="eeRenderPdfPage(+this.value)"></select></label>
+        </div>
+        <div class="ee-stage" id="eeStage"><canvas id="eeCanvas"></canvas><div class="ee-empty" id="eeEmpty">Haz una foto del ECG o elige una imagen o un PDF.</div></div>
+        <div class="ee-tools" id="eeTools">
+          <div class="st-seg" role="group" aria-label="Modo"><button type="button" data-m="crop" class="on" onclick="eeMode('crop')">✂ Recortar</button><button type="button" data-m="cover" onclick="eeMode('cover')">⬛ Tapar datos</button></div>
+          <button type="button" class="ecg12-b" onclick="eeRotate()" title="Girar 90°">↻ Girar</button>
+          <button type="button" class="ecg12-b" onclick="eeUndoCover()" title="Quitar el último tapado">Deshacer tapado</button>
+          <button type="button" class="ecg12-b" onclick="eeResetEdits()">Restablecer</button>
+          <label class="ee-sl">Enderezar <input type="range" id="eeAngle" min="-15" max="15" step="0.5" value="0" oninput="eeSet('angle',+this.value)"></label>
+          <label class="ee-sl">Brillo <input type="range" id="eeBri" min="-60" max="60" step="1" value="0" oninput="eeSet('bri',+this.value)"></label>
+          <label class="ee-sl">Contraste <input type="range" id="eeCon" min="-50" max="100" step="1" value="0" oninput="eeSet('con',+this.value)"></label>
+        </div>
+        <p class="ee-hint" id="eeHint">Arrastra sobre la imagen para recortar. Con «Tapar datos», arrastra sobre el nombre, número de historia, fecha o centro para cubrirlos de negro.</p>
+      </div>
+      <div class="ee-right">
+        <label class="ee-field">Título<input type="text" id="eeName" maxlength="120" autocomplete="off" placeholder="p. ej. BAV completo con escape ventricular"></label>
+        <label class="ee-field">Categoría<select id="eeCat"></select></label>
+        <label class="ee-field">Ritmo asociado (opcional)<select id="eeRhythm"></select></label>
+        <label class="ee-field">Interpretación / comentario<textarea id="eeNotes" rows="5" placeholder="Solo la ve el instructor"></textarea></label>
+        <label class="ee-check"><input type="checkbox" id="eeShowTitle"> El alumno puede ver el título al mostrárselo</label>
+        <label class="ee-check ee-consent"><input type="checkbox" id="eeConsent"> Confirmo que el ECG es propio y que la imagen no contiene datos que identifiquen al paciente (nombre, n.º de historia, fecha, centro…).</label>
+        <div class="ee-err" id="eeErr" role="alert"></div>
+        <div class="ee-actions">
+          <button type="button" class="casebtn" onclick="closeEcgEditor()">Cancelar</button>
+          <button type="button" class="casebtn primary" id="eeSave" onclick="eeSave()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="ecg12Overlay" role="dialog" aria-modal="true" aria-labelledby="ecg12Title" onclick="if(event.target===this) closeEcg12()">
   <div class="ecg12-box" id="ecg12Box">
     <div class="ecg12-head">
       <div class="ecg12-titlebox">
-        <span class="ecg12-k">ECG de 12 derivaciones</span>
+        <span class="ecg12-k" id="ecg12Kicker">ECG de 12 derivaciones</span>
         <label class="ecg12-namechk instructor-only" title="Mostrar el nombre del ritmo al alumno">
           <input type="checkbox" id="ecg12ShowName" onchange="onEcg12ShowName()" aria-label="Mostrar el nombre del ritmo al alumno">
         </label><span id="ecg12Title" class="ecg12-t"></span><span class="ecg12-live">● EN DIRECTO DEL INSTRUCTOR</span>
@@ -2138,6 +2298,11 @@
         <button type="button" class="ecg12-b ecg12-penbtn instructor-only" id="ecg12PenBtn" onclick="toggleInkBar()" aria-pressed="false" aria-controls="ecg12Tools" title="Anotar sobre el ECG">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 3.5l3 3L7 16H4v-3z"/><path d="M11.5 5.5l3 3"/></svg><span class="lbl"> Anotar</span>
         </button>
+        <button type="button" class="ecg12-b ecg12-penbtn instructor-only" id="ecg12CalBtn" onclick="toggleCaliper()" aria-pressed="false" title="Compás: medir intervalos y voltajes">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v14M15 3v14M5 10h10M7.5 7.5 5 10l2.5 2.5M12.5 7.5 15 10l-2.5 2.5"/></svg><span class="lbl"> Compás</span>
+        </button>
+        <button type="button" class="ecg12-b instructor-only bank-only" id="ecg12NotesBtn" onclick="toggleEcgNotes()" aria-pressed="false" title="Interpretación (solo la ves tú)"><span aria-hidden="true">📝</span><span class="lbl"> Interpretación</span></button>
+        <button type="button" class="ecg12-b instructor-only bank-only admin-only" id="ecg12CalibBtn" onclick="startCalibration()" title="Calibrar la escala de esta imagen"><span aria-hidden="true">📐</span><span class="lbl"> Calibrar</span></button>
         <span class="ecg12-sep instructor-only"></span>
         <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
         <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
@@ -2158,8 +2323,32 @@
       <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5 3.5 9l4 4"/><path d="M3.8 9H12a4.5 4.5 0 0 1 0 9h-2"/></svg></button>
       <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.5 8.5v5M11.5 8.5v5"/></svg><span class="lbl"> Borrar</span></button>
     </div>
+    <div class="ecg12-float ecg12-calbar instructor-only" id="ecg12CalBar" hidden>
+      <div class="cb-read" id="cbRead" aria-live="polite">—</div>
+      <div class="cb-btns">
+        <button type="button" class="ecg12-b" id="cbAxis" onclick="caliperAxis()">↕ Voltaje</button>
+        <button type="button" class="ecg12-b" onclick="caliperRepeat()" title="Desplazar un intervalo a la derecha">Repetir ›</button>
+        <button type="button" class="ecg12-b" id="cbGrid" onclick="toggleCalibGrid()" aria-pressed="false" title="Cuadrícula de comprobación de 5 mm">▦</button>
+        <button type="button" class="ecg12-b" onclick="caliperFix()" title="Dejar la medida dibujada">Fijar</button>
+        <button type="button" class="ecg12-b" onclick="toggleCaliper(false)" aria-label="Cerrar compás">✕</button>
+      </div>
+    </div>
+    <div class="ecg12-float ecg12-calibbar instructor-only" id="ecg12CalibBar" hidden>
+      <div class="cbb-msg" id="cbbMsg"></div>
+      <div class="cbb-row">
+        <label>Cuadros grandes <input type="number" id="cbbN" min="1" max="40" step="1" value="5" inputmode="numeric"></label>
+        <label>Velocidad <select id="cbbSpeed" data-native><option value="25">25 mm/s</option><option value="50">50 mm/s</option></select></label>
+        <label>Ganancia <select id="cbbGain" data-native><option value="5">5 mm/mV</option><option value="10" selected>10 mm/mV</option><option value="20">20 mm/mV</option></select></label>
+      </div>
+      <div class="cbb-btns">
+        <button type="button" class="ecg12-b" onclick="calibRestart()">Rehacer</button>
+        <button type="button" class="ecg12-b" onclick="calibCancel()">Cancelar</button>
+        <button type="button" class="ecg12-b cbb-save" id="cbbSave" onclick="calibSave()" disabled>Guardar</button>
+      </div>
+    </div>
+    <div class="ecg12-float ecg12-notes instructor-only" id="ecg12Notes" hidden></div>
     <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas><canvas id="ecg12Ink"></canvas></div>
-    <div class="ecg12-foot"><span id="ecg12Hint">Pellizca con dos dedos para ampliar y arrastra para moverte · </span>Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
+    <div class="ecg12-foot"><span id="ecg12Hint">Pellizca con dos dedos para ampliar y arrastra para moverte · </span><span id="ecg12FootSrc">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</span></div>
   </div>
 </div>
 <div id="quizOverlay" role="dialog" aria-modal="true" aria-label="Pregunta" aria-live="polite">
@@ -4040,6 +4229,7 @@ const GUIDE_STEPS = {
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#btnSendRhythm', text:'Con «Enviar» el alumno ve el nombre del ritmo y su ficha.', sub:'Vuelve a pulsarlo (✕ Retirar) para quitárselo; también se retira solo al cambiar de ritmo.', before:()=>switchTab('rhythm') },
     { sel:'#pulseBadge', text:'Pulsa aquí para quitar el pulso y simular una AESP.', sub:'Pide confirmación. En FV, asistolia y durante los casos queda bloqueado.', before:()=>switchTab('rhythm') },
+    { sel:'#bankOpenBtn', text:'Banco de ECG: ECG reales anonimizados.', sub:'Ábrelos en el visor, mide con el compás, anota y muéstralos al alumno. El administrador los sube con su PIN.', before:()=>switchTab('rhythm') },
     { sel:'#rhythmInfo', hand:false, text:'La ficha del ritmo y su ECG de 12 derivaciones.', sub:'Toca la miniatura para ampliarlo: puedes hacer zoom, anotar y mostrarlo en directo al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#caseSelect + .csel-btn', alt:'#tabBtnCase', text:'Lanza un caso clínico paso a paso.', sub:'El alumno ve la evolución del caso, el tiempo y, si lo permites, sus botones.', before:()=>switchTab('case') },
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
@@ -4551,6 +4741,17 @@ function renderEcg12(canvas, r, W, H, dpr){
   canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(e12IsBank(r)){
+    // imagen del banco: las "unidades" del papel son píxeles de la imagen original
+    const im = ECG_IMG[e12BankId(r)];
+    const IW = im.naturalWidth, IH = im.naturalHeight, sc = Math.min(W/IW, H/IH);
+    const ox = (W - IW*sc)/2, oy = (H - IH*sc)/2;
+    canvas._geo = { mm:sc, ox, oy };
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(im, ox, oy, IW*sc, IH*sc);
+    return;
+  }
   // papel: 264 mm × 128 mm (calibración + 10 s, 4 filas)
   const MMW = 264, MMH = 128, mm = Math.min(W/MMW, H/MMH);
   const ox = (W - MMW*mm)/2, oy = (H - MMH*mm)/2;
@@ -4629,11 +4830,14 @@ function openEcg12(r, opts){
   if(opts.view) e12View = Object.assign({}, opts.view);
   ecg12Remote = !!opts.remote;
   document.getElementById('ecg12Overlay').classList.toggle('remote', ecg12Remote);
-  document.getElementById('ecg12Title').textContent = (RHYTHM_INFO[r]||{}).t || '';
+  document.getElementById('ecg12Title').textContent = e12TitleOf(r);
   if(ecg12Remote) setRemoteEcgName(!!opts.showName);
   if(changed && !ecg12Remote){
-    ecg12ShowName = !!settings.ecgName; const chk = document.getElementById('ecg12ShowName'); if(chk) chk.checked = ecg12ShowName;
+    const bi = e12IsBank(r) ? bankItem(e12BankId(r)) : null;
+    ecg12ShowName = bi ? !!bi.show_title : !!settings.ecgName; const chk = document.getElementById('ecg12ShowName'); if(chk) chk.checked = ecg12ShowName;
   }
+  if(changed) e12ResetMeasure();
+  e12RefreshSourceUI(r);
   if(!ecg12Remote && !document.getElementById('ecg12Overlay').classList.contains('open')) toggleInkBar(false);
   document.getElementById('ecg12Overlay').classList.add('open');
   document.body.classList.add('waves-open');
@@ -4703,7 +4907,7 @@ function closeEcg12(){
   if(!ecg12Rhythm) return;
   if(ecg12Mirror) stopEcg12Mirror();
   ecg12Rhythm = null; ecg12Remote = false;
-  e12Ink = []; setInkTool(null); removeInkText();
+  e12Ink = []; setInkTool(null); removeInkText(); e12ResetMeasure();
   document.getElementById('ecg12Overlay').classList.remove('open','remote');
   updateWakeLock();
   if(!document.querySelector('.waves.expanded')) document.body.classList.remove('waves-open');
@@ -4739,6 +4943,7 @@ function closeEcg12(){
       }
       if(touches.size>2) return;
     }
+    if(e12MeasureDown(e)){ try{ paper.setPointerCapture(e.pointerId); }catch(_){} e.preventDefault(); return; }
     if(inkTool==='pen'){ e.preventDefault(); paper.setPointerCapture(e.pointerId); startInkStroke(e); return; }
     if(inkTool==='text'){ if(e.target.classList.contains('ecg12-txt')) return; e.preventDefault(); placeInkText(e); return; }
     if(e12View.z<=1) return;
@@ -4757,6 +4962,7 @@ function closeEcg12(){
       setEcg12View({ z:nz, cx:px - (st.f[0]-0.5)/nz, cy:py - (st.f[1]-0.5)/nz }, true, true);
       return;
     }
+    if(e12MeasureMove(e)) return;
     if(inkLive){ moveInkStroke(e); return; }
     if(!drag) return;
     let dx = e.clientX-drag.x, dy = e.clientY-drag.y;
@@ -4767,6 +4973,7 @@ function closeEcg12(){
   const end = (e)=>{
     if(e && touches.has(e.pointerId)) touches.delete(e.pointerId);
     if(pinch){ if(touches.size<2){ pinch = null; drawEcg12Big(); sendEcg12View(true); } return; }
+    if(e12MeasureUp(e)) return;
     if(inkLive){ endInkStroke(); return; } if(drag){ drag=null; paper.classList.remove('dragging'); sendEcg12View(true); } };
   paper.addEventListener('pointerup', end); paper.addEventListener('pointercancel', end);
   paper.addEventListener('wheel', e=>{
@@ -4776,7 +4983,7 @@ function closeEcg12(){
     zoomEcg12(e.deltaY<0 ? 1 : -1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
   }, { passive:false });
   paper.addEventListener('dblclick', e=>{
-    if(ecg12Remote || rotated() || inkTool) return;
+    if(ecg12Remote || rotated() || inkTool || e12Cal || e12CalibSess) return;
     const r = paper.getBoundingClientRect();
     if(e12View.z>=4) resetEcg12View(); else zoomEcg12(1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
   });
@@ -4800,6 +5007,7 @@ function toggleEcg12Mirror(){
   warnIfNoStudents();
   ecg12Mirror = true; refreshEcg12MirrorBtn(); sendEcg12View(true);
   sendInk({ op:'all', items:e12Ink });
+  e12SendCal(true);
 }
 function stopEcg12Mirror(){
   if(!ecg12Mirror) return;
@@ -4810,7 +5018,7 @@ let e12SendT = 0, e12SendTimer = null;
 function sendEcg12View(now){
   if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
   const go = ()=>{ e12SendT = Date.now(); e12SendTimer = null;
-    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, z:e12View.z, cx:e12View.cx, cy:e12View.cy, rect:e12VisibleRect(), showName:ecg12ShowName } }); };
+    channel.send({ type:'broadcast', event:'ecg_view', payload:{ key:ecg12Rhythm, title:e12TitleOf(ecg12Rhythm), z:e12View.z, cx:e12View.cx, cy:e12View.cy, rect:e12VisibleRect(), showName:ecg12ShowName } }); };
   clearTimeout(e12SendTimer);
   if(now || Date.now()-e12SendT > 90) go(); else e12SendTimer = setTimeout(go, 90);
 }
@@ -4834,7 +5042,7 @@ function onEcg12ShowName(){
   sendEcg12View(true);
 }
 function setRemoteEcgName(show){
-  document.getElementById('ecg12Title').textContent = show ? ((RHYTHM_INFO[ecg12Rhythm]||{}).t || '') : '';
+  document.getElementById('ecg12Title').textContent = show ? e12TitleOf(ecg12Rhythm) : '';
 }
 
 /* ---------- Anotar sobre el ECG (lápiz y texto) ----------
@@ -4925,6 +5133,7 @@ function drawInk(){
       ctx.fillText(it.t, X(it.p[0][0]), Y(it.p[0][1]));
     }
   }
+  if(typeof drawE12Extras==='function') drawE12Extras(ctx, g);
 }
 function sendInk(payload){
   if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
@@ -4938,6 +5147,7 @@ function applyRemoteInk(p){
   else if(p.op==='clear') e12Ink = [];
   else if(p.op==='del') e12Ink = e12Ink.filter(x=>x.id!==p.id);
   else if(p.op==='set' && p.item){ const i = e12Ink.findIndex(x=>x.id===p.item.id); if(i>=0) e12Ink[i] = p.item; else e12Ink.push(p.item); }
+  else if(p.op==='cal') e12RemoteCal = p.cal || null;
   drawInk();
 }
 
@@ -4948,14 +5158,16 @@ function e12VisibleRect(){
   if(!g) return null;
   const W = paper.clientWidth, H = paper.clientHeight, L = parseFloat(cv.style.left)||0, T = parseFloat(cv.style.top)||0;
   const r = { x0:(-L - g.ox)/g.mm, y0:(-T - g.oy)/g.mm, x1:(W - L - g.ox)/g.mm, y1:(H - T - g.oy)/g.mm };
-  r.x0 = Math.max(0, r.x0); r.y0 = Math.max(0, r.y0); r.x1 = Math.min(264, r.x1); r.y1 = Math.min(128, r.y1);
+  const dm = e12Dims(ecg12Rhythm);
+  r.x0 = Math.max(0, r.x0); r.y0 = Math.max(0, r.y0); r.x1 = Math.min(dm.W, r.x1); r.y1 = Math.min(dm.H, r.y1);
   return r;
 }
 function viewForRect(r){
   const paper = document.getElementById('ecg12Paper');
   const W = paper.clientWidth, H = paper.clientHeight;
   if(!W || !H) return { z:1, cx:0.5, cy:0.5 };
-  const mm1 = Math.min(W/264, H/128), ox1 = (W - 264*mm1)/2, oy1 = (H - 128*mm1)/2;
+  const dm = e12Dims(ecg12Rhythm);
+  const mm1 = Math.min(W/dm.W, H/dm.H), ox1 = (W - dm.W*mm1)/2, oy1 = (H - dm.H*mm1)/2;
   const rw = Math.max(5, r.x1 - r.x0), rh = Math.max(5, r.y1 - r.y0);
   let z = Math.min(W/rw, H/rh) / mm1;
   z = Math.round(Math.max(1, Math.min(6, z))*1000)/1000;
@@ -4965,7 +5177,11 @@ function viewForRect(r){
 let e12LastRect = null;
 // alumno: recibe la vista del instructor
 function applyRemoteEcgView(p){
-  if(!p || !p.key || !RHYTHM_INFO[p.key]) return;
+  if(!p || !p.key) return;
+  if(e12IsBank(p.key)){
+    e12RemoteMeta[p.key] = { title: p.title || 'ECG' };
+    if(!ECG_IMG[e12BankId(p.key)]){ loadEcgImage(e12BankId(p.key)).then(()=>applyRemoteEcgView(p)).catch(()=>{}); return; }
+  } else if(!RHYTHM_INFO[p.key]) return;
   e12LastRect = p.rect || null;
   let view = { z:p.z||1, cx:p.cx??0.5, cy:p.cy??0.5 };
   if(p.rect && ecg12Rhythm===p.key && ecg12Remote) view = viewForRect(p.rect);
@@ -4986,7 +5202,12 @@ window.addEventListener('resize', ()=>{
     if(ecg12Mirror) sendEcg12View(true); // si cambia la forma de la pantalla del instructor, se reenvía la zona
   });
 });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm && !e.target.classList.contains('ecg12-txt')) closeEcg12(); });
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape' || e.target.classList.contains('ecg12-txt') || document.getElementById('appDialog').classList.contains('open')) return;
+  if(ecg12Rhythm) closeEcg12();
+  else if(document.getElementById('ecgEditorOverlay').classList.contains('open')) closeEcgEditor();
+  else if(document.getElementById('ecgBankOverlay').classList.contains('open')) closeEcgBank();
+});
 
 /* ---------- Ficha informativa de cada ritmo ----------
    Definición, claves en el ECG y particularidades clínicas. Basada en las guías de práctica
@@ -5293,6 +5514,7 @@ document.addEventListener('visibilitychange', updateWakeLock);
 /* ---------- Menú ⚙ Configuración ---------- */
 function saveSettings(){ try{ localStorage.setItem('monitor-settings', JSON.stringify(settings)); }catch(e){} }
 function refreshSettingsUI(){
+  if(typeof refreshAdminUI==='function') refreshAdminUI();
   const vals = Object.assign({}, settings, { theme: getThemePref(),
     cprAlgo, quizCloseS:String(settings.quizCloseS), speed:String(settings.speed), fichaCollapsed: settings.fichaCollapsed!==false ? '1':'0' });
   document.querySelectorAll('#settingsPanel .st-seg').forEach(g=>{
@@ -5526,17 +5748,23 @@ function appConfirm(msg, opts){
   const ok = document.getElementById('adOk'), cancel = document.getElementById('adCancel');
   ok.textContent = opts.ok || 'Aceptar'; cancel.textContent = opts.cancel || 'Cancelar';
   d.classList.toggle('danger', !!opts.danger);
+  const inp = document.getElementById('adInput');
+  inp.hidden = !opts.input; inp.value = ''; inp.type = opts.input || 'text';
+  inp.placeholder = opts.placeholder || ''; inp.inputMode = opts.inputMode || '';
   const opener = document.activeElement;
   d.classList.add('open');
-  (opts.danger ? cancel : ok).focus({ preventScroll:true });
+  if(opts.input) inp.focus({ preventScroll:true }); else (opts.danger ? cancel : ok).focus({ preventScroll:true });
   return new Promise(resolve=>{
     const done = (v)=>{
       d.classList.remove('open');
       ok.onclick = cancel.onclick = d.onclick = null; document.removeEventListener('keydown', onKey, true);
       if(opener && opener.focus && document.body.contains(opener)) opener.focus({ preventScroll:true });
-      resolve(v);
+      resolve(opts.input ? (v ? inp.value.trim() : null) : v);
     };
-    const onKey = (e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done(false); } };
+    const onKey = (e)=>{
+      if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); done(false); }
+      else if(e.key==='Enter' && opts.input && e.target===inp){ e.preventDefault(); done(true); }
+    };
     ok.onclick = ()=>done(true); cancel.onclick = ()=>done(false);
     d.onclick = (e)=>{ if(e.target===d) done(false); };
     document.addEventListener('keydown', onKey, true);
@@ -5598,6 +5826,591 @@ function toggleCaseNameInfo(){
   const n = document.getElementById('caseNameInfo'), b = document.querySelector('.case-pick .info-btn');
   n.hidden = !n.hidden; b.setAttribute('aria-expanded', n.hidden ? 'false' : 'true');
 }
+
+
+/* =====================================================================
+   BANCO DE ECG — ECG reales anonimizados subidos por el administrador
+   - Lectura: cualquiera (tablas ecg_bank / ecg_images).
+   - Escritura: solo mediante funciones del servidor que comprueban el PIN.
+   - El visor es el mismo del ECG de 12 derivaciones; las "unidades" del papel son
+     píxeles de la imagen, y la calibración guarda cuántos píxeles hay por milímetro.
+   ===================================================================== */
+const ECG_CATS = { ritmos:'Ritmos y bloqueos', taqui:'Taquiarritmias', sca:'SCA / isquemia', ionicas:'Alteraciones iónicas', otros:'Otros' };
+var ecgBankList = [], ecgBankLoaded = false, ecgBankFilter = 'all', ecgBankQuery = '';
+var ECG_IMG = {}, ECG_IMG_P = {}, e12RemoteMeta = {};
+function e12IsBank(k){ return typeof k==='string' && k.indexOf('bank:')===0; }
+function e12BankId(k){ return k.slice(5); }
+function bankItem(id){ return ecgBankList.find(x=>x.id===id); }
+function e12Dims(k){
+  if(e12IsBank(k)){ const im = ECG_IMG[e12BankId(k)]; if(im) return { W:im.naturalWidth, H:im.naturalHeight }; }
+  return { W:264, H:128 };
+}
+function e12TitleOf(k){
+  if(e12IsBank(k)){ const it = bankItem(e12BankId(k)) || e12RemoteMeta[k]; return it ? it.title : 'ECG'; }
+  return (RHYTHM_INFO[k]||{}).t || '';
+}
+// escala: unidades del papel por mm (horizontal y vertical), velocidad y ganancia
+function e12Calib(k){
+  if(!e12IsBank(k)) return { ux:1, uy:1, speed:25, gain:10 };
+  const it = bankItem(e12BankId(k));
+  return it && it.calib && it.calib.ux ? it.calib : null;
+}
+function e12RefreshSourceUI(k){
+  const bank = e12IsBank(k), box = document.getElementById('ecg12Box');
+  box.classList.toggle('is-bank', bank);
+  document.getElementById('ecg12Kicker').textContent = bank ? 'Banco de ECG' : 'ECG de 12 derivaciones';
+  const c = e12Calib(k), f = document.getElementById('ecg12FootSrc');
+  if(!bank) f.textContent = 'Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV';
+  else f.textContent = 'ECG real anonimizado · ' + (c ? c.speed+' mm/s · '+c.gain+' mm/mV (calibrado)' : 'sin calibrar · escala aproximada');
+  const nb = document.getElementById('ecg12NotesBtn'); nb.setAttribute('aria-pressed','false');
+  document.getElementById('ecg12Notes').hidden = true;
+}
+
+/* ---------- carga de datos ---------- */
+async function loadEcgBank(){
+  if(!supa) return;
+  const { data, error } = await supa.from('ecg_bank')
+    .select('id,title,category,rhythm,notes,show_title,calib,width,height,thumb,created_at').order('created_at', { ascending:false });
+  if(error){ showToast('No se pudo cargar el banco de ECG: '+error.message); return; }
+  ecgBankList = data || []; ecgBankLoaded = true;
+}
+function loadEcgImage(id){
+  if(ECG_IMG[id]) return Promise.resolve(ECG_IMG[id]);
+  if(ECG_IMG_P[id]) return ECG_IMG_P[id];
+  ECG_IMG_P[id] = (async ()=>{
+    if(!supa) throw new Error('sin conexión');
+    const { data, error } = await supa.from('ecg_images').select('data').eq('id', id).single();
+    if(error || !data) throw new Error(error ? error.message : 'no encontrado');
+    const im = new Image(); im.src = data.data;
+    await (im.decode ? im.decode() : new Promise((r,j)=>{ im.onload=r; im.onerror=j; }));
+    ECG_IMG[id] = im; return im;
+  })().finally(()=>{ delete ECG_IMG_P[id]; });
+  return ECG_IMG_P[id];
+}
+
+/* ---------- administrador (PIN) ---------- */
+function adminPin(){ try{ const o = JSON.parse(localStorage.getItem('monitor-ecg-admin')||'null'); if(o && o.exp > Date.now()) return o.pin; }catch(e){} return null; }
+function refreshAdminUI(){
+  const on = role==='instructor' && !!adminPin();
+  document.body.classList.toggle('ecg-admin', on);
+  const b = document.getElementById('stAdminBtn'), t = document.getElementById('stAdmin');
+  if(b) b.textContent = on ? 'Cerrar sesión' : 'Desbloquear';
+  if(t) t.textContent = on ? 'Activo en este dispositivo: puedes subir, editar y calibrar ECG' : 'Desbloquea con el PIN para subir, editar y calibrar';
+}
+async function adminUnlock(){
+  if(!supa){ showToast('Conéctate a una sala para usar el banco de ECG.'); return false; }
+  const pin = await appConfirm('Acceso de administrador\n\nIntroduce el PIN del banco de ECG.', { ok:'Desbloquear', input:'password', inputMode:'numeric', placeholder:'PIN' });
+  if(!pin) return false;
+  const { data, error } = await supa.rpc('ecg_check_pin', { p_pin:pin });
+  if(error){ showToast(error.message); return false; }
+  if(!data){ showToast('PIN incorrecto.'); return false; }
+  try{ localStorage.setItem('monitor-ecg-admin', JSON.stringify({ pin, exp: Date.now() + 30*864e5 })); }catch(e){}
+  refreshAdminUI(); renderEcgBank(); showToast('Modo administrador activado en este dispositivo.');
+  return true;
+}
+function adminLogout(){ try{ localStorage.removeItem('monitor-ecg-admin'); }catch(e){} refreshAdminUI(); renderEcgBank(); }
+function adminToggle(){ adminPin() ? adminLogout() : adminUnlock(); }
+async function adminChangePin(){
+  const pin = adminPin(); if(!pin) return;
+  const nw = await appConfirm('Nuevo PIN\n\nAl menos 6 cifras. Guárdalo bien: sin él no se podrá administrar el banco.', { ok:'Cambiar', input:'password', inputMode:'numeric', placeholder:'Nuevo PIN' });
+  if(!nw) return;
+  if(nw.length < 6){ showToast('El PIN debe tener al menos 6 caracteres.'); return; }
+  const { data, error } = await supa.rpc('ecg_change_pin', { p_pin:pin, p_new:nw });
+  if(error){ showToast(error.message); return; }
+  if(!data){ adminLogout(); showToast('PIN incorrecto: vuelve a desbloquear.'); return; }
+  try{ localStorage.setItem('monitor-ecg-admin', JSON.stringify({ pin:nw, exp: Date.now() + 30*864e5 })); }catch(e){}
+  showToast('PIN cambiado.');
+}
+// llamada protegida: si el PIN ya no vale, se pide de nuevo
+async function adminRpc(fn, args){
+  let pin = adminPin();
+  if(!pin){ if(!(await adminUnlock())) return { cancelled:true }; pin = adminPin(); }
+  const { data, error } = await supa.rpc(fn, Object.assign({ p_pin:pin }, args));
+  if(error) return { error };
+  if(data===null || data===false){ adminLogout(); showToast('El PIN ya no es válido: vuelve a desbloquear.'); return { cancelled:true }; }
+  return { data };
+}
+
+/* ---------- panel del banco ---------- */
+async function openEcgBank(){
+  if(role!=='instructor') return;
+  refreshAdminUI();
+  document.getElementById('ecgBankOverlay').classList.add('open');
+  document.body.classList.add('waves-open');
+  if(!ecgBankLoaded){ document.getElementById('ebGrid').innerHTML = '<div class="eb-empty">Cargando…</div>'; await loadEcgBank(); }
+  renderEcgBank();
+}
+function closeEcgBank(){
+  document.getElementById('ecgBankOverlay').classList.remove('open');
+  if(!document.querySelector('.waves.expanded') && !ecg12Rhythm) document.body.classList.remove('waves-open');
+}
+function renderEcgBank(){
+  const chips = document.getElementById('ebChips'); if(!chips) return;
+  const counts = {}; ecgBankList.forEach(x=>counts[x.category]=(counts[x.category]||0)+1);
+  chips.innerHTML = [['all','Todas ('+ecgBankList.length+')']].concat(Object.keys(ECG_CATS).map(k=>[k, ECG_CATS[k]+(counts[k]?' ('+counts[k]+')':'')]))
+    .map(([k,l])=>'<button type="button" class="eb-chip'+(ecgBankFilter===k?' on':'')+'" aria-pressed="'+(ecgBankFilter===k)+'" onclick="ecgBankFilter=\''+k+'\'; renderEcgBank()">'+escapeHtml(l)+'</button>').join('');
+  const q = (ecgBankQuery||'').trim().toLowerCase();
+  const list = ecgBankList.filter(x=>(ecgBankFilter==='all' || x.category===ecgBankFilter)
+    && (!q || (x.title+' '+(x.notes||'')).toLowerCase().includes(q)));
+  const admin = document.body.classList.contains('ecg-admin');
+  const g = document.getElementById('ebGrid');
+  if(!list.length){
+    g.innerHTML = '<div class="eb-empty">'+(ecgBankList.length ? 'No hay ECG que coincidan con la búsqueda.'
+      : 'Todavía no hay ECG en el banco.'+(admin ? '<br>Pulsa «+ Subir ECG» para añadir el primero.' : '<br>El administrador puede añadirlos desde ☰ → Banco de ECG.'))+'</div>';
+    return;
+  }
+  g.innerHTML = list.map(x=>'<div class="eb-card">'
+    + '<button type="button" class="eb-open" onclick="openBankEcg(\''+x.id+'\')" aria-label="Abrir '+escapeHtml(x.title)+'">'+(x.thumb?'<img src="'+x.thumb+'" alt="" loading="lazy">':'')+'</button>'
+    + '<div class="eb-meta"><span class="eb-t">'+escapeHtml(x.title)+'</span><span class="eb-c">'+escapeHtml(ECG_CATS[x.category]||'Otros')
+    + (x.calib && x.calib.ux ? ' <span class="eb-cal">· 📐 calibrado</span>' : '')+'</span></div>'
+    + (admin ? '<div class="eb-acts"><button type="button" onclick="openEcgEditor(\''+x.id+'\')">Editar</button><button type="button" class="del" onclick="deleteBankEcg(\''+x.id+'\')">Eliminar</button></div>' : '')
+    + '</div>').join('');
+}
+async function openBankEcg(id){
+  try{ showToast('Abriendo ECG…', 1200); await loadEcgImage(id); }
+  catch(e){ showToast('No se pudo abrir la imagen: '+e.message); return; }
+  openEcg12('bank:'+id);
+}
+async function deleteBankEcg(id){
+  const it = bankItem(id); if(!it) return;
+  if(!(await appConfirm('¿Eliminar este ECG del banco?\n\n«'+it.title+'»\nSe borrará para todos los instructores y no se podrá recuperar.', { ok:'Eliminar', danger:true }))) return;
+  const r = await adminRpc('ecg_delete', { p_id:id });
+  if(r.cancelled) return;
+  if(r.error){ showToast('No se pudo eliminar: '+r.error.message); return; }
+  ecgBankList = ecgBankList.filter(x=>x.id!==id); delete ECG_IMG[id];
+  renderEcgBank(); showToast('ECG eliminado.');
+}
+function toggleEcgNotes(){
+  const n = document.getElementById('ecg12Notes'), b = document.getElementById('ecg12NotesBtn');
+  const it = e12IsBank(ecg12Rhythm) ? bankItem(e12BankId(ecg12Rhythm)) : null;
+  if(!it) return;
+  if(n.hidden){
+    const rh = it.rhythm && RHYTHM_INFO[it.rhythm] ? '\nRitmo asociado: '+RHYTHM_INFO[it.rhythm].t : '';
+    n.innerHTML = '<b>Interpretación · solo la ves tú</b>' + escapeHtml((it.notes||'Sin interpretación.') + rh);
+  }
+  n.hidden = !n.hidden; b.setAttribute('aria-pressed', n.hidden ? 'false' : 'true');
+}
+
+/* ---------- editor: subir / editar ---------- */
+var ee = null; // { id, src(canvas), rot, angle, bri, con, crop{x,y,w,h}, covers[], changed, mode, pdf, preview }
+function eeFillSelects(){
+  const c = document.getElementById('eeCat');
+  if(!c.options.length) c.innerHTML = Object.keys(ECG_CATS).map(k=>'<option value="'+k+'">'+escapeHtml(ECG_CATS[k])+'</option>').join('');
+  const r = document.getElementById('eeRhythm');
+  if(!r.options.length){
+    r.innerHTML = '<option value="">— Ninguno —</option>' + Object.keys(RHYTHM_INFO).map(k=>'<option value="'+k+'">'+escapeHtml(RHYTHM_INFO[k].t)+'</option>').join('');
+  }
+}
+async function openEcgEditor(id){
+  if(!adminPin() && !(await adminUnlock())) return;
+  eeFillSelects();
+  const it = id ? bankItem(id) : null;
+  ee = { id:id||null, src:null, rot:0, angle:0, bri:0, con:0, crop:{x:0,y:0,w:1,h:1}, covers:[], changed:false, mode:'crop', pdf:null, preview:null };
+  document.getElementById('eeTitle').textContent = it ? 'Editar ECG' : 'Subir ECG';
+  document.getElementById('eeName').value = it ? it.title : '';
+  document.getElementById('eeCat').value = it ? it.category : 'ritmos';
+  document.getElementById('eeRhythm').value = it && it.rhythm ? it.rhythm : '';
+  document.getElementById('eeNotes').value = it && it.notes ? it.notes : '';
+  document.getElementById('eeShowTitle').checked = it ? !!it.show_title : false;
+  document.getElementById('eeConsent').checked = !!it;
+  document.getElementById('eeErr').textContent = '';
+  document.getElementById('eePageWrap').hidden = true;
+  ['eeAngle','eeBri','eeCon'].forEach(i=>document.getElementById(i).value = 0);
+  eeMode('crop');
+  document.getElementById('eeStage').classList.remove('has-img');
+  const cv = document.getElementById('eeCanvas'); cv.width = cv.height = 0;
+  document.getElementById('ecgEditorOverlay').classList.add('open');
+  if(it){
+    try{ const im = await loadEcgImage(id); eeSetSource(im, false); }catch(e){ document.getElementById('eeErr').textContent = 'No se pudo cargar la imagen.'; }
+  }
+}
+function closeEcgEditor(){ document.getElementById('ecgEditorOverlay').classList.remove('open'); ee = null; }
+function eeSetSource(drawable, isNew){
+  // copia a un canvas de trabajo (máx. 3000 px por lado)
+  const w = drawable.naturalWidth || drawable.width, h = drawable.naturalHeight || drawable.height;
+  const k = Math.min(1, 3000/Math.max(w,h));
+  const c = document.createElement('canvas'); c.width = Math.round(w*k); c.height = Math.round(h*k);
+  c.getContext('2d').drawImage(drawable, 0, 0, c.width, c.height);
+  ee.src = c; ee.rot = 0; ee.angle = 0; ee.bri = 0; ee.con = 0; ee.crop = {x:0,y:0,w:1,h:1}; ee.covers = [];
+  ['eeAngle','eeBri','eeCon'].forEach(i=>document.getElementById(i).value = 0);
+  if(isNew){ ee.changed = true; document.getElementById('eeConsent').checked = false; }
+  document.getElementById('eeStage').classList.add('has-img');
+  eeRebuildPreview();
+}
+async function eeLoadFile(f){
+  if(!f || !ee) return;
+  document.getElementById('eeErr').textContent = '';
+  if(f.type==='application/pdf' || /\.pdf$/i.test(f.name)){
+    try{
+      const lib = await loadPdfJs();
+      ee.pdf = await lib.getDocument({ data: await f.arrayBuffer() }).promise;
+      const sel = document.getElementById('eePage');
+      sel.innerHTML = Array.from({length:ee.pdf.numPages},(_,i)=>'<option value="'+(i+1)+'">'+(i+1)+'</option>').join('');
+      document.getElementById('eePageWrap').hidden = ee.pdf.numPages < 2;
+      await eeRenderPdfPage(1);
+    }catch(e){ document.getElementById('eeErr').textContent = 'No se pudo leer el PDF: '+e.message; }
+    return;
+  }
+  ee.pdf = null; document.getElementById('eePageWrap').hidden = true;
+  const url = URL.createObjectURL(f);
+  try{
+    const im = new Image(); im.src = url;
+    await (im.decode ? im.decode() : new Promise((r,j)=>{ im.onload=r; im.onerror=j; }));
+    eeSetSource(im, true);
+  }catch(e){ document.getElementById('eeErr').textContent = 'No se pudo abrir la imagen (prueba con JPG o PNG).'; }
+  finally{ URL.revokeObjectURL(url); }
+}
+async function eeRenderPdfPage(n){
+  if(!ee || !ee.pdf) return;
+  const page = await ee.pdf.getPage(n);
+  const vp1 = page.getViewport({ scale:1 });
+  const scale = Math.min(4, 2600/Math.max(vp1.width, vp1.height));
+  const vp = page.getViewport({ scale });
+  const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+  await page.render({ canvasContext:ctx, viewport:vp }).promise;
+  eeSetSource(c, true);
+}
+let pdfJsP = null;
+function loadPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(pdfJsP) return pdfJsP;
+  pdfJsP = new Promise((res, rej)=>{
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    sc.onload = ()=>{ window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); };
+    sc.onerror = ()=>{ pdfJsP = null; rej(new Error('no se pudo cargar el lector de PDF (¿sin conexión?)')); };
+    document.head.appendChild(sc);
+  });
+  return pdfJsP;
+}
+function eeMode(m){
+  if(ee) ee.mode = m;
+  document.querySelectorAll('#eeTools .st-seg button').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
+}
+function eeSet(k, v){ if(!ee || !ee.src) return; ee[k] = v; ee.changed = true; eeRebuildPreview(); }
+function eeRotate(){ if(!ee || !ee.src) return; ee.rot = (ee.rot+90)%360; ee.crop = {x:0,y:0,w:1,h:1}; ee.covers = []; ee.changed = true; eeRebuildPreview(); }
+function eeUndoCover(){ if(!ee) return; ee.covers.pop(); ee.changed = true; eeDrawPreview(); }
+function eeResetEdits(){
+  if(!ee || !ee.src) return;
+  Object.assign(ee, { rot:0, angle:0, bri:0, con:0, crop:{x:0,y:0,w:1,h:1}, covers:[], changed:true });
+  ['eeAngle','eeBri','eeCon'].forEach(i=>document.getElementById(i).value = 0);
+  eeRebuildPreview();
+}
+// imagen girada/enderezada y con brillo/contraste, con el lado mayor ≤ maxSide (sin recorte ni tapados)
+function eeBuildR(maxSide){
+  const s = ee.src, swap = ee.rot===90 || ee.rot===270;
+  const W0 = swap ? s.height : s.width, H0 = swap ? s.width : s.height;
+  const k = Math.min(1, maxSide/Math.max(W0,H0));
+  const c = document.createElement('canvas'); c.width = Math.round(W0*k); c.height = Math.round(H0*k);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.translate(c.width/2, c.height/2);
+  ctx.rotate((ee.rot + ee.angle) * Math.PI/180);
+  if(ee.angle){ const a = Math.abs(ee.angle)*Math.PI/180, z = Math.cos(a) + Math.sin(a)*Math.max(W0/H0, H0/W0); ctx.scale(z, z); } // sin esquinas vacías
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(s, -s.width*k/2, -s.height*k/2, s.width*k, s.height*k);
+  ctx.setTransform(1,0,0,1,0,0);
+  if(ee.bri || ee.con){
+    const img = ctx.getImageData(0,0,c.width,c.height), d = img.data, lut = new Uint8ClampedArray(256);
+    const C = ee.con*2.55, f = (259*(C+255))/(255*(259-C));
+    for(let i=0;i<256;i++) lut[i] = f*(i-128)+128 + ee.bri*2.55;
+    for(let i=0;i<d.length;i+=4){ d[i]=lut[d[i]]; d[i+1]=lut[d[i+1]]; d[i+2]=lut[d[i+2]]; }
+    ctx.putImageData(img,0,0);
+  }
+  return c;
+}
+function eeRebuildPreview(){
+  if(!ee || !ee.src) return;
+  const stage = document.getElementById('eeStage');
+  ee.preview = eeBuildR(Math.min(1400, Math.max(600, stage.clientWidth*(window.devicePixelRatio||1))));
+  const cv = document.getElementById('eeCanvas'); cv.width = ee.preview.width; cv.height = ee.preview.height;
+  eeDrawPreview();
+}
+function eeDrawPreview(drag){
+  if(!ee || !ee.preview) return;
+  const cv = document.getElementById('eeCanvas'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  ctx.drawImage(ee.preview, 0, 0);
+  ctx.fillStyle = '#000';
+  ee.covers.forEach(r=>ctx.fillRect(r.x*W, r.y*H, r.w*W, r.h*H));
+  const cr = ee.crop;
+  ctx.fillStyle = 'rgba(0,0,0,.55)';
+  ctx.fillRect(0,0,W,cr.y*H); ctx.fillRect(0,(cr.y+cr.h)*H,W,H-(cr.y+cr.h)*H);
+  ctx.fillRect(0,cr.y*H,cr.x*W,cr.h*H); ctx.fillRect((cr.x+cr.w)*W,cr.y*H,W-(cr.x+cr.w)*W,cr.h*H);
+  ctx.strokeStyle = '#35ff6b'; ctx.lineWidth = Math.max(2, W/400); ctx.setLineDash([]);
+  ctx.strokeRect(cr.x*W, cr.y*H, cr.w*W, cr.h*H);
+  if(drag){
+    ctx.strokeStyle = drag.mode==='cover' ? '#ff4d5e' : '#35ff6b'; ctx.setLineDash([8,6]);
+    ctx.strokeRect(drag.x*W, drag.y*H, drag.w*W, drag.h*H); ctx.setLineDash([]);
+    if(drag.mode==='cover'){ ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(drag.x*W, drag.y*H, drag.w*W, drag.h*H); }
+  }
+}
+(function(){
+  const cv = document.getElementById('eeCanvas'); if(!cv) return;
+  let st = null;
+  const pt = e=>{ const r = cv.getBoundingClientRect(); return [ Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)), Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)) ]; };
+  const rect = (a,b)=>({ x:Math.min(a[0],b[0]), y:Math.min(a[1],b[1]), w:Math.abs(a[0]-b[0]), h:Math.abs(a[1]-b[1]) });
+  cv.addEventListener('pointerdown', e=>{ if(!ee || !ee.preview) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); st = { a:pt(e), mode:ee.mode }; });
+  cv.addEventListener('pointermove', e=>{ if(!st) return; const r = rect(st.a, pt(e)); r.mode = st.mode; st.r = r; eeDrawPreview(r); });
+  const end = ()=>{
+    if(!st) return; const r = st.r; st = null;
+    if(r && r.w > 0.03 && r.h > 0.03){
+      if(r.mode==='crop') ee.crop = { x:r.x, y:r.y, w:r.w, h:r.h };
+      else ee.covers.push({ x:r.x, y:r.y, w:r.w, h:r.h });
+      ee.changed = true;
+    }
+    eeDrawPreview();
+  };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+})();
+// imagen final: recorte, tapados (sobre la imagen, no quedan datos debajo) y compresión
+function eeExport(){
+  const cr = ee.crop, swap = ee.rot===90 || ee.rot===270;
+  const W0 = swap ? ee.src.height : ee.src.width, H0 = swap ? ee.src.width : ee.src.height;
+  const target = 2000 / Math.max(cr.w*W0, cr.h*H0);           // lado mayor del recorte → 2000 px
+  const R = eeBuildR(Math.max(W0,H0) * Math.min(1, target));
+  const rc = R.getContext('2d'); rc.fillStyle = '#000';
+  ee.covers.forEach(r=>rc.fillRect(r.x*R.width, r.y*R.height, r.w*R.width, r.h*R.height));
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(cr.w*R.width)); out.height = Math.max(1, Math.round(cr.h*R.height));
+  out.getContext('2d').drawImage(R, cr.x*R.width, cr.y*R.height, out.width, out.height, 0, 0, out.width, out.height);
+  let q = 0.86, data = out.toDataURL('image/jpeg', q);
+  while(data.length > 700000 && q > 0.5){ q -= 0.08; data = out.toDataURL('image/jpeg', q); }
+  const t = document.createElement('canvas'), tk = 420/out.width;
+  t.width = 420; t.height = Math.max(1, Math.round(out.height*tk));
+  const tc = t.getContext('2d'); tc.fillStyle = '#fff'; tc.fillRect(0,0,t.width,t.height); tc.drawImage(out, 0, 0, t.width, t.height);
+  return { image:data, thumb:t.toDataURL('image/jpeg', 0.72), width:out.width, height:out.height };
+}
+async function eeSave(){
+  if(!ee) return;
+  const err = document.getElementById('eeErr'); err.textContent = '';
+  const title = document.getElementById('eeName').value.trim();
+  if(!ee.src) return err.textContent = 'Añade una foto, una imagen o un PDF del ECG.';
+  if(!title) return err.textContent = 'Escribe un título.';
+  if(!document.getElementById('eeConsent').checked) return err.textContent = 'Confirma que la imagen está anonimizada.';
+  const btn = document.getElementById('eeSave'); btn.disabled = true; btn.textContent = 'Guardando…';
+  try{
+    const it = ee.id ? bankItem(ee.id) : null;
+    const imgChanged = !ee.id || ee.changed;
+    const exp = imgChanged ? eeExport() : null;
+    const r = await adminRpc('ecg_save', {
+      p_id: ee.id, p_title: title, p_category: document.getElementById('eeCat').value,
+      p_rhythm: document.getElementById('eeRhythm').value || null, p_notes: document.getElementById('eeNotes').value.trim() || null,
+      p_show_title: document.getElementById('eeShowTitle').checked,
+      p_calib: imgChanged ? null : (it && it.calib) || null,          // si cambia la imagen, hay que volver a calibrar
+      p_width: exp ? exp.width : null, p_height: exp ? exp.height : null, p_thumb: exp ? exp.thumb : null, p_image: exp ? exp.image : null
+    });
+    if(r.cancelled) return;
+    if(r.error){ err.textContent = 'No se pudo guardar: '+r.error.message; return; }
+    const id = r.data, isNew = !ee.id;
+    if(exp){ const im = new Image(); im.src = exp.image; await (im.decode ? im.decode() : Promise.resolve()); ECG_IMG[id] = im; }
+    await loadEcgBank(); renderEcgBank();
+    closeEcgEditor();
+    showToast(isNew ? 'ECG añadido al banco.' : 'Cambios guardados.');
+    if(imgChanged && await appConfirm('¿Calibrar ahora?\n\nCon la escala calibrada podrás medir intervalos y voltajes con el compás. También puedes hacerlo más tarde desde el visor.', { ok:'Calibrar', cancel:'Más tarde' })){
+      await openBankEcg(id); setTimeout(startCalibration, 300);
+    }
+  } finally { btn.disabled = false; btn.textContent = 'Guardar'; }
+}
+
+/* =====================================================================
+   COMPÁS Y CALIBRACIÓN (visor de ECG)
+   ===================================================================== */
+var e12Cal = null, e12RemoteCal = null, e12CalibSess = null, e12Grid = false, e12CalDrag = null, e12CalSendT = 0;
+function e12ResetMeasure(){
+  e12Cal = null; e12CalibSess = null; e12Grid = false; e12CalDrag = null; e12RemoteCal = null;
+  const cb = document.getElementById('ecg12CalBar'); if(cb) cb.hidden = true;
+  const kb = document.getElementById('ecg12CalibBar'); if(kb) kb.hidden = true;
+  const b = document.getElementById('ecg12CalBtn'); if(b) b.setAttribute('aria-pressed','false');
+  const g = document.getElementById('cbGrid'); if(g) g.setAttribute('aria-pressed','false');
+  const p = document.getElementById('ecg12Paper'); if(p){ p.classList.remove('measuring','calibrating'); }
+}
+function e12VisibleCenter(){ const r = e12VisibleRect() || {x0:0,y0:0,x1:264,y1:128}; return [ (r.x0+r.x1)/2, (r.y0+r.y1)/2, r ]; }
+function toggleCaliper(force){
+  const on = force===undefined ? !e12Cal : force;
+  if(on){
+    const c = e12Calib(ecg12Rhythm);
+    if(!c){
+      showToast(document.body.classList.contains('ecg-admin') ? 'Este ECG no está calibrado: pulsa «📐 Calibrar» primero.' : 'Este ECG no está calibrado: el administrador debe calibrarlo para poder medir.');
+      return;
+    }
+    if(e12CalibSess) calibCancel();
+    setInkTool(null);
+    const [cx, cy] = e12VisibleCenter(), half = 10*c.ux;   // 20 mm de separación inicial (800 ms a 25 mm/s)
+    e12Cal = { axis:'h', a:cx-half, b:cx+half, o:cy };
+  } else e12Cal = null;
+  document.getElementById('ecg12CalBar').hidden = !e12Cal;
+  document.getElementById('ecg12CalBtn').setAttribute('aria-pressed', e12Cal ? 'true':'false');
+  document.getElementById('ecg12Paper').classList.toggle('measuring', !!e12Cal);
+  caliperRead(); drawInk(); e12SendCal(true);
+}
+function caliperAxis(){
+  if(!e12Cal) return; const c = e12Calib(ecg12Rhythm), [cx, cy] = e12VisibleCenter();
+  if(e12Cal.axis==='h'){ e12Cal = { axis:'v', a:cy-5*c.uy, b:cy+5*c.uy, o:cx }; }
+  else { e12Cal = { axis:'h', a:cx-10*c.ux, b:cx+10*c.ux, o:cy }; }
+  caliperRead(); drawInk(); e12SendCal(true);
+}
+function caliperRepeat(){
+  if(!e12Cal || e12Cal.axis!=='h') return;
+  const d = e12Cal.b - e12Cal.a, dm = e12Dims(ecg12Rhythm);
+  if(e12Cal.b + d > dm.W) return showToast('No hay más trazado a la derecha.');
+  e12Cal.a = e12Cal.b; e12Cal.b += d; caliperRead(); drawInk(); e12SendCal(true);
+}
+function caliperLabel(cal){
+  const c = e12Calib(ecg12Rhythm); if(!c || !cal) return '';
+  const d = Math.abs(cal.b - cal.a);
+  if(cal.axis==='h'){
+    const mm = d / c.ux, ms = mm / c.speed * 1000;
+    return Math.round(ms)+' ms · '+mm.toFixed(1)+' mm' + (ms > 120 ? ' · '+Math.round(60000/ms)+' lpm' : '');
+  }
+  const mm = d / c.uy;
+  return (mm / c.gain).toFixed(2)+' mV · '+mm.toFixed(1)+' mm';
+}
+function caliperRead(){
+  const r = document.getElementById('cbRead'); if(r) r.textContent = e12Cal ? caliperLabel(e12Cal) : '—';
+  const ax = document.getElementById('cbAxis'); if(ax && e12Cal) ax.textContent = e12Cal.axis==='h' ? '↕ Voltaje' : '↔ Tiempo';
+}
+function toggleCalibGrid(){
+  if(!e12Calib(ecg12Rhythm)) return;
+  e12Grid = !e12Grid; document.getElementById('cbGrid').setAttribute('aria-pressed', e12Grid?'true':'false'); drawInk();
+}
+function caliperFix(){
+  if(!e12Cal) return;
+  const g = document.getElementById('ecg12Canvas')._geo, dm = e12Dims(ecg12Rhythm), w = +(2/g.mm).toFixed(3);
+  const id = ()=>'c'+(++inkSeq)+Date.now().toString(36), col = '#1f6fe0', lab = caliperLabel(e12Cal);
+  const items = e12Cal.axis==='h'
+    ? [ { id:id(), k:'s', c:col, w, p:[[e12Cal.a,0],[e12Cal.a,dm.H]] }, { id:id(), k:'s', c:col, w, p:[[e12Cal.b,0],[e12Cal.b,dm.H]] },
+        { id:id(), k:'s', c:col, w:w*1.5, p:[[e12Cal.a,e12Cal.o],[e12Cal.b,e12Cal.o]] },
+        { id:id(), k:'t', c:col, s:+(15/g.mm).toFixed(2), p:[[Math.min(e12Cal.a,e12Cal.b)+4/g.mm, e12Cal.o - 14/g.mm]], t:lab } ]
+    : [ { id:id(), k:'s', c:col, w, p:[[0,e12Cal.a],[dm.W,e12Cal.a]] }, { id:id(), k:'s', c:col, w, p:[[0,e12Cal.b],[dm.W,e12Cal.b]] },
+        { id:id(), k:'s', c:col, w:w*1.5, p:[[e12Cal.o,e12Cal.a],[e12Cal.o,e12Cal.b]] },
+        { id:id(), k:'t', c:col, s:+(15/g.mm).toFixed(2), p:[[e12Cal.o + 8/g.mm, (e12Cal.a+e12Cal.b)/2]], t:lab } ];
+  items.forEach(it=>{ e12Ink.push(it); sendInk({ op:'set', item:it }); });
+  toggleCaliper(false);
+}
+function e12SendCal(now){
+  if(!ecg12Mirror) return;
+  if(!now && Date.now()-e12CalSendT < 70) return;
+  e12CalSendT = Date.now();
+  sendInk({ op:'cal', cal: e12Cal ? Object.assign({}, e12Cal, { label:caliperLabel(e12Cal) }) : null });
+}
+function e12MeasureDown(e){
+  if(ecg12Remote) return false;
+  if(e12CalibSess){
+    const p = inkPoint(e), s = e12CalibSess;
+    if(s.pts.length >= 2) return true;
+    s.pts.push(p); calibUpdate(); drawInk(); return true;
+  }
+  if(!e12Cal || inkTool) return false;
+  const p = inkPoint(e), g = document.getElementById('ecg12Canvas')._geo, k = g.mm;   // k: px de pantalla por unidad (sin zoom CSS)
+  const along = e12Cal.axis==='h' ? p[0] : p[1], across = e12Cal.axis==='h' ? p[1] : p[0];
+  const da = Math.abs(along - e12Cal.a)*k, db = Math.abs(along - e12Cal.b)*k;
+  const tol = e.pointerType==='touch' ? 26 : 14;
+  if(Math.min(da, db) <= tol){ e12CalDrag = { which: da<=db ? 'a':'b' }; return true; }
+  const lo = Math.min(e12Cal.a, e12Cal.b), hi = Math.max(e12Cal.a, e12Cal.b);
+  if(along > lo && along < hi && Math.abs(across - e12Cal.o)*k <= tol*1.4){
+    e12CalDrag = { which:'both', p0:p, a0:e12Cal.a, b0:e12Cal.b, o0:e12Cal.o }; return true;
+  }
+  return false;
+}
+function e12MeasureMove(e){
+  if(!e12CalDrag || !e12Cal) return false;
+  const p = inkPoint(e), h = e12Cal.axis==='h';
+  if(e12CalDrag.which==='both'){
+    const dA = (h ? p[0]-e12CalDrag.p0[0] : p[1]-e12CalDrag.p0[1]), dO = (h ? p[1]-e12CalDrag.p0[1] : p[0]-e12CalDrag.p0[0]);
+    e12Cal.a = e12CalDrag.a0 + dA; e12Cal.b = e12CalDrag.b0 + dA; e12Cal.o = e12CalDrag.o0 + dO;
+  } else e12Cal[e12CalDrag.which] = h ? p[0] : p[1];
+  caliperRead(); drawInk(); e12SendCal(false);
+  return true;
+}
+function e12MeasureUp(){ if(!e12CalDrag) return false; e12CalDrag = null; e12SendCal(true); return true; }
+
+// calibración: dos puntos en horizontal y dos en vertical separados por N cuadros grandes (5 mm)
+function startCalibration(){
+  if(!e12IsBank(ecg12Rhythm)) return;
+  if(!document.body.classList.contains('ecg-admin')){ adminUnlock(); return; }
+  toggleCaliper(false); setInkTool(null);
+  const it = bankItem(e12BankId(ecg12Rhythm)), c = it && it.calib;
+  e12CalibSess = { step:1, pts:[], h:null, v:null };
+  document.getElementById('cbbSpeed').value = String(c && c.speed || 25);
+  document.getElementById('cbbGain').value = String(c && c.gain || 10);
+  document.getElementById('ecg12CalibBar').hidden = false;
+  document.getElementById('ecg12Paper').classList.add('calibrating');
+  calibUpdate(); drawInk();
+}
+function calibUpdate(){
+  const s = e12CalibSess; if(!s) return;
+  const n = document.getElementById('cbbN'), msg = document.getElementById('cbbMsg'), save = document.getElementById('cbbSave');
+  if(s.step===1 && s.pts.length===2){ s.h = { pts:s.pts, n:+n.value||5 }; s.step = 2; s.pts = []; n.value = 2; }
+  else if(s.step===2 && s.pts.length===2){ s.v = { pts:s.pts, n:+n.value||2 }; s.step = 3; }
+  if(s.step===1) msg.innerHTML = '<b>1/2 · Horizontal.</b> Toca dos puntos en la misma línea, separados por los cuadros grandes indicados<span class="cbb-long"> (5 mm cada uno). Amplía si lo necesitas</span>.';
+  else if(s.step===2) msg.innerHTML = '<b>2/2 · Vertical.</b> Ahora dos puntos en vertical, separados por los cuadros grandes indicados<span class="cbb-long"> (o la altura del pulso de calibración = 2 cuadros)</span>.';
+  else msg.innerHTML = '<b>Listo.</b> Revisa velocidad y ganancia y pulsa «Guardar».';
+  if(s.step===1) n.value = n.value || 5;
+  save.disabled = s.step!==3;
+}
+function calibRestart(){ if(!e12CalibSess) return; e12CalibSess = { step:1, pts:[], h:null, v:null }; document.getElementById('cbbN').value = 5; calibUpdate(); drawInk(); }
+function calibCancel(){ e12CalibSess = null; document.getElementById('ecg12CalibBar').hidden = true; document.getElementById('ecg12Paper').classList.remove('calibrating'); drawInk(); }
+async function calibSave(){
+  const s = e12CalibSess; if(!s || s.step!==3) return;
+  const nH = +document.getElementById('cbbN').value || s.v.n;
+  s.v.n = nH;   // el campo muestra el valor del paso vertical
+  const ux = Math.abs(s.h.pts[1][0]-s.h.pts[0][0]) / (s.h.n*5);
+  const uy = Math.abs(s.v.pts[1][1]-s.v.pts[0][1]) / (s.v.n*5);
+  if(!(ux > 0.05) || !(uy > 0.05)) return showToast('Los puntos están demasiado juntos: vuelve a marcarlos.');
+  const calib = { ux:+ux.toFixed(4), uy:+uy.toFixed(4), speed:+document.getElementById('cbbSpeed').value, gain:+document.getElementById('cbbGain').value };
+  const id = e12BankId(ecg12Rhythm), it = bankItem(id);
+  const r = await adminRpc('ecg_save', { p_id:id, p_title:it.title, p_category:it.category, p_rhythm:it.rhythm, p_notes:it.notes,
+    p_show_title:it.show_title, p_calib:calib, p_width:null, p_height:null, p_thumb:null, p_image:null });
+  if(r.cancelled) return;
+  if(r.error) return showToast('No se pudo guardar la calibración: '+r.error.message);
+  it.calib = calib; calibCancel(); e12RefreshSourceUI(ecg12Rhythm); renderEcgBank();
+  toggleCaliper(true); e12Grid = true; document.getElementById('cbGrid').setAttribute('aria-pressed','true'); drawInk();
+  showToast('Calibrado. Comprueba que la cuadrícula de 5 mm coincide con el papel.', 5000);
+}
+
+// dibujo de cuadrícula, puntos de calibración y compás sobre la capa de anotaciones
+function drawE12Extras(ctx, g){
+  const X = u=>g.ox+u*g.mm, Y = v=>g.oy+v*g.mm, dm = e12Dims(ecg12Rhythm), c = e12Calib(ecg12Rhythm);
+  if(e12Grid && c && !ecg12Remote){
+    ctx.save(); ctx.strokeStyle = 'rgba(31,111,224,.55)'; ctx.lineWidth = 1; ctx.beginPath();
+    const sx = 5*c.ux, sy = 5*c.uy, x0 = (dm.W/2) % sx, y0 = (dm.H/2) % sy;
+    for(let x=x0; x<=dm.W; x+=sx){ ctx.moveTo(X(x),Y(0)); ctx.lineTo(X(x),Y(dm.H)); }
+    for(let y=y0; y<=dm.H; y+=sy){ ctx.moveTo(X(0),Y(y)); ctx.lineTo(X(dm.W),Y(y)); }
+    ctx.stroke(); ctx.restore();
+  }
+  if(e12CalibSess){
+    const s = e12CalibSess, groups = [];
+    if(s.h) groups.push(s.h.pts); if(s.v) groups.push(s.v.pts); if(s.pts.length) groups.push(s.pts);
+    ctx.save(); ctx.strokeStyle = ctx.fillStyle = '#13a05a'; ctx.lineWidth = 2;
+    groups.forEach(pts=>{
+      pts.forEach(q=>{ ctx.beginPath(); ctx.arc(X(q[0]),Y(q[1]),6,0,Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.arc(X(q[0]),Y(q[1]),2,0,Math.PI*2); ctx.fill(); });
+      if(pts.length===2){ ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(X(pts[0][0]),Y(pts[0][1])); ctx.lineTo(X(pts[1][0]),Y(pts[1][1])); ctx.stroke(); ctx.setLineDash([]); }
+    });
+    ctx.restore();
+  }
+  const cal = ecg12Remote ? e12RemoteCal : e12Cal;
+  if(cal){
+    const h = cal.axis==='h', label = ecg12Remote ? cal.label : caliperLabel(cal);
+    ctx.save(); ctx.strokeStyle = ctx.fillStyle = '#1f6fe0'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    if(h){ [cal.a,cal.b].forEach(x=>{ ctx.moveTo(X(x),Y(0)); ctx.lineTo(X(x),Y(dm.H)); }); ctx.moveTo(X(cal.a),Y(cal.o)); ctx.lineTo(X(cal.b),Y(cal.o)); }
+    else { [cal.a,cal.b].forEach(y=>{ ctx.moveTo(X(0),Y(y)); ctx.lineTo(X(dm.W),Y(y)); }); ctx.moveTo(X(cal.o),Y(cal.a)); ctx.lineTo(X(cal.o),Y(cal.b)); }
+    ctx.stroke();
+    // asas para arrastrar
+    const handles = h ? [[cal.a,cal.o],[cal.b,cal.o]] : [[cal.o,cal.a],[cal.o,cal.b]];
+    handles.forEach(q=>{ ctx.beginPath(); ctx.arc(X(q[0]),Y(q[1]),7,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.stroke(); });
+    if(label){
+      ctx.font = '700 13px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+      const tw = ctx.measureText(label).width + 14;
+      const lx = h ? (X(cal.a)+X(cal.b))/2 - tw/2 : X(cal.o) + 12, ly = h ? Y(cal.o) - 20 : (Y(cal.a)+Y(cal.b))/2;
+      ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fillRect(lx, ly-11, tw, 22);
+      ctx.strokeRect(lx, ly-11, tw, 22); ctx.fillStyle = '#1f4fa8'; ctx.fillText(label, lx+7, ly);
+    }
+    ctx.restore();
+  }
+}
+refreshAdminUI();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
