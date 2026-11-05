@@ -5257,19 +5257,35 @@ function syncInstructorColumns(){
            && !document.querySelector('.waves.expanded');
   if(!on){ tp.style.minHeight=''; v.style.height=''; v.classList.remove('col-synced'); return; }
   const ri = document.getElementById('rhythmInfo'); const fichaClosed = ri && (ri.classList.contains('collapsed') || settings.showFicha===false);
-  if(currentTab==='rhythm' && fichaClosed){
-    const prev = tp.style.minHeight; tp.style.minHeight = '';
-    syncInstructorColumns.ref = tp.offsetHeight;
-    tp.style.minHeight = prev;
-  }
-  let ref = syncInstructorColumns.ref; if(!ref) return;
   const top = w.getBoundingClientRect().top, vTop = v.getBoundingClientRect().top;
   const gap = parseFloat(getComputedStyle(document.querySelector('.monitor-left')).rowGap) || 10;
-  // altura mínima que necesitan las constantes; si la pestaña es más baja (p. ej. sin ficha ni ECG),
+  // Solo se mide en el estado de referencia (pestaña Ritmo con la ficha contraída). Si después se
+  // despliega algo, se conservan las medidas: las constantes no cambian de tamaño.
+  if(currentTab==='rhythm' && fichaClosed){
+    const prevMin = tp.style.minHeight, prevH = v.style.height;
+    tp.style.minHeight = ''; v.style.height = ''; v.classList.remove('col-synced'); v.style.alignSelf = 'start';
+    // altura de la tarjeta de pestañas en reposo: la mayor de las tres pestañas sin nada desplegado
+    // (Caso clínico solo si no hay un caso en marcha; Preguntas sin pregunta ni barra de edición)
+    const panes = { rhythm:'paneRhythm', case:'paneCase', quiz:'paneQuiz' };
+    const idle = { case: !scenario.active, quiz: document.getElementById('quizPreview').style.display==='none' && !document.getElementById('quizEditBar').classList.contains('open') && document.getElementById('quizEditor').style.display!=='block' };
+    const hs = syncInstructorColumns.paneH || (syncInstructorColumns.paneH = {});
+    hs.rhythm = tp.offsetHeight;
+    ['case','quiz'].forEach(k=>{
+      if(!idle[k] && hs[k]) return;
+      const pr = document.getElementById(panes.rhythm), pk = document.getElementById(panes[k]);
+      pr.classList.remove('active'); pk.classList.add('active');
+      hs[k] = tp.offsetHeight;
+      pk.classList.remove('active'); pr.classList.add('active');
+    });
+    syncInstructorColumns.ref = Math.max(hs.rhythm, hs.case||0, hs.quiz||0);
+    // altura que necesitan las constantes sin estirarse (sin que la fila de la cuadrícula las alargue)
+    syncInstructorColumns.vNat = v.offsetHeight;
+    v.style.alignSelf = ''; tp.style.minHeight = prevMin; v.style.height = prevH;
+  }
+  let ref = syncInstructorColumns.ref; if(!ref) return;
+  // si la pestaña es más baja que lo que necesitan las constantes (p. ej. sin ficha ni ECG),
   // es la tarjeta de pestañas la que se alarga para que ambos bordes inferiores coincidan
-  const prevH = v.style.height; v.style.height = ''; v.classList.remove('col-synced');
-  const vNat = v.offsetHeight; v.style.height = prevH;
-  ref = Math.max(ref, vNat - w.offsetHeight - gap + (vTop - top));
+  ref = Math.max(ref, (syncInstructorColumns.vNat||0) - w.offsetHeight - gap + (vTop - top));
   tp.style.minHeight = ref+'px';
   v.style.height = (w.offsetHeight + gap + ref - (vTop - top))+'px';
   v.classList.add('col-synced');
