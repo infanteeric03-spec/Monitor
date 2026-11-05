@@ -1047,6 +1047,24 @@
   .ecg12-penbtn svg{ width:16px; height:16px; }
   .ecg12-penbtn[aria-pressed="true"]{ background:#2b2f33; border-color:#2b2f33; color:#fff; }
   .ecg12-ctrl .ecg12-sep{ margin:0 2px; }
+  .ecg12-morewrap{ position:relative; }
+  .ecg12-morebtn{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:600; }
+  .ecg12-morebtn svg{ width:16px; height:16px; }
+  .ecg12-morebtn[aria-expanded="true"], .ecg12-morebtn.has-on{ background:#2b2f33; border-color:#2b2f33; color:#fff; }
+  .ecg12-more{ position:absolute; top:calc(100% + 6px); right:0; z-index:8; min-width:220px; padding:6px;
+    background:#fff; color:#222; border:1px solid #e0d0d0; border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,.18);
+    display:flex; flex-direction:column; gap:2px; }
+  .ecg12-more[hidden]{ display:none; }
+  .ecg12-mi{ display:flex; align-items:center; gap:10px; width:100%; min-height:38px; padding:6px 10px; border:0; border-radius:7px;
+    background:none; color:#222; font:inherit; font-size:13.5px; text-align:left; cursor:pointer; }
+  .ecg12-mi:hover, .ecg12-mi:focus-visible{ background:#f5eded; outline:none; }
+  .ecg12-mi svg, .ecg12-mi .mi-ic{ width:18px; height:18px; flex-shrink:0; font-size:15px; line-height:18px; text-align:center; }
+  .ecg12-mi > span:not(.mi-ic){ flex:1; }
+  .ecg12-mi .mi-on{ font-style:normal; font-weight:700; color:#b2444b; visibility:hidden; }
+  .ecg12-mi[aria-pressed="true"] .mi-on{ visibility:visible; }
+  .ecg12-mz{ display:flex; align-items:center; gap:4px; padding:6px 4px 2px 10px; margin-top:2px; border-top:1px solid #efe4e4; }
+  body.role-monitor .ecg12-mz{ border-top:0; margin-top:0; }
+  .ecg12-mz .mz-l{ flex:1; font-size:13.5px; }
   body.role-monitor .ecg12-ctrl .ecg12-sep{ display:none; }
   .ecg12-tools{ display:flex; align-items:center; gap:4px; padding:6px 12px; border-bottom:1px solid #eadede; flex-wrap:wrap; }
   .ecg12-tools .ecg12-b{ height:30px; font-size:13px; }
@@ -2298,16 +2316,25 @@
         <button type="button" class="ecg12-b ecg12-penbtn instructor-only" id="ecg12PenBtn" onclick="toggleInkBar()" aria-pressed="false" aria-controls="ecg12Tools" title="Anotar sobre el ECG">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 3.5l3 3L7 16H4v-3z"/><path d="M11.5 5.5l3 3"/></svg><span class="lbl"> Anotar</span>
         </button>
-        <button type="button" class="ecg12-b ecg12-penbtn instructor-only" id="ecg12CalBtn" onclick="toggleCaliper()" aria-pressed="false" title="Compás: medir intervalos y voltajes">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v14M15 3v14M5 10h10M7.5 7.5 5 10l2.5 2.5M12.5 7.5 15 10l-2.5 2.5"/></svg><span class="lbl"> Compás</span>
-        </button>
-        <button type="button" class="ecg12-b instructor-only bank-only" id="ecg12NotesBtn" onclick="toggleEcgNotes()" aria-pressed="false" title="Interpretación (solo la ves tú)"><span aria-hidden="true">📝</span><span class="lbl"> Interpretación</span></button>
-        <button type="button" class="ecg12-b instructor-only bank-only admin-only" id="ecg12CalibBtn" onclick="startCalibration()" title="Calibrar la escala de esta imagen"><span aria-hidden="true">📐</span><span class="lbl"> Calibrar</span></button>
-        <span class="ecg12-sep instructor-only"></span>
-        <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
-        <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
-        <button type="button" class="ecg12-b" onclick="zoomEcg12(1)" aria-label="Ampliar">+</button>
-        <button type="button" class="ecg12-b" onclick="resetEcg12View()" aria-label="Ver completo" title="Ver completo">⟲</button>
+        <div class="ecg12-morewrap">
+          <button type="button" class="ecg12-b ecg12-morebtn" id="ecg12MoreBtn" onclick="toggleEcg12More()" aria-haspopup="true" aria-expanded="false" aria-controls="ecg12More" title="Más opciones">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg><span class="lbl"> Más</span>
+          </button>
+          <div class="ecg12-more" id="ecg12More" role="menu" hidden>
+            <button type="button" class="ecg12-mi instructor-only" id="ecg12CalBtn" role="menuitemcheckbox" onclick="toggleCaliper(); closeEcg12More()" aria-pressed="false" aria-checked="false">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v14M15 3v14M5 10h10M7.5 7.5 5 10l2.5 2.5M12.5 7.5 15 10l-2.5 2.5"/></svg><span>Compás</span><i class="mi-on" aria-hidden="true">✓</i>
+            </button>
+            <button type="button" class="ecg12-mi instructor-only bank-only" id="ecg12NotesBtn" role="menuitemcheckbox" onclick="toggleEcgNotes(); closeEcg12More()" aria-pressed="false"><span class="mi-ic" aria-hidden="true">📝</span><span>Interpretación</span><i class="mi-on" aria-hidden="true">✓</i></button>
+            <button type="button" class="ecg12-mi instructor-only bank-only admin-only" id="ecg12CalibBtn" role="menuitem" onclick="closeEcg12More(); startCalibration()"><span class="mi-ic" aria-hidden="true">📐</span><span>Calibrar escala</span></button>
+            <div class="ecg12-mz" role="group" aria-label="Zoom">
+              <span class="mz-l">Zoom</span>
+              <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
+              <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
+              <button type="button" class="ecg12-b" onclick="zoomEcg12(1)" aria-label="Ampliar">+</button>
+              <button type="button" class="ecg12-b" onclick="resetEcg12View()" aria-label="Ver completo" title="Ver completo">⟲</button>
+            </div>
+          </div>
+        </div>
         <button type="button" class="ecg12-b ecg12-mirror instructor-only" id="ecg12MirrorBtn" onclick="toggleEcg12Mirror()" aria-pressed="false"><span aria-hidden="true">📺</span><span class="lbl"> Mostrar al alumno</span></button>
       </div>
       <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
@@ -4905,6 +4932,7 @@ function zoomEcg12(dir, fx, fy){
 function resetEcg12View(){ if(!ecg12Remote) setEcg12View({ z:1, cx:0.5, cy:0.5 }); }
 function closeEcg12(){
   if(!ecg12Rhythm) return;
+  closeEcg12More();
   if(ecg12Mirror) stopEcg12Mirror();
   ecg12Rhythm = null; ecg12Remote = false;
   e12Ink = []; setInkTool(null); removeInkText(); e12ResetMeasure();
@@ -5204,7 +5232,8 @@ window.addEventListener('resize', ()=>{
 });
 document.addEventListener('keydown', e=>{
   if(e.key!=='Escape' || e.target.classList.contains('ecg12-txt') || document.getElementById('appDialog').classList.contains('open')) return;
-  if(ecg12Rhythm) closeEcg12();
+  if(!document.getElementById('ecg12More').hidden) closeEcg12More(true);
+  else if(ecg12Rhythm) closeEcg12();
   else if(document.getElementById('ecgEditorOverlay').classList.contains('open')) closeEcgEditor();
   else if(document.getElementById('ecgBankOverlay').classList.contains('open')) closeEcgBank();
 });
@@ -6231,7 +6260,7 @@ function toggleCaliper(force){
   if(on){
     const c = e12Calib(ecg12Rhythm);
     if(!c){
-      showToast(document.body.classList.contains('ecg-admin') ? 'Este ECG no está calibrado: pulsa «📐 Calibrar» primero.' : 'Este ECG no está calibrado: el administrador debe calibrarlo para poder medir.');
+      showToast(document.body.classList.contains('ecg-admin') ? 'Este ECG no está calibrado: abre «Más» › «Calibrar escala» primero.' : 'Este ECG no está calibrado: el administrador debe calibrarlo para poder medir.');
       return;
     }
     if(e12CalibSess) calibCancel();
@@ -6411,6 +6440,30 @@ function drawE12Extras(ctx, g){
   }
 }
 refreshAdminUI();
+
+/* ---------- Menú «Más» del visor de ECG: compás, interpretación, calibrar y zoom ---------- */
+function toggleEcg12More(force){
+  const m = document.getElementById('ecg12More'), b = document.getElementById('ecg12MoreBtn');
+  const open = force===undefined ? m.hidden : force;
+  m.hidden = !open; b.setAttribute('aria-expanded', open ? 'true':'false');
+  if(open){ const f = [...m.querySelectorAll('button')].find(x=>x.offsetParent); if(f) f.focus({preventScroll:true}); }
+}
+function closeEcg12More(refocus){
+  const m = document.getElementById('ecg12More'); if(!m || m.hidden) return;
+  toggleEcg12More(false); if(refocus) document.getElementById('ecg12MoreBtn').focus({preventScroll:true});
+}
+document.addEventListener('pointerdown', e=>{
+  const m = document.getElementById('ecg12More');
+  if(m && !m.hidden && !e.target.closest('.ecg12-morewrap')) closeEcg12More();
+}, true);
+// el botón «Más» se marca cuando el compás o la interpretación están activos
+(function(){
+  const upd = ()=>{ const on = ['ecg12CalBtn','ecg12NotesBtn'].some(id=>document.getElementById(id).getAttribute('aria-pressed')==='true');
+    document.getElementById('ecg12MoreBtn').classList.toggle('has-on', on);
+    ['ecg12CalBtn','ecg12NotesBtn'].forEach(id=>{ const b=document.getElementById(id); b.setAttribute('aria-checked', b.getAttribute('aria-pressed')||'false'); }); };
+  const mo = new MutationObserver(upd);
+  ['ecg12CalBtn','ecg12NotesBtn'].forEach(id=>mo.observe(document.getElementById(id), { attributes:true, attributeFilter:['aria-pressed'] }));
+})();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
