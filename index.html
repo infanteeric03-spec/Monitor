@@ -1017,7 +1017,18 @@
   .ecg12-mirror.on{ background:#b2444b; border-color:#b2444b; color:#fff; }
   body.role-monitor #ecg12Hint{ display:none; }
   #ecg12Overlay.remote .ecg12-paper{ cursor:default; }
-  #ecg12Overlay.remote .ecg12-ctrl{ display:none; }
+  #ecg12Overlay.remote .ecg12-ctrl, #ecg12Overlay.remote .ecg12-tools{ display:none; }
+  .ecg12-tools{ display:flex; align-items:center; gap:4px; padding:6px 12px; border-bottom:1px solid #eadede; flex-wrap:wrap; }
+  .ecg12-tools .ecg12-b{ height:30px; font-size:13px; }
+  .ecg12-tool[aria-pressed="true"]{ background:#2b2f33; border-color:#2b2f33; color:#fff; }
+  .ecg12-sep{ width:1px; height:20px; background:#e3d4d4; margin:0 4px; }
+  .ecg12-sw{ width:24px; height:24px; border-radius:50%; border:2px solid #fff; background:var(--c); box-shadow:0 0 0 1px #cbb9b9; cursor:pointer; padding:0; }
+  .ecg12-sw.on{ box-shadow:0 0 0 2px var(--c); }
+  #ecg12Ink{ position:absolute; left:0; top:0; pointer-events:none; }
+  .ecg12-paper.ink-pen{ cursor:crosshair; } .ecg12-paper.ink-text{ cursor:text; }
+  .ecg12-txt{ position:absolute; z-index:2; min-width:120px; font:600 16px system-ui, sans-serif; padding:3px 6px;
+    border:1.5px dashed currentColor; border-radius:4px; background:rgba(255,255,255,.92); outline:none; }
+  @media (max-width:600px), (max-height:500px){ .ecg12-tools .lbl{ display:none; } }
   .ecg12-live{ display:none; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:#b2444b; margin-left:8px; }
   #ecg12Overlay.remote .ecg12-live{ display:inline; }
   @media (max-width:600px), (max-height:500px){ .ecg12-mirror .lbl{ display:none; } .ecg12-k{ display:none; } }
@@ -1620,7 +1631,18 @@
       </div>
       <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
     </div>
-    <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas></div>
+    <div class="ecg12-tools instructor-only" id="ecg12Tools" role="toolbar" aria-label="Anotar sobre el ECG">
+      <button type="button" class="ecg12-b ecg12-tool" data-tool="pen" onclick="setInkTool('pen')" aria-pressed="false" title="Dibujar"><span aria-hidden="true">✏️</span><span class="lbl"> Dibujar</span></button>
+      <button type="button" class="ecg12-b ecg12-tool" data-tool="text" onclick="setInkTool('text')" aria-pressed="false" title="Escribir texto"><b aria-hidden="true">T</b><span class="lbl"> Texto</span></button>
+      <span class="ecg12-sep"></span>
+      <button type="button" class="ecg12-sw on" data-c="#e0263a" style="--c:#e0263a" onclick="setInkColor(this)" aria-label="Color rojo"></button>
+      <button type="button" class="ecg12-sw" data-c="#1f6fe0" style="--c:#1f6fe0" onclick="setInkColor(this)" aria-label="Color azul"></button>
+      <button type="button" class="ecg12-sw" data-c="#13a05a" style="--c:#13a05a" onclick="setInkColor(this)" aria-label="Color verde"></button>
+      <span class="ecg12-sep"></span>
+      <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer">↶</button>
+      <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><span aria-hidden="true">🗑</span><span class="lbl"> Borrar</span></button>
+    </div>
+    <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas><canvas id="ecg12Ink"></canvas></div>
     <div class="ecg12-foot"><span id="ecg12Hint">Arrastra para moverte cuando esté ampliado · </span>Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</div>
   </div>
 </div>
@@ -1739,6 +1761,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'rhythm_name_clear'}, ()=> hideRhythmShare());
     channel.on('broadcast', {event:'ecg_view'}, (msg)=> applyRemoteEcgView(msg.payload));
     channel.on('broadcast', {event:'ecg_view_close'}, ()=> closeRemoteEcgView());
+    channel.on('broadcast', {event:'ecg_ink'}, (msg)=> applyRemoteInk(msg.payload));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
   }
@@ -3917,6 +3940,7 @@ function renderEcg12(canvas, r, W, H, dpr){
   // papel: 264 mm × 128 mm (calibración + 10 s, 4 filas)
   const MMW = 264, MMH = 128, mm = Math.min(W/MMW, H/MMH);
   const ox = (W - MMW*mm)/2, oy = (H - MMH*mm)/2;
+  canvas._geo = { mm, ox, oy };
   ctx.fillStyle = '#fffafa'; ctx.fillRect(0,0,W,H);
   const grid = (step, color, lw)=>{
     ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
@@ -3987,6 +4011,7 @@ function openEcg12(r, opts){
   ecg12Rhythm = r;
   if(!opts.keepFocus) ecg12Opener = document.activeElement;
   if(changed && !opts.view) e12View = { z:1, cx:0.5, cy:0.5 };
+  if(changed) e12Ink = [];
   if(opts.view) e12View = Object.assign({}, opts.view);
   ecg12Remote = !!opts.remote;
   document.getElementById('ecg12Overlay').classList.toggle('remote', ecg12Remote);
@@ -4007,6 +4032,9 @@ function drawEcg12Big(){
     renderEcg12(cv, ecg12Rhythm, W*z, H*z, dpr);
     cv.style.width = (W*z)+'px'; cv.style.height = (H*z)+'px';
     cv._w = W; cv._h = H; cv._r = ecg12Rhythm; e12DrawnZ = z;
+    const ink = document.getElementById('ecg12Ink');
+    ink.width = cv.width; ink.height = cv.height; ink.style.width = cv.style.width; ink.style.height = cv.style.height;
+    ink._dpr = dpr; drawInk();
   }
   positionEcg12();
 }
@@ -4017,6 +4045,7 @@ function positionEcg12(){
   e12View.cy = Math.min(1-h, Math.max(h, e12View.cy));
   cv.style.left = (W/2 - e12View.cx*W*z)+'px';
   cv.style.top  = (H/2 - e12View.cy*H*z)+'px';
+  const ink = document.getElementById('ecg12Ink'); ink.style.left = cv.style.left; ink.style.top = cv.style.top;
   paper.classList.toggle('zoomed', z>1 && !ecg12Remote);
   document.getElementById('ecg12Zoom').textContent = Math.round(z*100)+' %';
 }
@@ -4042,6 +4071,7 @@ function closeEcg12(){
   if(!ecg12Rhythm) return;
   if(ecg12Mirror) stopEcg12Mirror();
   ecg12Rhythm = null; ecg12Remote = false;
+  e12Ink = []; setInkTool(null); removeInkText();
   document.getElementById('ecg12Overlay').classList.remove('open','remote');
   if(!document.querySelector('.waves.expanded')) document.body.classList.remove('waves-open');
   if(ecg12Opener && ecg12Opener.focus) ecg12Opener.focus({ preventScroll:true });
@@ -4052,18 +4082,24 @@ function closeEcg12(){
   const rotated = ()=>matchMedia('(max-width:760px) and (orientation:portrait)').matches;
   let drag = null;
   paper.addEventListener('pointerdown', e=>{
-    if(ecg12Remote || e12View.z<=1) return;
+    if(ecg12Remote) return;
+    if(inkTool==='pen'){ e.preventDefault(); paper.setPointerCapture(e.pointerId); startInkStroke(e); return; }
+    if(inkTool==='text'){ if(e.target.classList.contains('ecg12-txt')) return; e.preventDefault(); placeInkText(e); return; }
+    if(e12View.z<=1) return;
     drag = { x:e.clientX, y:e.clientY, cx:e12View.cx, cy:e12View.cy };
     paper.setPointerCapture(e.pointerId); paper.classList.add('dragging');
   });
+  // que el clic no le quite el foco a la casilla de texto recién creada
+  paper.addEventListener('mousedown', e=>{ if(inkTool && !e.target.classList.contains('ecg12-txt')) e.preventDefault(); });
   paper.addEventListener('pointermove', e=>{
+    if(inkLive){ moveInkStroke(e); return; }
     if(!drag) return;
     let dx = e.clientX-drag.x, dy = e.clientY-drag.y;
     if(rotated()){ const t = dx; dx = dy; dy = -t; } // la ventana está girada 90°
     const W = paper.clientWidth*e12View.z, H = paper.clientHeight*e12View.z;
     setEcg12View({ cx:drag.cx - dx/W, cy:drag.cy - dy/H });
   });
-  const end = ()=>{ if(drag){ drag=null; paper.classList.remove('dragging'); sendEcg12View(true); } };
+  const end = ()=>{ if(inkLive){ endInkStroke(); return; } if(drag){ drag=null; paper.classList.remove('dragging'); sendEcg12View(true); } };
   paper.addEventListener('pointerup', end); paper.addEventListener('pointercancel', end);
   paper.addEventListener('wheel', e=>{
     if(ecg12Remote || rotated()) return;
@@ -4072,7 +4108,7 @@ function closeEcg12(){
     zoomEcg12(e.deltaY<0 ? 1 : -1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
   }, { passive:false });
   paper.addEventListener('dblclick', e=>{
-    if(ecg12Remote || rotated()) return;
+    if(ecg12Remote || rotated() || inkTool) return;
     const r = paper.getBoundingClientRect();
     if(e12View.z>=4) resetEcg12View(); else zoomEcg12(1, (e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height);
   });
@@ -4094,6 +4130,7 @@ function toggleEcg12Mirror(){
   if(ecg12Mirror){ stopEcg12Mirror(); return; }
   if(!channel){ const l=document.querySelector('#ecg12MirrorBtn .lbl'); if(l){ l.textContent=' Sin conexión'; setTimeout(refreshEcg12MirrorBtn,1800); } return; }
   ecg12Mirror = true; refreshEcg12MirrorBtn(); sendEcg12View(true);
+  sendInk({ op:'all', items:e12Ink });
 }
 function stopEcg12Mirror(){
   if(!ecg12Mirror) return;
@@ -4108,6 +4145,111 @@ function sendEcg12View(now){
   clearTimeout(e12SendTimer);
   if(now || Date.now()-e12SendT > 90) go(); else e12SendTimer = setTimeout(go, 90);
 }
+
+/* ---------- Anotar sobre el ECG (lápiz y texto) ----------
+   Las anotaciones se guardan en milímetros del papel (0–264 × 0–128), así quedan pegadas al
+   trazado aunque se amplíe, se mueva o la pantalla del alumno tenga otra forma. */
+let e12Ink = [], inkTool = null, inkColor = '#e0263a', inkLive = null, inkSeq = 0, inkLastSend = 0;
+function setInkTool(t){
+  inkTool = (t && inkTool===t) ? null : t;
+  document.querySelectorAll('.ecg12-tool').forEach(b=>b.setAttribute('aria-pressed', b.dataset.tool===inkTool ? 'true':'false'));
+  const paper = document.getElementById('ecg12Paper');
+  if(paper){ paper.classList.toggle('ink-pen', inkTool==='pen'); paper.classList.toggle('ink-text', inkTool==='text'); }
+  if(inkTool!=='text') commitInkText();
+}
+function setInkColor(btn){
+  inkColor = btn.dataset.c;
+  document.querySelectorAll('.ecg12-sw').forEach(b=>b.classList.toggle('on', b===btn));
+}
+// pantalla → milímetros del papel
+function inkPoint(e){
+  const cv = document.getElementById('ecg12Canvas'), g = cv._geo, r = cv.getBoundingClientRect();
+  const rot = matchMedia('(max-width:760px) and (orientation:portrait)').matches;
+  const cw = parseFloat(cv.style.width), ch = parseFloat(cv.style.height);
+  let x, y; // posición dentro del canvas en px CSS sin girar
+  if(rot){ x = (e.clientY - r.top)/r.height*cw; y = (r.right - e.clientX)/r.width*ch; }
+  else { x = (e.clientX - r.left)/r.width*cw; y = (e.clientY - r.top)/r.height*ch; }
+  return [ +((x - g.ox)/g.mm).toFixed(2), +((y - g.oy)/g.mm).toFixed(2) ];
+}
+function startInkStroke(e){
+  commitInkText();
+  const g = document.getElementById('ecg12Canvas')._geo;
+  inkLive = { id:'s'+(++inkSeq)+Date.now().toString(36), k:'s', c:inkColor, w:+(2.6/g.mm).toFixed(3), p:[inkPoint(e)] };
+  e12Ink.push(inkLive); drawInk();
+}
+function moveInkStroke(e){
+  const pt = inkPoint(e), last = inkLive.p[inkLive.p.length-1];
+  if(Math.hypot(pt[0]-last[0], pt[1]-last[1]) < 0.4) return;
+  inkLive.p.push(pt); drawInk();
+  if(Date.now()-inkLastSend > 70){ inkLastSend = Date.now(); sendInk({ op:'set', item:inkLive }); }
+}
+function endInkStroke(){ const it = inkLive; inkLive = null; if(it) sendInk({ op:'set', item:it }); }
+let inkTextEl = null;
+function placeInkText(e){
+  commitInkText();
+  const paper = document.getElementById('ecg12Paper'), cv = document.getElementById('ecg12Canvas');
+  const pt = inkPoint(e), g = cv._geo;
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'ecg12-txt'; inp.placeholder = 'Escribe y pulsa Intro';
+  inp.setAttribute('aria-label','Texto de la anotación'); inp.autocomplete = 'off';
+  inp.style.color = inkColor;
+  inp.style.left = (parseFloat(cv.style.left) + g.ox + pt[0]*g.mm)+'px';
+  inp.style.top  = (parseFloat(cv.style.top)  + g.oy + pt[1]*g.mm - 14)+'px';
+  inp._pt = pt; inp._c = inkColor; inp._s = +(18/g.mm).toFixed(2);
+  inp.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); commitInkText(); } else if(ev.key==='Escape'){ ev.stopPropagation(); removeInkText(); } });
+  inp.addEventListener('blur', ()=>setTimeout(()=>{ if(inkTextEl===inp) commitInkText(); }, 150));
+  paper.appendChild(inp); inkTextEl = inp; inp.focus({ preventScroll:true }); requestAnimationFrame(()=>{ if(document.activeElement!==inp) inp.focus({ preventScroll:true }); });
+}
+function commitInkText(){
+  const inp = inkTextEl; if(!inp) return;
+  inkTextEl = null; const txt = inp.value.trim(); inp.remove();
+  if(!txt) return;
+  const it = { id:'t'+(++inkSeq)+Date.now().toString(36), k:'t', c:inp._c, s:inp._s, p:[inp._pt], t:txt.slice(0,80) };
+  e12Ink.push(it); drawInk(); sendInk({ op:'set', item:it });
+}
+function removeInkText(){ if(inkTextEl){ inkTextEl.remove(); inkTextEl = null; } }
+function undoInk(){ const it = e12Ink.pop(); if(it){ drawInk(); sendInk({ op:'del', id:it.id }); } }
+function clearInk(){ if(!e12Ink.length) return; e12Ink = []; drawInk(); sendInk({ op:'clear' }); }
+function drawInk(){
+  const ink = document.getElementById('ecg12Ink'), cv = document.getElementById('ecg12Canvas');
+  if(!ink || !cv._geo) return;
+  const ctx = ink.getContext('2d'), d = ink._dpr || 1, g = cv._geo;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height);
+  ctx.setTransform(d,0,0,d,0,0);
+  const X = u=>g.ox+u*g.mm, Y = v=>g.oy+v*g.mm;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for(const it of e12Ink){
+    ctx.strokeStyle = ctx.fillStyle = it.c;
+    if(it.k==='s'){
+      ctx.lineWidth = Math.max(1.5, it.w*g.mm);
+      ctx.beginPath();
+      it.p.forEach((q,i)=> i ? ctx.lineTo(X(q[0]),Y(q[1])) : ctx.moveTo(X(q[0]),Y(q[1])));
+      if(it.p.length===1) ctx.lineTo(X(it.p[0][0])+0.1, Y(it.p[0][1]));
+      ctx.stroke();
+    } else if(it.k==='t'){
+      const fs = Math.max(9, it.s*g.mm);
+      ctx.font = '700 '+fs+'px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = Math.max(2, fs*0.22); ctx.strokeStyle = 'rgba(255,255,255,.9)';
+      ctx.strokeText(it.t, X(it.p[0][0]), Y(it.p[0][1]));
+      ctx.fillText(it.t, X(it.p[0][0]), Y(it.p[0][1]));
+    }
+  }
+}
+function sendInk(payload){
+  if(!ecg12Mirror || !channel || !ecg12Rhythm) return;
+  payload.key = ecg12Rhythm;
+  channel.send({ type:'broadcast', event:'ecg_ink', payload });
+}
+// alumno: aplica las anotaciones que llegan del instructor
+function applyRemoteInk(p){
+  if(!p || !ecg12Remote || p.key !== ecg12Rhythm) return;
+  if(p.op==='all') e12Ink = (p.items||[]).slice();
+  else if(p.op==='clear') e12Ink = [];
+  else if(p.op==='del') e12Ink = e12Ink.filter(x=>x.id!==p.id);
+  else if(p.op==='set' && p.item){ const i = e12Ink.findIndex(x=>x.id===p.item.id); if(i>=0) e12Ink[i] = p.item; else e12Ink.push(p.item); }
+  drawInk();
+}
+
 // alumno: recibe la vista del instructor
 function applyRemoteEcgView(p){
   if(!p || !p.key || !RHYTHM_INFO[p.key]) return;
@@ -4116,7 +4258,7 @@ function applyRemoteEcgView(p){
   else openEcg12(p.key, { remote:true, view, keepFocus:true });
 }
 function closeRemoteEcgView(){ if(ecg12Rhythm && ecg12Remote) closeEcg12(); }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm) closeEcg12(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ecg12Rhythm && !e.target.classList.contains('ecg12-txt')) closeEcg12(); });
 
 /* ---------- Ficha informativa de cada ritmo ----------
    Definición, claves en el ECG y particularidades clínicas. Basada en las guías de práctica
