@@ -1102,6 +1102,12 @@
     body.role-monitor .vitals #cardBp .vital-sub{ font-size:9px; }
     body.role-monitor .vitals #cardBp .vital-unit{ display:none; }
   }
+
+  /* pestaña Ritmo: el pulso se alinea con la fila del desplegable y "Enviar", no con su etiqueta */
+  #paneRhythm .controls{ align-items:flex-end; }
+  #paneRhythm .controls > #pulseBadge, #paneRhythm .controls > #pulseToggleWrap{
+    min-height:var(--rpick-h, 36px); display:flex; align-items:center; box-sizing:border-box; }
+  #paneRhythm .controls > #pulseBadge{ min-height:0; height:auto; margin-bottom:calc((var(--rpick-h, 36px) - var(--badge-h, 26px)) / 2); }
 </style>
 </head>
 <body>
@@ -4496,6 +4502,17 @@ function onRhythmChangedForShare(r){
   if(sharedRhythm && r !== sharedRhythm){ sharedRhythm = null; refreshSendRhythmBtn(); }
   if(typeof ecg12Mirror!=='undefined' && ecg12Mirror && ecg12Rhythm && r !== ecg12Rhythm) stopEcg12Mirror();
 }
+
+
+// altura real de la fila "desplegable + Enviar" para centrar con ella los controles del pulso
+(function(){
+  const pick = document.querySelector('#paneRhythm .rhythm-pick'), badge = document.getElementById('pulseBadge');
+  if(!pick || !window.ResizeObserver) return;
+  const upd = ()=>{ const pane = document.getElementById('paneRhythm');
+    pane.style.setProperty('--rpick-h', pick.offsetHeight+'px');
+    if(badge) pane.style.setProperty('--badge-h', badge.offsetHeight+'px'); };
+  new ResizeObserver(upd).observe(pick); if(badge) new ResizeObserver(upd).observe(badge); upd();
+})();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
