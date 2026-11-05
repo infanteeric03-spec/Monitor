@@ -1122,6 +1122,12 @@
   .cs-player .casebtn{ display:inline-flex; align-items:center; gap:2px; }
   .cs-player .casebtn.sent{ opacity:.6; }
   @media (max-width:420px){ .cs-player .lbl{ display:none; } .cs-player .casebtn{ flex:1; justify-content:center; } }
+
+  /* proyección al alumno: "● EN DIRECTO DEL INSTRUCTOR • nombre del ritmo" */
+  #ecg12Overlay.remote .ecg12-titlebox .ecg12-k{ order:0; }
+  #ecg12Overlay.remote .ecg12-titlebox .ecg12-live{ order:1; margin-left:2px; }
+  #ecg12Overlay.remote .ecg12-titlebox #ecg12Title{ order:2; }
+  #ecg12Overlay.remote #ecg12Title:not(:empty)::before{ content:"•"; color:#000; font-weight:700; margin:0 8px 0 2px; }
 </style>
 </head>
 <body>
