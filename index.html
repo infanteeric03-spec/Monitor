@@ -112,6 +112,7 @@
     body.role-instructor .header-row .btn-send-now{ padding:4px 6px; }
     body.role-instructor .header-row .helpBtn{ order:4; flex-shrink:0; width:26px; height:24px; font-size:13px; }
     body.role-instructor .header-row .themeToggle{ order:5; flex-shrink:0; width:26px; height:24px; font-size:13px; }
+    body.role-instructor .header-row .settings-btn{ order:6; flex-shrink:0; width:28px; height:26px; margin-left:2px; }
     .btn-send-now{ padding:5px 8px; }
   }
   header h1{ font-size:15px; font-weight:600; letter-spacing:.08em; color:var(--title); text-transform:uppercase; margin:0;}
@@ -1175,6 +1176,62 @@
   body.role-monitor .waves-remote-btn{ display:none; }
   body .waves.expanded .waves-remote-btn{ width:min(36px,9cqh); height:min(36px,9cqh); right:calc(12px + min(36px,9cqh)); bottom:6px; }
   body.role-instructor .waves.expanded .wx-vitals{ padding-right:calc(2*min(36px,9cqh) + 6px + 1.5cqw); }
+
+  /* ---------- Menú de configuración (instructor) ---------- */
+  .settings-btn svg{ width:17px; height:17px; }
+  body.role-instructor header .helpBtn, body.role-instructor header .themeToggle{ display:none; }
+  body.role-instructor .quiz-right .quiz-algo-row, body.role-instructor #btnQuizMore, body.role-instructor .cpr-head .algo-seg{ display:none !important; }
+  .algo-tag{ margin-left:auto; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--ecg); background:transparent;
+    border:1px solid color-mix(in srgb, var(--ecg) 45%, transparent); border-radius:4px; padding:2px 7px; cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0; }
+  .qeb-k{ grid-column:1 / -1; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); }
+  .quiz-edit-bar{ grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) auto; }
+  .qeb-close{ padding-left:12px !important; padding-right:12px !important; }
+  @media (max-width:420px){ .qeb-close .lbl{ display:none; } }
+  #settingsOverlay{ position:fixed; inset:0; z-index:96; background:rgba(0,0,0,.5); display:none; overscroll-behavior:contain; }
+  #settingsOverlay.open{ display:block; }
+  #settingsPanel{ position:absolute; top:0; right:0; bottom:0; width:min(420px,100vw); background:var(--panel); color:var(--text);
+    border-left:1px solid var(--line); box-shadow:-12px 0 40px rgba(0,0,0,.45); display:flex; flex-direction:column;
+    animation:stIn .18s ease-out; }
+  @keyframes stIn{ from{ transform:translateX(24px); opacity:.4; } to{ transform:none; opacity:1; } }
+  .st-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--line);
+    padding-top:max(14px, env(safe-area-inset-top)); }
+  .st-head h2{ margin:0; font-size:16px; font-weight:800; }
+  .st-x{ width:32px; height:32px; border-radius:6px; border:1px solid var(--line); background:transparent; color:var(--text-dim); font-size:14px; cursor:pointer; }
+  .st-body{ flex:1; overflow-y:auto; padding:4px 16px max(16px, env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+  .st-sec{ padding:12px 0 2px; }
+  .st-sec h3{ margin:0 0 4px; font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); }
+  .st-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--line);
+    font-size:13.5px; width:100%; }
+  .st-sec .st-row:last-child{ border-bottom:none; }
+  .st-row > span:first-child{ min-width:0; }
+  .st-row small{ display:block; font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+  .st-link{ background:none; border:none; border-bottom:1px solid var(--line); color:var(--text); font-family:inherit; text-align:left; cursor:pointer; }
+  .st-chev{ color:var(--text-dim); font-size:20px; }
+  .st-seg{ display:flex; flex-shrink:0; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .st-seg button{ background:transparent; border:none; color:var(--text-dim); font-family:inherit; font-size:12px; font-weight:700;
+    padding:6px 10px; cursor:pointer; white-space:nowrap; }
+  .st-seg button.on{ background:var(--ecg); color:#04140b; }
+  .st-go{ flex-shrink:0; background:transparent; border:1px solid var(--line); color:var(--text); border-radius:6px; padding:6px 11px;
+    font-family:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  .st-go.st-red{ color:var(--alarm); border-color:color-mix(in srgb, var(--alarm) 50%, transparent); }
+  .st-sw{ flex-shrink:0; width:40px; height:23px; border-radius:12px; border:none; background:var(--line); position:relative; cursor:pointer; padding:0; transition:background .15s; }
+  .st-sw::after{ content:""; position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:#8a979b; transition:transform .15s, background .15s; }
+  .st-sw[aria-checked="true"]{ background:var(--ecg); }
+  .st-sw[aria-checked="true"]::after{ transform:translateX(17px); background:#fff; }
+  .st-flash{ animation:stFlash 1.2s ease-out; }
+  @keyframes stFlash{ 0%,40%{ background:color-mix(in srgb, var(--ecg) 14%, transparent); } 100%{ background:transparent; } }
+  @media (max-width:760px){
+    #settingsPanel{ top:auto; left:0; width:100%; max-height:88dvh; border-left:none; border-top:1px solid var(--line);
+      border-radius:14px 14px 0 0; box-shadow:0 -12px 40px rgba(0,0,0,.45); animation-name:stUp; }
+    @keyframes stUp{ from{ transform:translateY(30px); opacity:.4; } to{ transform:none; opacity:1; } }
+  }
+  /* ajustes que el instructor aplica a la pantalla del alumno */
+  body.role-monitor.pref-no-case .case-share{ display:none !important; }
+  body.role-monitor.pref-no-case-btns .cs-player{ display:none; }
+  body.role-monitor.pref-no-temp #cardTemp{ display:none !important; }
+  @media (max-width:760px){
+    body.role-monitor.pref-no-temp .vitals #cardResp, body.role-monitor.pref-no-temp .vitals #cardBp{ grid-column:span 3; }
+  }
 </style>
 </head>
 <body>
@@ -1344,6 +1401,9 @@
             <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
         </div>
+        <button type="button" class="theme-btn settings-btn instructor-only" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Configuración" aria-label="Configuración">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="2.6"/><path d="M10 1.8v2.3M10 15.9v2.3M18.2 10h-2.3M4.1 10H1.8M15.8 4.2l-1.6 1.6M5.8 14.2l-1.6 1.6M15.8 15.8l-1.6-1.6M5.8 5.8 4.2 4.2"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -1502,6 +1562,7 @@
                     <button type="button" data-algo="AHA" onclick="setCprAlgo('AHA')">AHA</button>
                     <button type="button" data-algo="ERC" onclick="setCprAlgo('ERC')">ERC</button>
                   </div>
+                  <button type="button" class="algo-tag cpr-algo-tag" onclick="openSettings('settingsAlgo')" title="Cambiar el algoritmo en Configuración">RCP · ERC</button>
                 </div>
                 <select id="cprSelect" onchange="previewQuestion(this.value,'cpr')"></select>
                 <div class="quiz-preview" id="cprPreview" style="display:none;">
@@ -1537,6 +1598,7 @@
               <div style="flex:1; min-width:200px;">
                 <div class="quiz-label-row">
                   <label for="quizCat">Banco de preguntas</label>
+                  <button type="button" class="algo-tag" id="algoTag" onclick="openSettings('settingsAlgo')" title="Cambiar el algoritmo en Configuración">RCP · ERC</button>
                   <button type="button" class="theme-btn quiz-more-btn" id="btnQuizMore" onclick="toggleQuizEditBar()" title="Crear, editar o eliminar preguntas" aria-expanded="false"><span>+</span></button>
                 </div>
                 <select id="quizCat" class="quiz-cat" data-popw="240" aria-label="Categoría de preguntas" onchange="setQuizCat(this.value)" style="width:100%; min-width:0;">
@@ -1567,9 +1629,11 @@
               <div class="quiz-answer-status" id="quizAnswerStatus">Aún no se ha enviado al monitor.</div>
             </div>
             <div class="quiz-edit-bar" id="quizEditBar">
+              <span class="qeb-k">Gestionar preguntas</span>
               <button class="casebtn" id="btnNewQ" onclick="openQuestionEditor(null)">+ Nueva pregunta</button>
               <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled><span aria-hidden="true">✎</span> Editar</button>
               <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled><span aria-hidden="true">🗑</span> Eliminar</button>
+              <button class="casebtn qeb-close" onclick="toggleQuizEditBar()" aria-label="Terminar de gestionar preguntas" title="Terminar"><span aria-hidden="true">✕</span><span class="lbl"> Terminar</span></button>
             </div>
             <button type="button" class="quiz-restore-link" id="btnRestoreHidden" onclick="restoreHiddenQuestions()" style="display:none;"></button>
            </div>
@@ -1719,6 +1783,40 @@
   </div>
 </div>
 
+<div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
+  <aside id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="st-head"><h2 id="settingsTitle">Configuración</h2><button type="button" class="st-x" onclick="closeSettings()" aria-label="Cerrar configuración">✕</button></div>
+    <div class="st-body">
+      <section class="st-sec"><h3>Aspecto y ayuda</h3>
+        <div class="st-row"><span>Tema</span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button></div></div>
+        <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
+      </section>
+      <section class="st-sec"><h3>Sala</h3>
+        <div class="st-row"><span>Sala actual<small class="mono" id="stRoom">—</small></span><button type="button" class="st-go" onclick="leaveRoom(true)">Cambiar</button></div>
+        <div class="st-row"><span>Salir al inicio<small>Para cambiar de rol o de sala</small></span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
+      </section>
+      <section class="st-sec"><h3>Preguntas</h3>
+        <div class="st-row" id="settingsAlgo"><span>Algoritmo de RCP<small>Preguntas y barra «Q. RCP»</small></span><div class="st-seg" data-set="cprAlgo" role="group" aria-label="Algoritmo de RCP"><button type="button" data-v="AHA">AHA</button><button type="button" data-v="ERC">ERC</button></div></div>
+        <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span>Gestionar preguntas<small>Crear, editar o eliminar</small></span><span class="st-chev" aria-hidden="true">›</span></button>
+        <div class="st-row"><span>Cerrar la pregunta del alumno tras contestar</span><div class="st-seg" data-set="quizCloseS" role="group" aria-label="Segundos hasta cerrar la pregunta"><button type="button" data-v="1">1 s</button><button type="button" data-v="3">3 s</button><button type="button" data-v="5">5 s</button></div></div>
+      </section>
+      <section class="st-sec"><h3>Casos clínicos</h3>
+        <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span>Editor de casos<small>Crear o modificar casos</small></span><span class="st-chev" aria-hidden="true">›</span></button>
+        <div class="st-row"><span>Velocidad por defecto</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
+      </section>
+      <section class="st-sec"><h3>Pantalla del alumno</h3>
+        <div class="st-row"><span>Ver el caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
+        <div class="st-row"><span>Puede usar los botones del caso<small>⏮ ▶ ⏭ ⟲</small></span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
+        <div class="st-row"><span>Nombre del ritmo en el ECG proyectado<small>Valor inicial de la casilla al abrir un ECG</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
+        <div class="st-row"><span>Mostrar temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
+      </section>
+      <section class="st-sec"><h3>Este dispositivo</h3>
+        <div class="st-row"><span>Pantalla encendida al ampliar</span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
+        <div class="st-row"><span>Ficha del ritmo al abrir</span><div class="st-seg" data-set="fichaCollapsed" role="group" aria-label="Ficha del ritmo al abrir"><button type="button" data-v="1">Contraída</button><button type="button" data-v="0">Desplegada</button></div></div>
+      </section>
+    </div>
+  </aside>
+</div>
 <div id="ecg12Overlay" role="dialog" aria-modal="true" aria-labelledby="ecg12Title" onclick="if(event.target===this) closeEcg12()">
   <div class="ecg12-box" id="ecg12Box">
     <div class="ecg12-head">
@@ -1874,6 +1972,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'ecg_ink'}, (msg)=> applyRemoteInk(msg.payload));
     channel.on('broadcast', {event:'waves_expand'}, (msg)=> toggleWavesExpand(!!(msg.payload && msg.payload.open)));
     channel.on('broadcast', {event:'case_view'}, (msg)=> applyRemoteCaseView(msg.payload));
+    channel.on('broadcast', {event:'student_prefs'}, (msg)=> applyStudentPrefs(msg.payload));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
     channel.on('broadcast', {event:'waves_state'}, (msg)=> setStudentWavesBtn(!!(msg.payload && msg.payload.open)));
@@ -1898,6 +1997,7 @@ function connectRoom(){
       if(role==='instructor'){
         // primer aviso inmediato + late-joiners: late arrivals reciben el siguiente latido del heartbeat
         broadcastState();
+        sendStudentPrefs();
         loadCustomCases();
         loadCustomQuestions();
       }
@@ -2167,8 +2267,11 @@ let CPR_BANK = BASE_CPR_BANK.map(x=>({ ...x, bank:'rcp', origin:'base' }));
 let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
-let cprAlgo = 'AHA';
-try{ const v = localStorage.getItem('monitor-cpr-algo'); if(v==='AHA'||v==='ERC') cprAlgo = v; }catch(e){}
+/* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
+var SETTINGS_DEF = { cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
+var settings = Object.assign({}, SETTINGS_DEF);
+try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
+let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
 
 // Las dos zonas de preguntas (pestaña "Preguntas" y panel de RCP del caso) comparten la lógica
 const QUIZ_UI = {
@@ -2227,8 +2330,9 @@ function populateQuizSelect(){
 
 function setCprAlgo(algo){
   cprAlgo = algo;
-  try{ localStorage.setItem('monitor-cpr-algo', algo); }catch(e){}
+  settings.cprAlgo = algo; saveSettings();
   document.querySelectorAll('.algo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.algo===algo));
+  document.querySelectorAll('.algo-tag').forEach(t=>t.textContent = 'RCP · '+algo);
   populateQuizSelect();
   updateCprPanel(true);
 }
@@ -2564,7 +2668,7 @@ function answerQuestion(id, optionIndex){
   if(channel) channel.send({ type:'broadcast', event:'answer', payload:{ id, optionIndex }});
   // una vez contestada, el panel de la pregunta se cierra solo
   clearTimeout(answerQuestion._t);
-  answerQuestion._t = setTimeout(hideQuestionOnMonitor, 3000);
+  answerQuestion._t = setTimeout(hideQuestionOnMonitor, (studentPrefs.quizCloseS||3)*1000);
 }
 
 /* ---------- Motor de casos clínicos ---------- */
@@ -2978,6 +3082,7 @@ function onCaseSelect(key){
   setPlayLabel('start');
   updateCaseActionButtons();
   scenario.started = false; sendCaseView(true); // un caso nuevo no se muestra al alumno hasta iniciarlo
+  if(!scenario.playing && scenario.t===0 && settings.speed && settings.speed!==scenario.speed) setCaseSpeed(+settings.speed);
   applyScenarioAtTime(0);
   updateStickyMonitor();
 }
@@ -3577,14 +3682,11 @@ const GUIDE_STEPS = {
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
     { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
       sub:'Ábrela para enviar al alumno preguntas de la fase en curso: FV/TVSP, asistolia/AESP o tras la RCE.', before:()=>switchTab('case') },
-    { sel:'.quiz-algo-row .algo-seg', text:'Elige el algoritmo de RCP: AHA o ERC.',
-      sub:'Las preguntas en las que las guías difieren se adaptan al que elijas.', before:()=>switchTab('quiz') },
-    { sel:'#btnQuizMore', text:'Pulsa + para crear, editar o eliminar preguntas.',
-      sub:'Se guardan en la nube y las ven todos los instructores.', before:()=>switchTab('quiz') },
+
     { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con 📨.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
-    { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
-    { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
+    { sel:'#settingsBtn', text:'En ⚙ Configuración tienes el resto de opciones.',
+      sub:'Tema, esta guía, algoritmo de RCP (ERC por defecto), gestión de preguntas y casos, y qué ve el alumno.' }
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
@@ -4149,7 +4251,7 @@ function openEcg12(r, opts){
   document.getElementById('ecg12Title').textContent = (RHYTHM_INFO[r]||{}).t || '';
   if(ecg12Remote) setRemoteEcgName(!!opts.showName);
   if(changed && !ecg12Remote){
-    ecg12ShowName = false; const chk = document.getElementById('ecg12ShowName'); if(chk) chk.checked = false;
+    ecg12ShowName = !!settings.ecgName; const chk = document.getElementById('ecg12ShowName'); if(chk) chk.checked = ecg12ShowName;
   }
   if(!ecg12Remote && !document.getElementById('ecg12Overlay').classList.contains('open')) toggleInkBar(false);
   document.getElementById('ecg12Overlay').classList.add('open');
@@ -4534,7 +4636,7 @@ function rhythmBodyHTML(i){
     + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
 }
 const RI_CHEV = '<svg class="ri-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
-let rhythmInfoCollapsed = true; // la ficha empieza contraída al abrir la app
+let rhythmInfoCollapsed = settings.fichaCollapsed !== false; // según Configuración (contraída por defecto)
 function toggleRhythmInfo(){
   rhythmInfoCollapsed = !rhythmInfoCollapsed;
   const el = document.getElementById('rhythmInfo');
@@ -4674,7 +4776,7 @@ function sendCaseCmd(cmd){
 }
 // instructor: ejecuta la orden del alumno ("Salir" no está permitido desde el alumno)
 function onRemoteCaseCmd(p){
-  if(!p || !scenario.active) return;
+  if(!p || !scenario.active || settings.caseButtons===false) return;
   if(p.cmd==='prev') stepScenario(-1);
   else if(p.cmd==='next') stepScenario(1);
   else if(p.cmd==='reset') resetScenario();
@@ -4724,6 +4826,7 @@ function toggleStudentWaves(){
    así que se vuelve a pedir al regresar. Si el navegador no lo admite, simplemente no hace nada. */
 var wakeLock = null;
 function wakeWanted(){
+  if(role!=='monitor' && settings.wake===false) return false;
   return !!document.querySelector('.waves.expanded') || !!(document.getElementById('ecg12Overlay') && document.getElementById('ecg12Overlay').classList.contains('open'));
 }
 async function updateWakeLock(){
@@ -4738,6 +4841,88 @@ async function updateWakeLock(){
   }catch(e){ wakeLock = null; }
 }
 document.addEventListener('visibilitychange', updateWakeLock);
+
+
+/* ---------- Menú ⚙ Configuración ---------- */
+function saveSettings(){ try{ localStorage.setItem('monitor-settings', JSON.stringify(settings)); }catch(e){} }
+function refreshSettingsUI(){
+  const vals = Object.assign({}, settings, { theme: document.body.classList.contains('theme-light') ? 'light' : 'dark',
+    cprAlgo, quizCloseS:String(settings.quizCloseS), speed:String(settings.speed), fichaCollapsed: settings.fichaCollapsed!==false ? '1':'0' });
+  document.querySelectorAll('#settingsPanel .st-seg').forEach(g=>{
+    g.querySelectorAll('button').forEach(b=>{ const on = String(vals[g.dataset.set])===b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
+  });
+  document.querySelectorAll('#settingsPanel .st-sw').forEach(b=>b.setAttribute('aria-checked', settings[b.dataset.set]!==false ? 'true':'false'));
+  document.getElementById('stRoom').textContent = roomCode ? 'Sala '+roomCode : 'Sin sala';
+}
+function openSettings(focusId){
+  refreshSettingsUI();
+  document.getElementById('settingsOverlay').classList.add('open');
+  openSettings._opener = document.activeElement;
+  const target = focusId && document.getElementById(focusId);
+  if(target){ target.scrollIntoView({ block:'center' }); target.classList.remove('st-flash'); void target.offsetWidth; target.classList.add('st-flash'); }
+  document.querySelector('#settingsPanel .st-x').focus({ preventScroll:true });
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+  const o = openSettings._opener; if(o && o.focus && document.body.contains(o)) o.focus({ preventScroll:true });
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('settingsOverlay').classList.contains('open')) closeSettings(); });
+document.getElementById('settingsPanel').addEventListener('click', e=>{
+  const segBtn = e.target.closest('.st-seg button');
+  if(segBtn){
+    const key = segBtn.parentElement.dataset.set, v = segBtn.dataset.v;
+    if(key==='theme'){ const light = document.body.classList.contains('theme-light'); if((v==='light')!==light) toggleTheme(); }
+    else if(key==='cprAlgo') setCprAlgo(v);
+    else if(key==='quizCloseS'){ settings.quizCloseS = +v; saveSettings(); sendStudentPrefs(); }
+    else if(key==='speed'){ settings.speed = +v; saveSettings(); if(!scenario.active || (!scenario.playing && scenario.t===0)) setCaseSpeed(+v); }
+    else if(key==='fichaCollapsed'){ settings.fichaCollapsed = v==='1'; saveSettings(); }
+    refreshSettingsUI(); return;
+  }
+  const sw = e.target.closest('.st-sw');
+  if(sw){
+    const key = sw.dataset.set; settings[key] = settings[key]===false; saveSettings();
+    if(key==='wake') updateWakeLock();
+    if(['showCase','caseButtons','showTemp'].includes(key)) sendStudentPrefs();
+    refreshSettingsUI();
+  }
+});
+// "Gestionar preguntas": abre la pestaña Preguntas con la barra de edición desplegada
+function manageQuestions(){
+  switchTab('quiz');
+  if(!document.getElementById('quizEditBar').classList.contains('open')) toggleQuizEditBar();
+  document.getElementById('quizEditBar').scrollIntoView({ block:'nearest', behavior:'smooth' });
+}
+// Salir de la sala: se recarga la app (vuelve a la pantalla de inicio); "Cambiar" va directo a crear otra sala
+function leaveRoom(change){
+  const msg = change ? '¿Cambiar de sala? El alumno quedará desconectado hasta que entre en la nueva.' : '¿Salir al inicio? Se cerrará la sala actual.';
+  if(!confirm(msg)) return;
+  try{ if(change) sessionStorage.setItem('monitor-change-room', role||'instructor'); }catch(e){}
+  try{ if(channel) channel.unsubscribe(); }catch(e){}
+  location.reload();
+}
+(function(){
+  let r = null; try{ r = sessionStorage.getItem('monitor-change-room'); sessionStorage.removeItem('monitor-change-room'); }catch(e){}
+  if(r==='instructor' || r==='monitor') setTimeout(()=>selectRole(r), 0);
+})();
+/* ajustes que afectan a la pantalla del alumno: se envían al cambiar y cada pocos segundos */
+var studentPrefs = { showCase:true, caseButtons:true, showTemp:true, quizCloseS:3 };
+function sendStudentPrefs(){
+  if(role!=='instructor' || !channel) return;
+  channel.send({ type:'broadcast', event:'student_prefs', payload:{ showCase:settings.showCase!==false, caseButtons:settings.caseButtons!==false,
+    showTemp:settings.showTemp!==false, quizCloseS:settings.quizCloseS||3 } });
+}
+setInterval(sendStudentPrefs, 5000);
+function applyStudentPrefs(p){
+  if(!p) return;
+  studentPrefs = Object.assign(studentPrefs, p);
+  document.body.classList.toggle('pref-no-case', p.showCase===false);
+  document.body.classList.toggle('pref-no-case-btns', p.caseButtons===false);
+  document.body.classList.toggle('pref-no-temp', p.showTemp===false);
+}
+// estado inicial de la interfaz según las preferencias guardadas
+document.querySelectorAll('.algo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.algo===cprAlgo));
+document.querySelectorAll('.algo-tag').forEach(t=>t.textContent = 'RCP · '+cprAlgo);
+if(settings.speed && settings.speed!==1) setCaseSpeed(+settings.speed);
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
