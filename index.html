@@ -3904,6 +3904,7 @@ function toggleWavesExpand(force){
   } else if(wavesPlaceholder){ wavesPlaceholder.remove(); wavesPlaceholder = null; }
   w.classList.toggle('expanded', open);
   document.body.classList.toggle('waves-expanded', open);
+  updateWakeLock();
   if(open){ w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-label','Monitor ampliado'); }
   else { w.removeAttribute('role'); w.removeAttribute('aria-modal'); w.removeAttribute('aria-label'); }
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -4153,6 +4154,7 @@ function openEcg12(r, opts){
   if(!ecg12Remote && !document.getElementById('ecg12Overlay').classList.contains('open')) toggleInkBar(false);
   document.getElementById('ecg12Overlay').classList.add('open');
   document.body.classList.add('waves-open');
+  updateWakeLock();
   e12DrawnZ = 0;
   requestAnimationFrame(drawEcg12Big);
   if(!opts.keepFocus) document.querySelector('.ecg12-close').focus({ preventScroll:true });
@@ -4208,6 +4210,7 @@ function closeEcg12(){
   ecg12Rhythm = null; ecg12Remote = false;
   e12Ink = []; setInkTool(null); removeInkText();
   document.getElementById('ecg12Overlay').classList.remove('open','remote');
+  updateWakeLock();
   if(!document.querySelector('.waves.expanded')) document.body.classList.remove('waves-open');
   if(ecg12Opener && ecg12Opener.focus) ecg12Opener.focus({ preventScroll:true });
 }
@@ -4713,6 +4716,28 @@ function toggleStudentWaves(){
   channel.send({ type:'broadcast', event:'waves_expand', payload:{ open } });
   setStudentWavesBtn(open); // se confirma (o corrige) con el aviso que devuelve el alumno
 }
+
+
+/* ---------- Pantalla siempre encendida ----------
+   Mientras el monitor o el ECG de 12 derivaciones estén ampliados se pide al navegador que no
+   apague la pantalla (API Screen Wake Lock). El sistema la libera al cambiar de app o pestaña,
+   así que se vuelve a pedir al regresar. Si el navegador no lo admite, simplemente no hace nada. */
+var wakeLock = null;
+function wakeWanted(){
+  return !!document.querySelector('.waves.expanded') || !!(document.getElementById('ecg12Overlay') && document.getElementById('ecg12Overlay').classList.contains('open'));
+}
+async function updateWakeLock(){
+  try{
+    if(!('wakeLock' in navigator)) return;
+    if(wakeWanted() && document.visibilityState==='visible'){
+      if(!wakeLock){
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', ()=>{ wakeLock = null; });
+      }
+    } else if(wakeLock){ const w = wakeLock; wakeLock = null; await w.release(); }
+  }catch(e){ wakeLock = null; }
+}
+document.addEventListener('visibilitychange', updateWakeLock);
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
