@@ -1613,6 +1613,10 @@
     .cbb-row{ gap:6px; font-size:11px; }
     .ecg12-calibbar .ecg12-b{ padding:4px 8px; }
   }
+  .ecg12-fixundo{ bottom:34px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; padding:5px 6px 5px 12px; }
+  .ecg12-fixundo .ecg12-b{ display:inline-flex; align-items:center; gap:5px; height:30px; font-size:13px; font-weight:600; }
+  .ecg12-fixundo .ecg12-b svg{ width:16px; height:16px; }
+  .ecg12-fixundo .fu-x{ border-color:transparent; background:none; color:#777; }
   .cbb-save:not(:disabled){ background:#13a05a; color:#fff; border-color:#13a05a; }
   .ecg12-notes{ top:calc(var(--e12-head) + 8px); left:auto; right:8px; transform:none; width:min(360px, calc(100% - 16px));
     max-height:45%; overflow:auto; font-size:13px; line-height:1.5; white-space:pre-wrap; }
@@ -2374,6 +2378,11 @@
       </div>
     </div>
     <div class="ecg12-float ecg12-notes instructor-only" id="ecg12Notes" hidden></div>
+    <div class="ecg12-float ecg12-fixundo instructor-only" id="ecg12FixUndo" role="status" hidden>
+      <span>Medida fijada</span>
+      <button type="button" class="ecg12-b" onclick="undoCaliperFix()"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5 3.5 9l4 4"/><path d="M3.8 9H12a4.5 4.5 0 0 1 0 9h-2"/></svg> Deshacer</button>
+      <button type="button" class="ecg12-b fu-x" onclick="hideFixUndo()" aria-label="Cerrar aviso">✕</button>
+    </div>
     <div class="ecg12-paper" id="ecg12Paper"><canvas id="ecg12Canvas"></canvas><canvas id="ecg12Ink"></canvas></div>
     <div class="ecg12-foot"><span id="ecg12Hint">Pellizca con dos dedos para ampliar y arrastra para moverte · </span><span id="ecg12FootSrc">Trazado esquemático generado con fines formativos · 25 mm/s · 10 mm/mV</span></div>
   </div>
@@ -5135,8 +5144,14 @@ function commitInkText(){
   e12Ink.push(it); drawInk(); sendInk({ op:'set', item:it });
 }
 function removeInkText(){ if(inkTextEl){ inkTextEl.remove(); inkTextEl = null; } }
-function undoInk(){ const it = e12Ink.pop(); if(it){ drawInk(); sendInk({ op:'del', id:it.id }); } }
-function clearInk(){ if(!e12Ink.length) return; e12Ink = []; drawInk(); sendInk({ op:'clear' }); }
+function undoInk(){
+  const it = e12Ink.pop(); if(!it) return;
+  const del = [it];   // las medidas fijadas del compás (varios trazos con el mismo grupo) se deshacen juntas
+  if(it.g) while(e12Ink.length && e12Ink[e12Ink.length-1].g===it.g) del.push(e12Ink.pop());
+  drawInk(); del.forEach(x=>sendInk({ op:'del', id:x.id }));
+  if(it.g) hideFixUndo();
+}
+function clearInk(){ if(!e12Ink.length) return; hideFixUndo(); e12Ink = []; drawInk(); sendInk({ op:'clear' }); }
 function drawInk(){
   const ink = document.getElementById('ecg12Ink'), cv = document.getElementById('ecg12Canvas');
   if(!ink || !cv._geo) return;
@@ -6248,6 +6263,7 @@ async function eeSave(){
 var e12Cal = null, e12RemoteCal = null, e12CalibSess = null, e12Grid = false, e12CalDrag = null, e12CalSendT = 0;
 function e12ResetMeasure(){
   e12Cal = null; e12CalibSess = null; e12Grid = false; e12CalDrag = null; e12RemoteCal = null;
+  hideFixUndo();
   const cb = document.getElementById('ecg12CalBar'); if(cb) cb.hidden = true;
   const kb = document.getElementById('ecg12CalibBar'); if(kb) kb.hidden = true;
   const b = document.getElementById('ecg12CalBtn'); if(b) b.setAttribute('aria-pressed','false');
@@ -6264,7 +6280,7 @@ function toggleCaliper(force){
       return;
     }
     if(e12CalibSess) calibCancel();
-    setInkTool(null);
+    setInkTool(null); hideFixUndo();
     const [cx, cy] = e12VisibleCenter(), half = 10*c.ux;   // 20 mm de separación inicial (800 ms a 25 mm/s)
     e12Cal = { axis:'h', a:cx-half, b:cx+half, o:cy };
   } else e12Cal = null;
@@ -6314,8 +6330,27 @@ function caliperFix(){
     : [ { id:id(), k:'s', c:col, w, p:[[0,e12Cal.a],[dm.W,e12Cal.a]] }, { id:id(), k:'s', c:col, w, p:[[0,e12Cal.b],[dm.W,e12Cal.b]] },
         { id:id(), k:'s', c:col, w:w*1.5, p:[[e12Cal.o,e12Cal.a],[e12Cal.o,e12Cal.b]] },
         { id:id(), k:'t', c:col, s:+(15/g.mm).toFixed(2), p:[[e12Cal.o + 8/g.mm, (e12Cal.a+e12Cal.b)/2]], t:lab } ];
-  items.forEach(it=>{ e12Ink.push(it); sendInk({ op:'set', item:it }); });
+  const grp = 'm'+Date.now().toString(36);
+  items.forEach(it=>{ it.g = grp; e12Ink.push(it); sendInk({ op:'set', item:it }); });
   toggleCaliper(false);
+  showFixUndo(grp);
+}
+/* aviso «Medida fijada · Deshacer» tras fijar el compás */
+var e12FixUndoT = 0;
+function showFixUndo(grp){
+  const el = document.getElementById('ecg12FixUndo'); el.dataset.g = grp; el.hidden = false;
+  clearTimeout(e12FixUndoT); e12FixUndoT = setTimeout(hideFixUndo, 8000);
+}
+function hideFixUndo(){ const el = document.getElementById('ecg12FixUndo'); if(el) el.hidden = true; clearTimeout(e12FixUndoT); }
+function undoCaliperFix(){
+  const g = document.getElementById('ecg12FixUndo').dataset.g;
+  const last = e12Ink[e12Ink.length-1];
+  if(last && last.g===g) undoInk();
+  else {   // si ya hay otras anotaciones encima, se borra solo ese grupo
+    const del = e12Ink.filter(x=>x.g===g); e12Ink = e12Ink.filter(x=>x.g!==g);
+    drawInk(); del.forEach(x=>sendInk({ op:'del', id:x.id }));
+  }
+  hideFixUndo(); showToast('Medida eliminada.');
 }
 function e12SendCal(now){
   if(!ecg12Mirror) return;
