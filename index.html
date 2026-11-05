@@ -1258,6 +1258,25 @@
   .st-sw::after{ content:""; position:absolute; top:3px; left:3px; width:17px; height:17px; border-radius:50%; background:#8a979b; transition:transform .15s, background .15s; }
   .st-sw[aria-checked="true"]{ background:var(--ecg); }
   .st-sw[aria-checked="true"]::after{ transform:translateX(17px); background:#fff; }
+  .st-tabs{ display:flex; gap:3px; margin:10px 16px 2px; padding:3px; border:1px solid var(--line); border-radius:8px; flex-shrink:0; }
+  .st-tabs button{ flex:1; background:transparent; border:none; border-radius:6px; padding:7px 0; color:var(--text-dim);
+    font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+  .st-tabs button[aria-selected="true"]{ background:var(--ecg); color:#04140b; }
+  body.role-instructor .st-pane:not(.on){ display:none; }
+  .st-l{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .st-l > small{ flex-basis:100%; }
+  .st-i{ width:17px; height:17px; flex-shrink:0; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--text-dim);
+    font:italic 10px/1 Georgia, serif; cursor:pointer; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+  .st-i[aria-expanded="true"]{ border-color:var(--ecg); color:var(--ecg); }
+  .st-row small.st-tip{ display:none; }
+  .st-row.tip-open small.st-tip{ display:block; flex-basis:100%; margin:6px 0 0; padding:7px 9px; border:1px solid var(--line); border-radius:7px;
+    background:var(--field); line-height:1.45; }
+  .st-row.tip-open{ flex-wrap:wrap; }
+  .st-row.tip-open > .st-l{ flex:1 1 60%; }
+  .st-stack{ flex-direction:column; align-items:stretch; gap:8px; }
+  .st-seg-full{ display:grid; grid-template-columns:repeat(4,1fr); }
+  .st-seg-full button{ padding:7px 2px; text-align:center; }
+  .st-ic{ width:18px; text-align:center; color:var(--ecg); font-weight:700; flex-shrink:0; }
   .st-flash{ animation:stFlash 1.2s ease-out; }
   @keyframes stFlash{ 0%,40%{ background:color-mix(in srgb, var(--ecg) 14%, transparent); } 100%{ background:transparent; } }
   @media (max-width:760px){
@@ -2208,45 +2227,56 @@
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
   <aside id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="st-head"><h2 id="settingsTitle">Configuración</h2><button type="button" class="st-x" onclick="closeSettings()" aria-label="Cerrar configuración">✕</button></div>
+    <div class="st-tabs instructor-only" role="tablist" aria-label="Secciones de configuración">
+      <button type="button" role="tab" data-tab="general" onclick="setSettingsTab('general')">General</button>
+      <button type="button" role="tab" data-tab="clase" onclick="setSettingsTab('clase')">Clase</button>
+      <button type="button" role="tab" data-tab="alumno" onclick="setSettingsTab('alumno')">Alumno</button>
+    </div>
     <div class="st-body">
+      <div class="st-pane" data-pane="general" role="tabpanel">
       <section class="st-sec"><h3>Aspecto y ayuda</h3>
-        <div class="st-row"><span>Tema<small>«Auto» sigue el modo claro/oscuro del dispositivo</small></span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button><button type="button" data-v="auto">Auto</button></div></div>
+        <div class="st-row"><span class="st-l">Tema <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">«Auto» sigue el modo claro u oscuro del dispositivo.</small></span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="auto">Auto</button><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button></div></div>
         <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
         <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
       <section class="st-sec st-room"><h3>Sala</h3>
         <div class="st-row"><span>Sala actual<small class="mono" id="stRoom">—</small></span><button type="button" class="st-go" onclick="leaveRoom(true)">Cambiar</button></div>
-        <div class="st-row"><span>Avisar cuando se conecte un alumno<small>Notificación discreta en la esquina</small></span><button type="button" class="st-sw" role="switch" data-set="notifyJoin" aria-label="Avisar cuando se conecte un alumno"></button></div>
-        <div class="st-row"><span>Salir al inicio<small>Para cambiar de rol o de sala</small></span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
-      </section>
-      <section class="st-sec instructor-only"><h3>Banco de ECG</h3>
-        <button type="button" class="st-row st-link" onclick="closeSettings(); openEcgBank();"><span>Abrir el banco de ECG<small>ECG reales anonimizados para mostrar y medir</small></span><span class="st-chev" aria-hidden="true">›</span></button>
-        <div class="st-row"><span>Administrador<small id="stAdmin">Desbloquea con el PIN para subir, editar y calibrar</small></span><button type="button" class="st-go" id="stAdminBtn" onclick="adminToggle()">Desbloquear</button></div>
-        <div class="st-row admin-only"><span>PIN de administrador</span><button type="button" class="st-go" onclick="adminChangePin()">Cambiar PIN</button></div>
-      </section>
-      <section class="st-sec instructor-only"><h3>Preguntas</h3>
-        <div class="st-row" id="settingsAlgo"><span>Algoritmo de RCP<small>Preguntas y barra «Q. RCP»</small></span><div class="st-seg" data-set="cprAlgo" role="group" aria-label="Algoritmo de RCP"><button type="button" data-v="AHA">AHA</button><button type="button" data-v="ERC">ERC</button></div></div>
-        <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span>Gestionar preguntas<small>Crear, editar o eliminar</small></span><span class="st-chev" aria-hidden="true">›</span></button>
-        <div class="st-row"><span>Cerrar la pregunta del alumno tras contestar</span><div class="st-seg" data-set="quizCloseS" role="group" aria-label="Segundos hasta cerrar la pregunta"><button type="button" data-v="1">1 s</button><button type="button" data-v="3">3 s</button><button type="button" data-v="5">5 s</button></div></div>
-      </section>
-      <section class="st-sec instructor-only"><h3>Casos clínicos</h3>
-        <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span>Editor de casos<small>Crear o modificar casos</small></span><span class="st-chev" aria-hidden="true">›</span></button>
-        <div class="st-row"><span>Pausar el caso al llegar a la parada<small>El caso se detiene y espera a que confirmes; el alumno ve el aviso al continuar</small></span><button type="button" class="st-sw" role="switch" data-set="pauseOnArrest" aria-label="Pausar el caso al llegar a la parada"></button></div>
-        <div class="st-row"><span>Velocidad por defecto</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
-      </section>
-      <section class="st-sec instructor-only"><h3>Pantalla del alumno</h3>
-        <div class="st-row"><span>Ver el caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
-        <div class="st-row"><span>Puede usar los botones del caso<small>⏮ ▶ ⏭ ⟲</small></span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
-        <div class="st-row"><span>Nombre del ritmo en el ECG proyectado<small>Valor inicial de la casilla al abrir un ECG</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
-        <div class="st-row"><span>Parpadeo rojo al perder el pulso<small>Si se desactiva, el aviso «SIN PULSO» aparece sin parpadear</small></span><button type="button" class="st-sw" role="switch" data-set="noPulseFlash" aria-label="Parpadeo rojo al perder el pulso"></button></div>
-        <div class="st-row"><span>Mostrar temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
+        <div class="st-row instructor-only"><span class="st-l">Avisar al conectarse un alumno <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Notificación discreta en la esquina de la pantalla.</small></span><button type="button" class="st-sw" role="switch" data-set="notifyJoin" aria-label="Avisar cuando se conecte un alumno"></button></div>
+        <div class="st-row"><span>Salir al inicio</span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
       </section>
       <section class="st-sec instructor-only"><h3>Este dispositivo</h3>
-        <div class="st-row"><span>Pantalla encendida al ampliar</span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
-        <div class="st-row"><span>Ficha del ritmo<small>Definición, claves del ECG y particularidades, en la pestaña Ritmo</small></span><button type="button" class="st-sw" role="switch" data-set="showFicha" aria-label="Mostrar la ficha del ritmo"></button></div>
-        <div class="st-row"><span>ECG de 12 derivaciones<small>Aunque la ficha esté desactivada</small></span><button type="button" class="st-sw" role="switch" data-set="showEcg12" aria-label="Mostrar el ECG de 12 derivaciones"></button></div>
-        <div class="st-row"><span>Ficha del ritmo al abrir</span><div class="st-seg" data-set="fichaCollapsed" role="group" aria-label="Ficha del ritmo al abrir"><button type="button" data-v="1">Contraída</button><button type="button" data-v="0">Desplegada</button></div></div>
+        <div class="st-row"><span class="st-l">Pantalla encendida al ampliar <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Evita que la pantalla se apague mientras el monitor o el ECG están ampliados.</small></span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
       </section>
+      </div>
+      <div class="st-pane instructor-only" data-pane="clase" role="tabpanel">
+      <section class="st-sec"><h3>Ritmo</h3>
+        <div class="st-row st-stack" id="settingsFicha"><span class="st-l">Ficha del ritmo <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Definición, claves del ECG y particularidades en la pestaña Ritmo. «Solo ECG» deja únicamente la miniatura del ECG de 12 derivaciones.</small></span>
+          <div class="st-seg st-seg-full" data-set="fichaMode" role="group" aria-label="Ficha del ritmo"><button type="button" data-v="off">Oculta</button><button type="button" data-v="ecg">Solo ECG</button><button type="button" data-v="collapsed">Contraída</button><button type="button" data-v="expanded">Desplegada</button></div></div>
+      </section>
+      <section class="st-sec"><h3>Preguntas y casos</h3>
+        <div class="st-row" id="settingsAlgo"><span class="st-l">Algoritmo de RCP <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Preguntas de RCP y barra «Q. RCP» de los casos con parada.</small></span><div class="st-seg" data-set="cprAlgo" role="group" aria-label="Algoritmo de RCP"><button type="button" data-v="AHA">AHA</button><button type="button" data-v="ERC">ERC</button></div></div>
+        <div class="st-row"><span>Cerrar pregunta tras contestar</span><div class="st-seg" data-set="quizCloseS" role="group" aria-label="Segundos hasta cerrar la pregunta"><button type="button" data-v="1">1 s</button><button type="button" data-v="3">3 s</button><button type="button" data-v="5">5 s</button></div></div>
+        <div class="st-row"><span class="st-l">Pausar el caso en la parada <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">El caso se detiene y espera a que confirmes; el alumno ve el aviso al continuar.</small></span><button type="button" class="st-sw" role="switch" data-set="pauseOnArrest" aria-label="Pausar el caso al llegar a la parada"></button></div>
+        <div class="st-row"><span>Velocidad del caso</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
+      </section>
+      <section class="st-sec"><h3>Herramientas</h3>
+        <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span class="st-l"><span class="st-ic" aria-hidden="true">?</span>Gestionar preguntas</span><span class="st-chev" aria-hidden="true">›</span></button>
+        <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span class="st-l"><span class="st-ic" aria-hidden="true">▤</span>Editor de casos</span><span class="st-chev" aria-hidden="true">›</span></button>
+        <div class="st-row"><span class="st-l" style="flex-wrap:nowrap"><span class="st-ic" aria-hidden="true">∿</span><span>Banco de ECG · administrador<small id="stAdmin">Desbloquea con el PIN para subir, editar y calibrar</small></span></span><button type="button" class="st-go" id="stAdminBtn" onclick="adminToggle()">Desbloquear</button></div>
+        <div class="st-row admin-only"><span class="st-l"><span class="st-ic" aria-hidden="true"></span>PIN de administrador</span><button type="button" class="st-go" onclick="adminChangePin()">Cambiar PIN</button></div>
+      </section>
+      </div>
+      <div class="st-pane instructor-only" data-pane="alumno" role="tabpanel">
+      <section class="st-sec"><h3>Qué ve el alumno</h3>
+        <div class="st-row"><span class="st-l">Caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
+        <div class="st-row"><span class="st-l">Puede usar ⏮ ▶ ⏭ ⟲ del caso</span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
+        <div class="st-row"><span class="st-l">Nombre del ritmo en el ECG <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Valor inicial de la casilla al abrir un ECG para mostrarlo al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
+        <div class="st-row"><span class="st-l">Temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
+      </section>
+      <section class="st-sec"><h3>Parada cardiaca</h3>
+        <div class="st-row"><span class="st-l">Parpadeo rojo al perder el pulso <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Si se desactiva, el aviso «SIN PULSO» aparece igual pero sin parpadear.</small></span><button type="button" class="st-sw" role="switch" data-set="noPulseFlash" aria-label="Parpadeo rojo al perder el pulso"></button></div>
+      </section>
+      </div>
     </div>
   </aside>
 </div>
@@ -4275,7 +4305,7 @@ const GUIDE_STEPS = {
     { sel:'#roomBadge', text:'Tu sala y cuántos alumnos hay conectados.', sub:'Comparte el código para que se unan; te avisamos cuando entre alguien.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
     { sel:'#settingsBtn', text:'En ☰ Configuración tienes el resto de opciones.',
-      sub:'Tema, esta guía, actualizar la app, algoritmo de RCP (ERC por defecto), preguntas y casos, y qué ve el alumno.' }
+      sub:'Tres pestañas: General (tema, guía, actualizar y sala), Clase (ficha del ritmo, RCP ERC/AHA, casos, preguntas y herramientas) y Alumno (lo que ve el alumno). Toca ⓘ para ver la explicación de cada opción.' }
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
@@ -5559,15 +5589,29 @@ function saveSettings(){ try{ localStorage.setItem('monitor-settings', JSON.stri
 function refreshSettingsUI(){
   if(typeof refreshAdminUI==='function') refreshAdminUI();
   const vals = Object.assign({}, settings, { theme: getThemePref(),
-    cprAlgo, quizCloseS:String(settings.quizCloseS), speed:String(settings.speed), fichaCollapsed: settings.fichaCollapsed!==false ? '1':'0' });
+    cprAlgo, quizCloseS:String(settings.quizCloseS), speed:String(settings.speed),
+    fichaMode: settings.showFicha!==false ? (settings.fichaCollapsed!==false ? 'collapsed':'expanded') : (settings.showEcg12!==false ? 'ecg':'off') });
   document.querySelectorAll('#settingsPanel .st-seg').forEach(g=>{
     g.querySelectorAll('button').forEach(b=>{ const on = String(vals[g.dataset.set])===b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
   });
   document.querySelectorAll('#settingsPanel .st-sw').forEach(b=>b.setAttribute('aria-checked', settings[b.dataset.set]!==false ? 'true':'false'));
   document.getElementById('stRoom').textContent = roomCode ? 'Sala '+roomCode+' · '+(studentCount===1 ? '1 alumno conectado' : studentCount+' alumnos conectados') : 'Sin sala';
 }
+/* pestañas del menú: General · Clase · Alumno (se recuerda la última) */
+function setSettingsTab(t){
+  if(!['general','clase','alumno'].includes(t)) t = 'general';
+  document.querySelectorAll('#settingsPanel .st-tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t ? 'true':'false'));
+  document.querySelectorAll('#settingsPanel .st-pane').forEach(p=>p.classList.toggle('on', p.dataset.pane===t));
+  document.querySelector('#settingsPanel .st-body').scrollTop = 0;
+  try{ localStorage.setItem('monitor-settings-tab', t); }catch(e){}
+}
 function openSettings(focusId){
   refreshSettingsUI();
+  let tab = 'general'; try{ tab = localStorage.getItem('monitor-settings-tab') || 'general'; }catch(e){}
+  const tgt = focusId && document.getElementById(focusId), pane = tgt && tgt.closest('.st-pane');
+  if(role!=='instructor') tab = 'general'; else if(pane) tab = pane.dataset.pane;
+  setSettingsTab(tab);
+  document.querySelectorAll('#settingsPanel .st-row.tip-open').forEach(r=>{ r.classList.remove('tip-open'); const i=r.querySelector('.st-i'); if(i) i.setAttribute('aria-expanded','false'); });
   document.getElementById('settingsOverlay').classList.add('open');
   openSettings._opener = document.activeElement;
   const target = focusId && document.getElementById(focusId);
@@ -5587,9 +5631,17 @@ document.getElementById('settingsPanel').addEventListener('click', e=>{
     else if(key==='cprAlgo') setCprAlgo(v);
     else if(key==='quizCloseS'){ settings.quizCloseS = +v; saveSettings(); sendStudentPrefs(); }
     else if(key==='speed'){ settings.speed = +v; saveSettings(); if(!scenario.active || (!scenario.playing && scenario.t===0)) setCaseSpeed(+v); }
-    else if(key==='fichaCollapsed'){ settings.fichaCollapsed = v==='1'; saveSettings(); }
+    else if(key==='fichaMode'){
+      settings.showFicha = v==='collapsed' || v==='expanded';
+      settings.showEcg12 = v!=='off';
+      if(settings.showFicha) settings.fichaCollapsed = v==='collapsed';
+      saveSettings(); updateRhythmInfo(state.rhythm); syncInstructorColumns();
+    }
     refreshSettingsUI(); return;
   }
+  const info = e.target.closest('.st-i');
+  if(info){ const row = info.closest('.st-row'), open = !row.classList.contains('tip-open');
+    row.classList.toggle('tip-open', open); info.setAttribute('aria-expanded', open ? 'true':'false'); return; }
   const sw = e.target.closest('.st-sw');
   if(sw){
     const key = sw.dataset.set; settings[key] = settings[key]===false; saveSettings();
