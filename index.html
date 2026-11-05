@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Monitor de Constantes — Simulador</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1236,6 +1236,19 @@
   .badge-count{ display:inline-flex; align-items:center; gap:2px; margin-left:6px; padding-left:6px; border-left:1px solid var(--line); color:var(--ecg); }
   .badge-count svg{ width:12px; height:12px; }
   .badge-count.zero{ color:var(--text-dim); }
+
+  /* App instalada en iPhone/iPad: la barra de estado del sistema (hora, batería) es translúcida y se
+     superpone a la página; se deja su hueco para que no quede nada debajo. */
+  #appWrap header{ padding-top:calc(6px + env(safe-area-inset-top, 0px)); }
+  .wrap{ padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px)); }
+  /* aviso de versión nueva */
+  #updateBar{ position:fixed; left:50%; bottom:max(14px, env(safe-area-inset-bottom, 0px)); transform:translate(-50%, 20px); z-index:97;
+    display:flex; align-items:center; gap:10px; padding:10px 10px 10px 14px; border-radius:10px; max-width:calc(100vw - 24px);
+    background:#0b1113; color:#e6f2ee; border:1px solid #2a3a33; border-left:3px solid #35ff6b; box-shadow:0 12px 36px rgba(0,0,0,.5);
+    font-size:13px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
+  #updateBar.open{ opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+  #updateBar .ub-go{ background:#35ff6b; color:#04140b; border:none; border-radius:6px; padding:7px 12px; font-weight:700; font-family:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  #updateBar .ub-x{ background:transparent; border:none; color:#8a979b; font-size:18px; cursor:pointer; padding:0 4px; }
 </style>
 </head>
 <body>
@@ -1787,6 +1800,11 @@
   </div>
 </div>
 
+<div id="updateBar" role="status" aria-live="polite">
+  <span>Hay una versión nueva de la app.</span>
+  <button type="button" class="ub-go" onclick="reloadApp()">Actualizar</button>
+  <button type="button" class="ub-x" onclick="document.getElementById('updateBar').classList.remove('open')" aria-label="Ahora no">×</button>
+</div>
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
   <aside id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="st-head"><h2 id="settingsTitle">Configuración</h2><button type="button" class="st-x" onclick="closeSettings()" aria-label="Cerrar configuración">✕</button></div>
@@ -1794,6 +1812,7 @@
       <section class="st-sec"><h3>Aspecto y ayuda</h3>
         <div class="st-row"><span>Tema</span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button></div></div>
         <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
+        <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
       <section class="st-sec"><h3>Sala</h3>
         <div class="st-row"><span>Sala actual<small class="mono" id="stRoom">—</small></span><button type="button" class="st-go" onclick="leaveRoom(true)">Cambiar</button></div>
@@ -4952,6 +4971,44 @@ function updateStudentCount(){
   const r = document.getElementById('stRoom');
   if(r && roomCode) r.textContent = 'Sala '+roomCode+' · '+txt;
 }
+
+
+/* ---------- Actualizaciones de la app ----------
+   En la app instalada en iPhone/iPad no existe "tirar hacia abajo para recargar". La app comprueba
+   sola si hay una versión nueva (al volver a ella y cada 10 min) y ofrece "Actualizar"; al recargar
+   vuelve a entrar automáticamente en la misma sala y con el mismo rol. */
+var appVersionHash = null;
+function textHash(t){ let h = 5381; for(let i=0;i<t.length;i++) h = ((h<<5)+h + t.charCodeAt(i))|0; return h; }
+async function checkForUpdate(){
+  if(location.protocol==='file:') return;
+  try{
+    const r = await fetch(location.href.split('#')[0], { cache:'no-store' });
+    if(!r.ok) return;
+    const h = textHash(await r.text());
+    if(appVersionHash===null){ appVersionHash = h; return; }
+    if(h!==appVersionHash){
+      document.getElementById('updateBar').classList.add('open');
+      const st = document.getElementById('stUpdate'); if(st) st.textContent = 'Hay una versión nueva disponible';
+    }
+  }catch(e){}
+}
+function reloadApp(){
+  try{ if(role && roomCode) sessionStorage.setItem('monitor-rejoin', JSON.stringify({ role, room:roomCode })); }catch(e){}
+  try{ if(navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(r=>r && r.update()).catch(()=>{}); }catch(e){}
+  location.reload();
+}
+window.addEventListener('load', ()=>setTimeout(checkForUpdate, 1500));
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkForUpdate(); });
+setInterval(checkForUpdate, 10*60*1000);
+// tras "Actualizar": volver a la misma sala
+(function(){
+  let j = null; try{ j = JSON.parse(sessionStorage.getItem('monitor-rejoin')||'null'); sessionStorage.removeItem('monitor-rejoin'); }catch(e){}
+  if(!j || !/^\d{4}$/.test(j.room||'') || (j.role!=='instructor' && j.role!=='monitor')) return;
+  const go = ()=>{ if(typeof supabase==='undefined') return setTimeout(go, 200);
+    connectRoom._guided = true; // sin volver a lanzar la guía
+    selectRole(j.role); document.getElementById('roomCodeInput').value = j.room; connectRoom(); };
+  setTimeout(go, 0);
+})();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
