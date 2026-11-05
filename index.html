@@ -1161,6 +1161,20 @@
   @media (max-width:760px) and (orientation:portrait){
     body.waves-expanded .quiz-card{ transform:rotate(90deg); width:min(82dvh,520px); max-width:none; max-height:88vw; }
   }
+
+  /* botón 📺: amplía/reduce solo el monitor del alumno (instructor) */
+  .waves-remote-btn{
+    position:absolute; right:42px; bottom:6px; z-index:4; width:30px; height:30px; padding:0;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:rgba(5,8,10,.55); color:#c9d3d6; border:1px solid rgba(255,255,255,.18); border-radius:6px;
+    opacity:.75; transition:opacity .15s, background .15s, color .15s, border-color .15s;
+  }
+  .waves-remote-btn svg{ width:17px; height:17px; }
+  .waves-remote-btn:hover, .waves-remote-btn:focus-visible{ opacity:1; background:rgba(5,8,10,.85); }
+  .waves-remote-btn.on{ opacity:1; color:#35ff6b; border-color:#35ff6b; background:rgba(53,255,107,.12); box-shadow:0 0 8px rgba(53,255,107,.35); }
+  body.role-monitor .waves-remote-btn{ display:none; }
+  body .waves.expanded .waves-remote-btn{ width:min(36px,9cqh); height:min(36px,9cqh); right:calc(12px + min(36px,9cqh)); bottom:6px; }
+  body.role-instructor .waves.expanded .wx-vitals{ padding-right:calc(2*min(36px,9cqh) + 6px + 1.5cqw); }
 </style>
 </head>
 <body>
@@ -1370,6 +1384,9 @@
           <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
         </div>
+        <button type="button" class="waves-remote-btn" id="wavesRemoteBtn" onclick="toggleStudentWaves()" aria-pressed="false" aria-label="Ampliar el monitor del alumno" title="Ampliar el monitor del alumno">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="16" height="11" rx="1.6"/><path d="M7 17.5h6M10 14v3.5"/><path d="M11.5 6h3v3M8.5 11.2h-3v-3M14.5 6l-3 3M5.5 11.2l3-3"/></svg>
+        </button>
         <button type="button" class="waves-expand-btn" id="wavesExpandBtn" onclick="toggleWavesExpand()" aria-label="Ampliar monitor" title="Ampliar monitor">
           <svg class="ic-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>
           <svg class="ic-collapse" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 6H10V2.5M2.5 10H6v3.5M10 6l4-4M6 10l-4 4"/></svg>
@@ -1859,6 +1876,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'case_view'}, (msg)=> applyRemoteCaseView(msg.payload));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
+    channel.on('broadcast', {event:'waves_state'}, (msg)=> setStudentWavesBtn(!!(msg.payload && msg.payload.open)));
     channel.on('broadcast', {event:'case_cmd'}, (msg)=> onRemoteCaseCmd(msg.payload));
   }
   // La derivación de ECG mostrada es puramente de visualización (no forma parte del estado
@@ -3895,8 +3913,8 @@ function toggleWavesExpand(force){
   const lbl = open ? 'Reducir monitor' : 'Ampliar monitor';
   btn.setAttribute('aria-label', lbl); btn.title = lbl;
   if(open) syncWxVitals();
-  // el instructor amplía/reduce también el monitor del alumno (mismo formato horizontal preestablecido)
-  if(role==='instructor' && channel) channel.send({ type:'broadcast', event:'waves_expand', payload:{ open } });
+  // el alumno avisa al instructor de si tiene su monitor ampliado (para el botón 📺 del instructor)
+  if(role==='monitor' && channel) channel.send({ type:'broadcast', event:'waves_state', payload:{ open } });
   requestAnimationFrame(()=>{ [ecgSweep, spo2Sweep, respSweep].forEach(s=>s && s.resize && s.resize()); });
 }
 // copia de las constantes (valor + alarma) en la ventana ampliada
@@ -4673,6 +4691,27 @@ function closeQuizPreview(){
   sel.value = '';
   previewQuestion('', 'quiz');
   const btn = sel._cselBtn; if(btn) btn.focus({ preventScroll:true });
+}
+
+
+/* ---------- Monitor del alumno ampliado desde la consola del instructor ----------
+   El botón 📺 amplía o reduce solo la pantalla del alumno; el ⤢ solo la del instructor. */
+var studentWavesOpen = false;
+function setStudentWavesBtn(open){
+  studentWavesOpen = !!open;
+  const b = document.getElementById('wavesRemoteBtn'); if(!b) return;
+  b.classList.toggle('on', studentWavesOpen);
+  b.setAttribute('aria-pressed', studentWavesOpen?'true':'false');
+  const t = studentWavesOpen ? 'Reducir el monitor del alumno' : 'Ampliar el monitor del alumno';
+  b.title = t; b.setAttribute('aria-label', t);
+}
+function toggleStudentWaves(){
+  if(role!=='instructor') return;
+  const b = document.getElementById('wavesRemoteBtn');
+  if(!channel){ b.title = 'Sin conexión con el alumno'; b.animate && b.animate([{transform:'translateX(-2px)'},{transform:'translateX(2px)'},{transform:'none'}],{duration:220}); return; }
+  const open = !studentWavesOpen;
+  channel.send({ type:'broadcast', event:'waves_expand', payload:{ open } });
+  setStudentWavesBtn(open); // se confirma (o corrige) con el aviso que devuelve el alumno
 }
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
