@@ -1198,7 +1198,10 @@
 
   /* ---------- Menú de configuración (instructor) ---------- */
   .settings-btn svg{ width:17px; height:17px; }
-  body.role-instructor header .helpBtn, body.role-instructor header .themeToggle{ display:none; }
+  header .helpBtn, header .themeToggle{ display:none !important; }
+  body.role-monitor .st-room .st-row:not(:last-child){ display:none; }
+  body.role-monitor .st-room .st-row:last-child{ border-bottom:none; }
+  body.role-monitor .header-row .settings-btn{ order:6; flex-shrink:0; }
   body.role-instructor .quiz-right .quiz-algo-row, body.role-instructor #btnQuizMore, body.role-instructor .cpr-head .algo-seg{ display:none !important; }
   .algo-tag{ margin-left:auto; font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--ecg); background:transparent;
     border:1px solid color-mix(in srgb, var(--ecg) 45%, transparent); border-radius:4px; padding:2px 7px; cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0; }
@@ -1669,7 +1672,7 @@
             <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
         </div>
-        <button type="button" class="theme-btn settings-btn instructor-only" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Menú de configuración" aria-label="Menú de configuración">
+        <button type="button" class="theme-btn settings-btn" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Menú de configuración" aria-label="Menú de configuración">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12"/></svg>
         </button>
       </div>
@@ -2091,29 +2094,29 @@
         <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
         <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
-      <section class="st-sec"><h3>Sala</h3>
+      <section class="st-sec st-room"><h3>Sala</h3>
         <div class="st-row"><span>Sala actual<small class="mono" id="stRoom">—</small></span><button type="button" class="st-go" onclick="leaveRoom(true)">Cambiar</button></div>
         <div class="st-row"><span>Avisar cuando se conecte un alumno<small>Notificación discreta en la esquina</small></span><button type="button" class="st-sw" role="switch" data-set="notifyJoin" aria-label="Avisar cuando se conecte un alumno"></button></div>
         <div class="st-row"><span>Salir al inicio<small>Para cambiar de rol o de sala</small></span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
       </section>
-      <section class="st-sec"><h3>Preguntas</h3>
+      <section class="st-sec instructor-only"><h3>Preguntas</h3>
         <div class="st-row" id="settingsAlgo"><span>Algoritmo de RCP<small>Preguntas y barra «Q. RCP»</small></span><div class="st-seg" data-set="cprAlgo" role="group" aria-label="Algoritmo de RCP"><button type="button" data-v="AHA">AHA</button><button type="button" data-v="ERC">ERC</button></div></div>
         <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span>Gestionar preguntas<small>Crear, editar o eliminar</small></span><span class="st-chev" aria-hidden="true">›</span></button>
         <div class="st-row"><span>Cerrar la pregunta del alumno tras contestar</span><div class="st-seg" data-set="quizCloseS" role="group" aria-label="Segundos hasta cerrar la pregunta"><button type="button" data-v="1">1 s</button><button type="button" data-v="3">3 s</button><button type="button" data-v="5">5 s</button></div></div>
       </section>
-      <section class="st-sec"><h3>Casos clínicos</h3>
+      <section class="st-sec instructor-only"><h3>Casos clínicos</h3>
         <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span>Editor de casos<small>Crear o modificar casos</small></span><span class="st-chev" aria-hidden="true">›</span></button>
         <div class="st-row"><span>Pausar el caso al llegar a la parada<small>El caso se detiene y espera a que confirmes; el alumno ve el aviso al continuar</small></span><button type="button" class="st-sw" role="switch" data-set="pauseOnArrest" aria-label="Pausar el caso al llegar a la parada"></button></div>
         <div class="st-row"><span>Velocidad por defecto</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
       </section>
-      <section class="st-sec"><h3>Pantalla del alumno</h3>
+      <section class="st-sec instructor-only"><h3>Pantalla del alumno</h3>
         <div class="st-row"><span>Ver el caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
         <div class="st-row"><span>Puede usar los botones del caso<small>⏮ ▶ ⏭ ⟲</small></span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
         <div class="st-row"><span>Nombre del ritmo en el ECG proyectado<small>Valor inicial de la casilla al abrir un ECG</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
         <div class="st-row"><span>Parpadeo rojo al perder el pulso<small>Si se desactiva, el aviso «SIN PULSO» aparece sin parpadear</small></span><button type="button" class="st-sw" role="switch" data-set="noPulseFlash" aria-label="Parpadeo rojo al perder el pulso"></button></div>
         <div class="st-row"><span>Mostrar temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
       </section>
-      <section class="st-sec"><h3>Este dispositivo</h3>
+      <section class="st-sec instructor-only"><h3>Este dispositivo</h3>
         <div class="st-row"><span>Pantalla encendida al ampliar</span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
         <div class="st-row"><span>Ficha del ritmo<small>Definición, claves del ECG y particularidades, en la pestaña Ritmo</small></span><button type="button" class="st-sw" role="switch" data-set="showFicha" aria-label="Mostrar la ficha del ritmo"></button></div>
         <div class="st-row"><span>ECG de 12 derivaciones<small>Aunque la ficha esté desactivada</small></span><button type="button" class="st-sw" role="switch" data-set="showEcg12" aria-label="Mostrar el ECG de 12 derivaciones"></button></div>
@@ -4054,8 +4057,7 @@ const GUIDE_STEPS = {
     ...GUIDE_MONITOR_PARTS,
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.' },
     { sel:'#wavesExpandBtn', text:'Amplía el monitor a pantalla completa.', sub:'El instructor también puede ampliarlo desde su consola, y enviarte preguntas, fichas de ritmos o un ECG en directo.' },
-    { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
-    { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
+    { sel:'#settingsBtn', text:'En ☰ tienes el tema, esta guía y «Actualizar la app».', sub:'La pantalla del monitor siempre queda oscura, aunque elijas el tema claro.' }
   ]
 };
 let guideSteps = [], guideIdx = 0;
@@ -5340,7 +5342,7 @@ function manageQuestions(){
 }
 // Salir de la sala: se recarga la app (vuelve a la pantalla de inicio); "Cambiar" va directo a crear otra sala
 async function leaveRoom(change){
-  const msg = change ? '¿Cambiar de sala?\n\nEl alumno quedará desconectado hasta que entre en la nueva.' : '¿Salir al inicio?\n\nSe cerrará la sala actual.';
+  const msg = change ? '¿Cambiar de sala?\n\nEl alumno quedará desconectado hasta que entre en la nueva.' : (role==='monitor' ? '¿Salir al inicio?\n\nDejarás de ver el monitor de esta sala.' : '¿Salir al inicio?\n\nSe cerrará la sala actual.');
   if(!(await appConfirm(msg, { ok: change ? 'Cambiar' : 'Salir', danger:true }))) return;
   try{ if(change) sessionStorage.setItem('monitor-change-room', role||'instructor'); }catch(e){}
   try{ if(channel) channel.unsubscribe(); }catch(e){}
