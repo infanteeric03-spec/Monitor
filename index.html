@@ -1152,6 +1152,15 @@
     .quiz-right .casebtns .casebtn > span[aria-hidden]{ display:none; }
     .quiz-right .algo-seg button{ padding-left:8px; padding-right:8px; }
   }
+
+  /* pregunta del alumno por encima del monitor ampliado (y girada igual que él en el móvil en vertical) */
+  #quizOverlay{ z-index:88; }
+  body.waves-expanded #quizOverlay{ background:rgba(2,4,5,.55); }
+  body.waves-expanded .quiz-card{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; box-shadow:0 14px 40px rgba(0,0,0,.6); max-height:86vh; overflow:auto; }
+  @media (max-width:760px) and (orientation:portrait){
+    body.waves-expanded .quiz-card{ transform:rotate(90deg); width:min(82dvh,520px); max-width:none; max-height:88vw; }
+  }
 </style>
 </head>
 <body>
@@ -2522,6 +2531,7 @@ function showQuestionOnMonitor(payload){
   document.getElementById('quizCardOptions').innerHTML = payload.options.map((op,i)=>
     '<button class="quiz-btn" onclick="answerQuestion(\''+payload.id+'\','+i+')"><span class="quiz-opt-letter">'+letters[i]+'</span><span>'+op+'</span></button>'
   ).join('');
+  clearTimeout(answerQuestion._t);
   document.getElementById('quizSentMsg').style.display = 'none';
   document.getElementById('quizOverlay').style.display = 'flex';
 }
@@ -2530,8 +2540,13 @@ function hideQuestionOnMonitor(){
 }
 function answerQuestion(id, optionIndex){
   document.querySelectorAll('#quizCardOptions .quiz-btn').forEach(b=>b.disabled = true);
-  document.getElementById('quizSentMsg').style.display = 'block';
+  const msg = document.getElementById('quizSentMsg');
+  msg.textContent = 'Respuesta enviada.';
+  msg.style.display = 'block';
   if(channel) channel.send({ type:'broadcast', event:'answer', payload:{ id, optionIndex }});
+  // una vez contestada, el panel de la pregunta se cierra solo
+  clearTimeout(answerQuestion._t);
+  answerQuestion._t = setTimeout(hideQuestionOnMonitor, 1400);
 }
 
 /* ---------- Motor de casos clínicos ---------- */
@@ -3870,6 +3885,7 @@ function toggleWavesExpand(force){
     w.parentNode.insertBefore(wavesPlaceholder, w);
   } else if(wavesPlaceholder){ wavesPlaceholder.remove(); wavesPlaceholder = null; }
   w.classList.toggle('expanded', open);
+  document.body.classList.toggle('waves-expanded', open);
   if(open){ w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-label','Monitor ampliado'); }
   else { w.removeAttribute('role'); w.removeAttribute('aria-modal'); w.removeAttribute('aria-label'); }
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
