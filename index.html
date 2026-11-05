@@ -4338,11 +4338,9 @@ function rhythmBodyHTML(i){
     + '<p class="ri-src">Basado en las guías ESC/SEC y en las recomendaciones de soporte vital ERC/AHA. Uso formativo.</p>';
 }
 const RI_CHEV = '<svg class="ri-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
-let rhythmInfoCollapsed = false;
-try{ rhythmInfoCollapsed = localStorage.getItem('monitor-ri-collapsed')==='1'; }catch(e){}
+let rhythmInfoCollapsed = true; // la ficha empieza contraída al abrir la app
 function toggleRhythmInfo(){
   rhythmInfoCollapsed = !rhythmInfoCollapsed;
-  try{ localStorage.setItem('monitor-ri-collapsed', rhythmInfoCollapsed?'1':'0'); }catch(e){}
   const el = document.getElementById('rhythmInfo');
   el.classList.toggle('collapsed', rhythmInfoCollapsed);
   const h = el.querySelector('.ri-head'); if(h) h.setAttribute('aria-expanded', rhythmInfoCollapsed?'false':'true');
