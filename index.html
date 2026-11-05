@@ -1342,6 +1342,29 @@
     body.role-instructor .badge-count{ margin-left:3px; padding-left:3px; }
     body.role-instructor .header-row .sync-label{ display:none; }
   }
+
+  /* ---------- Móvil en horizontal (instructor): panel derecho más compacto ---------- */
+  @media (orientation:landscape) and (max-height:560px){
+    body.role-instructor .tab-btn{ white-space:nowrap; font-size:11px; letter-spacing:.04em; padding-left:4px; padding-right:4px; }
+    body.role-instructor .rhythm-pick{ min-width:0; width:100%; }
+    body.role-instructor #rhythmSelect + .csel-btn{ min-width:0; }
+    body.role-instructor .rhythm-send .lbl{ display:none; }
+    body.role-instructor .rhythm-send{ padding-left:10px; padding-right:10px; }
+    body.role-instructor #paneRhythm .controls{ gap:8px; }
+    body.role-instructor #paneRhythm .controls > div:first-child{ flex:1 1 100%; min-width:0; }
+    body.role-instructor #paneRhythm .controls > #pulseBadge{ display:none; }
+    body.role-instructor .rhythm-info{ margin-top:8px; padding:8px 10px; }
+    body.role-instructor .rhythm-info .ri-head-k{ display:none; }
+    body.role-instructor .rhythm-info .ri-head-t{ font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    body.role-instructor .vital-card .vital-value{ min-width:0; overflow:hidden; }
+    body.role-instructor .vital-card .stepper button{ min-width:28px; padding-left:4px; padding-right:4px; font-size:12px; }
+    body.role-instructor #cardTemp .vital-value{ font-size:min(22px, 5.4vh); }
+  }
+  /* botón compacto para abrir el ECG cuando la ficha del ritmo está desactivada */
+  .rhythm-info.ecg-only{ display:flex; align-items:center; gap:10px; padding:8px 10px; cursor:pointer; }
+  .rhythm-info.ecg-only .ri-thumb{ float:none; margin:0; width:64px; flex-shrink:0; }
+  .rhythm-info.ecg-only .ri-eo-t{ font-size:13px; font-weight:600; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rhythm-info.ecg-only .ri-eo-t small{ display:block; font-weight:400; color:var(--text-dim); font-size:11px; }
 </style>
 </head>
 <body>
@@ -1929,6 +1952,8 @@
       </section>
       <section class="st-sec"><h3>Este dispositivo</h3>
         <div class="st-row"><span>Pantalla encendida al ampliar</span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
+        <div class="st-row"><span>Ficha del ritmo<small>Definición, claves del ECG y particularidades, en la pestaña Ritmo</small></span><button type="button" class="st-sw" role="switch" data-set="showFicha" aria-label="Mostrar la ficha del ritmo"></button></div>
+        <div class="st-row"><span>ECG de 12 derivaciones<small>Aunque la ficha esté desactivada</small></span><button type="button" class="st-sw" role="switch" data-set="showEcg12" aria-label="Mostrar el ECG de 12 derivaciones"></button></div>
         <div class="st-row"><span>Ficha del ritmo al abrir</span><div class="st-seg" data-set="fichaCollapsed" role="group" aria-label="Ficha del ritmo al abrir"><button type="button" data-v="1">Contraída</button><button type="button" data-v="0">Desplegada</button></div></div>
       </section>
     </div>
@@ -2394,7 +2419,7 @@ let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 /* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
-var SETTINGS_DEF = { cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
+var SETTINGS_DEF = { showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
 var settings = Object.assign({}, SETTINGS_DEF);
 try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
 let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
@@ -4842,10 +4867,23 @@ function updateRhythmInfo(r){
   if(typeof onRhythmChangedForShare==='function') onRhythmChangedForShare(r);
   const i = RHYTHM_INFO[r];
   if(!i){ el.innerHTML = ''; return; }
+  const showFicha = !(typeof settings!=='undefined' && settings.showFicha===false);
+  const showEcg = !(typeof settings!=='undefined' && settings.showEcg12===false);
+  el.classList.remove('ecg-only');
+  if(!showFicha){
+    // sin ficha: solo un acceso compacto al ECG de 12 derivaciones (o nada, si también está desactivado)
+    el.classList.remove('collapsed');
+    if(!showEcg){ el.innerHTML = ''; return; }
+    el.classList.add('ecg-only');
+    el.innerHTML = rhythmThumbHTML(r,i,false) + '<span class="ri-eo-t">ECG de 12 derivaciones<small>'+escapeHtml(i.t)+'</small></span>';
+    el.onclick = (e)=>{ if(!e.target.closest('.ri-thumb')) openEcg12(r); };
+    return;
+  }
+  el.onclick = null;
   el.classList.toggle('collapsed', rhythmInfoCollapsed);
   el.innerHTML = '<button type="button" class="ri-head" onclick="toggleRhythmInfo()" aria-expanded="'+(rhythmInfoCollapsed?'false':'true')+'" aria-controls="rhythmInfoBody">'
     + '<span class="ri-head-k">Ficha del ritmo</span><span class="ri-head-t">'+escapeHtml(i.t)+'</span>'+RI_CHEV+'</button>'
-    + '<div class="ri-body" id="rhythmInfoBody">'+rhythmThumbHTML(r,i,false)+rhythmBodyHTML(i)+'</div>';
+    + '<div class="ri-body" id="rhythmInfoBody">'+(showEcg ? rhythmThumbHTML(r,i,false) : '')+rhythmBodyHTML(i)+'</div>';
 }
 /* vista del alumno: ficha enviada por el instructor, debajo de las constantes */
 var rhythmShareKey = null;
@@ -5076,6 +5114,7 @@ document.getElementById('settingsPanel').addEventListener('click', e=>{
   if(sw){
     const key = sw.dataset.set; settings[key] = settings[key]===false; saveSettings();
     if(key==='wake') updateWakeLock();
+    if(key==='showFicha' || key==='showEcg12'){ updateRhythmInfo(state.rhythm); syncInstructorColumns(); }
     if(['showCase','caseButtons','showTemp'].includes(key)) sendStudentPrefs();
     refreshSettingsUI();
   }
@@ -5186,7 +5225,7 @@ function syncInstructorColumns(){
   const on = role==='instructor' && matchMedia('(min-width:761px) and (min-height:561px)').matches
            && !document.querySelector('.waves.expanded');
   if(!on){ tp.style.minHeight=''; v.style.height=''; v.classList.remove('col-synced'); return; }
-  const fichaClosed = document.getElementById('rhythmInfo')?.classList.contains('collapsed');
+  const ri = document.getElementById('rhythmInfo'); const fichaClosed = ri && (ri.classList.contains('collapsed') || settings.showFicha===false);
   if(currentTab==='rhythm' && fichaClosed){
     const prev = tp.style.minHeight; tp.style.minHeight = '';
     syncInstructorColumns.ref = tp.offsetHeight;
