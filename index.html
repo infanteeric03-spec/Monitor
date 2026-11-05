@@ -5262,11 +5262,15 @@ function syncInstructorColumns(){
     syncInstructorColumns.ref = tp.offsetHeight;
     tp.style.minHeight = prev;
   }
-  const ref = syncInstructorColumns.ref; if(!ref) return;
-  tp.style.minHeight = ref+'px';
-  // la columna de constantes termina donde termina la tarjeta de pestañas en el estado de referencia
+  let ref = syncInstructorColumns.ref; if(!ref) return;
   const top = w.getBoundingClientRect().top, vTop = v.getBoundingClientRect().top;
   const gap = parseFloat(getComputedStyle(document.querySelector('.monitor-left')).rowGap) || 10;
+  // altura mínima que necesitan las constantes; si la pestaña es más baja (p. ej. sin ficha ni ECG),
+  // es la tarjeta de pestañas la que se alarga para que ambos bordes inferiores coincidan
+  const prevH = v.style.height; v.style.height = ''; v.classList.remove('col-synced');
+  const vNat = v.offsetHeight; v.style.height = prevH;
+  ref = Math.max(ref, vNat - w.offsetHeight - gap + (vTop - top));
+  tp.style.minHeight = ref+'px';
   v.style.height = (w.offsetHeight + gap + ref - (vTop - top))+'px';
   v.classList.add('col-synced');
 }
