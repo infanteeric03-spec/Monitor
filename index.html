@@ -22,7 +22,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta name="theme-color" content="#02163c">
+<meta name="theme-color" content="#05080a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1282,7 +1282,7 @@
   // Tema guardado en este dispositivo (claro/oscuro); se aplica antes de pintar nada para que no "parpadee"
   (function(){
     var t = null; try{ t = localStorage.getItem('monitor-theme'); }catch(e){}
-    if(t==='light'){ document.body.classList.add('theme-light'); document.documentElement.classList.add('light-root'); }
+    if(t==='light'){ document.body.classList.add('theme-light'); }
   })();
 </script>
 
@@ -2040,6 +2040,7 @@ function connectRoom(){
   channel.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       document.body.classList.add(role==='monitor' ? 'role-monitor' : 'role-instructor');
+      refreshThemeUI();
       document.getElementById('roomBadgeText').innerHTML = (role==='instructor' ? '<span class="badge-role">Instructor · </span>' : '') + 'Sala '+escapeHtml(roomCode)
         + (role==='instructor' ? '<span class="badge-count" id="badgeCount" title="Alumnos conectados"></span>' : '');
       try{ channel.track({ role, at: Date.now() }); }catch(e){}
@@ -3886,13 +3887,16 @@ function refreshThemeUI(){
     b.title = light ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro';
     b.setAttribute('aria-label', b.title);
   });
+  // La pantalla de inicio es siempre oscura: hasta entrar en la sala, la barra de estado del
+  // sistema (que en iPadOS/iOS 26 toma este color) también lo es, aunque el tema sea claro.
+  const inApp = document.body.classList.contains('role-instructor') || document.body.classList.contains('role-monitor');
+  document.documentElement.classList.toggle('light-root', light && inApp);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', light ? '#eef2f3' : '#02163c');
+  if(meta) meta.setAttribute('content', (light && inApp) ? '#eef2f3' : '#05080a');
 }
 function toggleTheme(){
   const light = !document.body.classList.contains('theme-light');
   document.body.classList.toggle('theme-light', light);
-  document.documentElement.classList.toggle('light-root', light);
   try{ localStorage.setItem('monitor-theme', light ? 'light' : 'dark'); }catch(e){}
   refreshThemeUI();
 }
