@@ -1383,6 +1383,10 @@
     opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .25s, transform .25s; }
   #joinNote.open{ opacity:1; transform:none; }
   #joinNote svg{ width:14px; height:14px; color:#35ff6b; }
+
+  /* aviso de actualización: en pantallas estrechas el texto ocupa el ancho disponible */
+  #updateBar > span{ flex:1 1 auto; min-width:0; line-height:1.35; }
+  @media (max-width:520px){ #updateBar{ width:calc(100vw - 24px); } }
 </style>
 </head>
 <body>
@@ -3847,23 +3851,28 @@ const GUIDE_STEPS = {
   instructor: [
     { text:'¡Bienvenido al simulador!', sub:'Te enseñamos lo básico en unos pocos pasos.' },
     ...GUIDE_MONITOR_PARTS,
-    { text:'Ahora, los controles del instructor.', sub:'Todo lo que cambies aquí lo verá el alumno en su monitor.' },
+    { sel:'.vitals', hand:false, text:'Ahora, los controles del instructor.', sub:'Con − y + cambias cada constante; el alumno lo ve en su monitor al momento.' },
+    { sel:'#wavesRemoteBtn', text:'📺 amplía el monitor del alumno; ⤢ amplía solo el tuyo.', sub:'Mientras el alumno lo tiene ampliado, el botón 📺 se queda encendido.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
-    { sel:'#cardHr .stepper', text:'Toca − y + para ajustar cada constante.', sub:'La cifra grande cambia al momento.' },
+    { sel:'#btnSendRhythm', text:'Con «Enviar» el alumno ve el nombre del ritmo y su ficha.', sub:'Vuelve a pulsarlo (✕ Retirar) para quitárselo; también se retira solo al cambiar de ritmo.', before:()=>switchTab('rhythm') },
     { sel:'#pulseSwitch', text:'Apaga el pulso para simular una AESP.', sub:'En FV y asistolia se bloquea solo.', before:()=>switchTab('rhythm') },
+    { sel:'#rhythmInfo', hand:false, text:'La ficha del ritmo y su ECG de 12 derivaciones.', sub:'Toca la miniatura para ampliarlo: puedes hacer zoom, anotar y mostrarlo en directo al alumno.', before:()=>switchTab('rhythm') },
+    { sel:'#caseSelect + .csel-btn', alt:'#tabBtnCase', text:'Lanza un caso clínico paso a paso.', sub:'El alumno ve la evolución del caso, el tiempo y, si lo permites, sus botones.', before:()=>switchTab('case') },
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
     { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
       sub:'Ábrela para enviar al alumno preguntas de la fase en curso: FV/TVSP, asistolia/AESP o tras la RCE.', before:()=>switchTab('case') },
-
+    { sel:'#quizCat + .csel-btn', text:'Elige una categoría y una pregunta, y envíala al monitor.', sub:'Al contestar, el alumno ve su respuesta enviada y la pregunta se cierra sola.', before:()=>switchTab('quiz') },
     { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con 📨.' },
+    { sel:'#roomBadge', text:'Tu sala y cuántos alumnos hay conectados.', sub:'Comparte el código para que se unan; te avisamos cuando entre alguien.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
-    { sel:'#settingsBtn', text:'En ⚙ Configuración tienes el resto de opciones.',
-      sub:'Tema, esta guía, algoritmo de RCP (ERC por defecto), gestión de preguntas y casos, y qué ve el alumno.' }
+    { sel:'#settingsBtn', text:'En ☰ Configuración tienes el resto de opciones.',
+      sub:'Tema, esta guía, actualizar la app, algoritmo de RCP (ERC por defecto), preguntas y casos, y qué ve el alumno.' }
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
     ...GUIDE_MONITOR_PARTS,
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.' },
+    { sel:'#wavesExpandBtn', text:'Amplía el monitor a pantalla completa.', sub:'El instructor también puede ampliarlo desde su consola, y enviarte preguntas, fichas de ritmos o un ECG en directo.' },
     { sel:'header .themeToggle', text:'Cambia entre tema claro y oscuro.', sub:'La pantalla del monitor siempre queda oscura.' },
     { sel:'header .helpBtn', text:'Puedes volver a ver esta guía cuando quieras.' }
   ]
