@@ -1140,9 +1140,17 @@
     border:1px solid var(--line); color:var(--text-dim); font-size:17px; line-height:1; cursor:pointer; }
   .qp-close:hover{ color:var(--text); border-color:var(--text-dim); }
   @media (max-width:760px){
-    .quiz-right{ width:100%; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; }
-    .quiz-right .casebtns{ margin:0; }
-    .quiz-right .quiz-algo-row{ order:2; }
+    .quiz-right{ width:100%; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:space-between; gap:6px; }
+    .quiz-right .casebtns{ margin:0; flex-wrap:nowrap; gap:6px; min-width:0; }
+    .quiz-right .quiz-algo-row{ order:2; flex-shrink:0; }
+    .quiz-right .quiz-algo-row > span{ display:none; }   /* sin "Q. RCP" en el móvil */
+    .quiz-right .algo-seg button{ padding-left:10px; padding-right:10px; }
+    .quiz-right .casebtns .casebtn{ white-space:nowrap; }
+  }
+  @media (max-width:390px){
+    .quiz-right .casebtns .casebtn{ padding-left:8px; padding-right:8px; font-size:12.5px; }
+    .quiz-right .casebtns .casebtn > span[aria-hidden]{ display:none; }
+    .quiz-right .algo-seg button{ padding-left:8px; padding-right:8px; }
   }
 </style>
 </head>
