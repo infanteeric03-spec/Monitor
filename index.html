@@ -1306,6 +1306,25 @@
     border:1px solid rgba(255,196,77,.45); border-left:3px solid #ffc44d; box-shadow:0 12px 36px rgba(0,0,0,.5);
     font-size:13px; line-height:1.4; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
   #toast.open{ opacity:1; transform:translate(-50%,0); }
+
+  /* Móvil en vertical: la barra "BOX 3 · URG / hora" vuelve a su altura original (sin el cm extra) */
+  @media (max-width:760px) and (orientation:portrait){
+    .gate-bar{ top:max(16px, env(safe-area-inset-top, 0px)); }
+  }
+  /* Móvil en horizontal: pantalla de inicio como en tablet/ordenador (roles uno al lado del otro,
+     título grande y bloque centrado), compactada para la poca altura */
+  @media (orientation:landscape) and (max-height:600px) and (min-width:560px){
+    .gate-bar{ top:max(10px, env(safe-area-inset-top, 0px)); left:max(18px, env(safe-area-inset-left, 0px)); right:max(18px, env(safe-area-inset-right, 0px)); }
+    #gate .gate-box{ max-width:min(680px, 86vw); }
+    #gate .gate-ecg{ height:64px; margin-top:-32px; margin-bottom:2px; }
+    #gate .gate-box h2.gate-kicker{ font-size:clamp(22px, 4.2vw, 32px); letter-spacing:.14em; }
+    #gate .gate-box p{ font-size:13px; margin:4px 0 14px; }
+    #gate .role-cards{ flex-direction:row; gap:14px; }
+    #gate .role-card{ flex:1 1 0; padding:12px 14px 12px 18px; }
+    #gate .role-card .name{ font-size:20px; }
+    #gate #gateRoomStep{ max-width:400px; margin:0 auto; }
+    .gate-foot{ display:block; bottom:max(8px, env(safe-area-inset-bottom, 0px)); font-size:10px; }
+  }
 </style>
 </head>
 <body>
