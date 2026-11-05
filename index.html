@@ -1396,6 +1396,16 @@
   /* aviso de actualización: en pantallas estrechas el texto ocupa el ancho disponible */
   #updateBar > span{ flex:1 1 auto; min-width:0; line-height:1.35; }
   @media (max-width:520px){ #updateBar{ width:calc(100vw - 24px); } }
+
+  /* "Sinc" como botón pulsable: verde = sincronizado, gris = no sincronizado */
+  .sync-pill{ display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 11px; border-radius:6px; cursor:pointer;
+    font-family:var(--font-num); font-size:12px; font-weight:700; letter-spacing:.06em;
+    background:transparent; color:var(--text-dim); border:1px solid var(--line); transition:background .15s, color .15s, border-color .15s; }
+  .sync-pill .sp-dot{ width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.6; }
+  .sync-pill.on{ color:var(--ecg); border-color:color-mix(in srgb, var(--ecg) 60%, transparent); background:color-mix(in srgb, var(--ecg) 12%, transparent); }
+  .sync-pill.on .sp-dot{ opacity:1; box-shadow:0 0 6px var(--ecg); }
+  .sync-pill:hover{ border-color:var(--text-dim); }
+  @media (max-width:760px){ .sync-pill{ height:24px; padding:0 8px; font-size:10.5px; gap:4px; } }
 </style>
 </head>
 <body>
@@ -1557,10 +1567,8 @@
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
         <div class="sync-toggle instructor-only">
-          <span class="sync-label" id="syncLabel">Sinc</span>
-          <div class="sync-switch on" id="syncSwitch" role="switch" tabindex="0" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo">
-            <div class="knob"></div>
-          </div>
+          <span class="sync-label" id="syncLabel" hidden>Sinc</span>
+          <button type="button" class="sync-pill on" id="syncSwitch" role="switch" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo"><span class="sp-dot" aria-hidden="true"></span>Sinc</button>
           <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()" aria-label="Enviar cambios al monitor">
             <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
