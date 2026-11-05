@@ -1232,6 +1232,10 @@
   @media (max-width:760px){
     body.role-monitor.pref-no-temp .vitals #cardResp, body.role-monitor.pref-no-temp .vitals #cardBp{ grid-column:span 3; }
   }
+
+  .badge-count{ display:inline-flex; align-items:center; gap:2px; margin-left:6px; padding-left:6px; border-left:1px solid var(--line); color:var(--ecg); }
+  .badge-count svg{ width:12px; height:12px; }
+  .badge-count.zero{ color:var(--text-dim); }
 </style>
 </head>
 <body>
@@ -1959,7 +1963,10 @@ function connectRoom(){
   document.getElementById('gateStatus').textContent = 'Conectando…';
 
   supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  channel = supa.channel('monitor-sala-'+roomCode, { config: { broadcast: { self:false } } });
+  // presence: cada dispositivo se anuncia con su rol, así el instructor sabe cuántos alumnos hay
+  const presenceKey = role+'-'+Math.random().toString(36).slice(2,10);
+  channel = supa.channel('monitor-sala-'+roomCode, { config: { broadcast: { self:false }, presence: { key: presenceKey } } });
+  if(role==='instructor') channel.on('presence', { event:'sync' }, ()=> updateStudentCount());
 
   if(role==='monitor'){
     channel.on('broadcast', {event:'state'}, (msg)=> applyRemoteState(msg.payload));
@@ -1987,7 +1994,10 @@ function connectRoom(){
   channel.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       document.body.classList.add(role==='monitor' ? 'role-monitor' : 'role-instructor');
-      document.getElementById('roomBadgeText').innerHTML = (role==='instructor' ? '<span class="badge-role">Instructor · </span>' : '') + 'Sala '+escapeHtml(roomCode);
+      document.getElementById('roomBadgeText').innerHTML = (role==='instructor' ? '<span class="badge-role">Instructor · </span>' : '') + 'Sala '+escapeHtml(roomCode)
+        + (role==='instructor' ? '<span class="badge-count" id="badgeCount" title="Alumnos conectados"></span>' : '');
+      try{ channel.track({ role, at: Date.now() }); }catch(e){}
+      if(role==='instructor') updateStudentCount();
       document.getElementById('roomDot').classList.add('on');
       document.getElementById('gate').style.display = 'none';
       document.getElementById('appWrap').style.display = 'block';
@@ -4852,7 +4862,7 @@ function refreshSettingsUI(){
     g.querySelectorAll('button').forEach(b=>{ const on = String(vals[g.dataset.set])===b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
   });
   document.querySelectorAll('#settingsPanel .st-sw').forEach(b=>b.setAttribute('aria-checked', settings[b.dataset.set]!==false ? 'true':'false'));
-  document.getElementById('stRoom').textContent = roomCode ? 'Sala '+roomCode : 'Sin sala';
+  document.getElementById('stRoom').textContent = roomCode ? 'Sala '+roomCode+' · '+(studentCount===1 ? '1 alumno conectado' : studentCount+' alumnos conectados') : 'Sin sala';
 }
 function openSettings(focusId){
   refreshSettingsUI();
@@ -4923,6 +4933,25 @@ function applyStudentPrefs(p){
 document.querySelectorAll('.algo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.algo===cprAlgo));
 document.querySelectorAll('.algo-tag').forEach(t=>t.textContent = 'RCP · '+cprAlgo);
 if(settings.speed && settings.speed!==1) setCaseSpeed(+settings.speed);
+
+
+/* ---------- Recuento de alumnos conectados (Supabase Presence) ---------- */
+var studentCount = 0;
+function updateStudentCount(){
+  try{
+    const st = channel ? channel.presenceState() : {};
+    studentCount = Object.values(st).filter(list=>list.some(m=>m.role==='monitor')).length;
+  }catch(e){ studentCount = 0; }
+  const txt = studentCount===1 ? '1 alumno conectado' : studentCount+' alumnos conectados';
+  const b = document.getElementById('badgeCount');
+  if(b){
+    b.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5.5" r="2.6"/><path d="M3 14c.6-2.8 2.6-4.2 5-4.2s4.4 1.4 5 4.2"/></svg>'+studentCount;
+    b.title = txt; b.setAttribute('aria-label', txt);
+    b.classList.toggle('zero', studentCount===0);
+  }
+  const r = document.getElementById('stRoom');
+  if(r && roomCode) r.textContent = 'Sala '+roomCode+' · '+txt;
+}
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
