@@ -1406,6 +1406,14 @@
   .sync-pill.on .sp-dot{ opacity:1; box-shadow:0 0 6px var(--ecg); }
   .sync-pill:hover{ border-color:var(--text-dim); }
   @media (max-width:760px){ .sync-pill{ height:24px; padding:0 8px; font-size:10.5px; gap:4px; } }
+
+  /* Fila del ritmo: el botón Enviar siempre visible y en su sitio; el nombre del ritmo se recorta con "…" */
+  #paneRhythm .controls > div:first-child{ flex:1 1 300px; min-width:0; max-width:460px; }
+  #paneRhythm .rhythm-pick{ display:flex; flex-wrap:nowrap; min-width:0; width:100%; }
+  #paneRhythm .rhythm-pick #rhythmSelect + .csel-btn{ flex:1 1 auto; min-width:0 !important; width:auto; }
+  #paneRhythm .rhythm-pick .csel-btn .csel-text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #paneRhythm .rhythm-pick .rhythm-send{ flex:0 0 auto; }
+  @media (max-width:760px){ #paneRhythm .controls > div:first-child{ flex-basis:100%; max-width:none; } }
 </style>
 </head>
 <body>
