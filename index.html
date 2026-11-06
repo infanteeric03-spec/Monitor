@@ -2371,7 +2371,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -2471,6 +2471,9 @@
         <div class="st-row"><span class="st-l">Alumno usa los controles del caso</span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
         <div class="st-row"><span class="st-l">Nombre del ritmo en el ECG <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Valor inicial de la casilla al abrir un ECG para mostrarlo al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
         <div class="st-row"><span class="st-l">Temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
+      </section>
+      <section class="st-sec"><h3>Alarmas en el monitor</h3>
+        <div class="st-row"><span class="st-l">Mostrar el parámetro alterado <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Desactivado: si salta una alarma solo cambia de color la campana. Activado: además aparece arriba en el monitor el parámetro y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»), en tu monitor y en el de los alumnos. El diagnóstico del ritmo nunca se muestra.</small></span><button type="button" class="st-sw" role="switch" data-set="alarmDetail" aria-label="Mostrar el parámetro alterado en el monitor"></button></div>
       </section>
       <section class="st-sec"><h3>Parada cardiaca</h3>
         <div class="st-row"><span class="st-l">Parpadeo rojo al perder el pulso <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Si se desactiva, el aviso «SIN PULSO» aparece igual pero sin parpadear.</small></span><button type="button" class="st-sw" role="switch" data-set="noPulseFlash" aria-label="Parpadeo rojo al perder el pulso"></button></div>
@@ -3090,7 +3093,7 @@ let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 /* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
-var SETTINGS_DEF = { pauseOnArrest:true, noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true, beep:false, alarms:false, vol:0.7 };
+var SETTINGS_DEF = { pauseOnArrest:true, noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true, beep:false, alarms:false, vol:0.7, alarmDetail:false };
 var settings = Object.assign({}, SETTINGS_DEF);
 try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
 let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
@@ -5876,7 +5879,7 @@ document.getElementById('settingsPanel').addEventListener('click', e=>{
     if(key==='wake') updateWakeLock();
     if(key==='beep' || key==='alarms'){ ensureAudio(); updateSoundUI(); if(settings[key]) testSound(key==='alarms' ? 2 : 0); }
     if(key==='showFicha' || key==='showEcg12'){ updateRhythmInfo(state.rhythm); syncInstructorColumns(); }
-    if(['showCase','caseButtons','showTemp','noPulseFlash'].includes(key)) sendStudentPrefs();
+    if(['showCase','caseButtons','showTemp','noPulseFlash','alarmDetail'].includes(key)){ sendStudentPrefs(); alarmTick(); }
     refreshSettingsUI();
   }
 });
@@ -5903,7 +5906,7 @@ var studentPrefs = { showCase:true, caseButtons:true, showTemp:true, quizCloseS:
 function sendStudentPrefs(){
   if(role!=='instructor' || !channel) return;
   channel.send({ type:'broadcast', event:'student_prefs', payload:{ showCase:settings.showCase!==false, caseButtons:settings.caseButtons!==false,
-    showTemp:settings.showTemp!==false, noPulseFlash:settings.noPulseFlash!==false, quizCloseS:settings.quizCloseS||3 } });
+    showTemp:settings.showTemp!==false, noPulseFlash:settings.noPulseFlash!==false, quizCloseS:settings.quizCloseS||3, alarmDetail:settings.alarmDetail===true } });
 }
 setInterval(sendStudentPrefs, 5000);
 function applyStudentPrefs(p){
@@ -6886,7 +6889,8 @@ function alarmTick(){
   b.classList.toggle('lv-2', a.level===2); b.classList.toggle('lv-3', a.level===3); b.classList.toggle('silenced', sil);
   document.getElementById('alarmMsg').textContent = '';   // el parámetro alterado se muestra arriba (#alarmTag)
   const tag = document.getElementById('alarmTag');
-  if(tag){ const on = a.level===2 && !!a.msg; tag.classList.toggle('on', on); tag.classList.toggle('sil', on && sil);
+  const detail = role==='monitor' ? studentPrefs.alarmDetail===true : settings.alarmDetail===true;
+  if(tag){ const on = detail && a.level===2 && !!a.msg; tag.classList.toggle('on', on); tag.classList.toggle('sil', on && sil);
     const t = on ? a.msg : ''; if(tag.textContent!==t) tag.textContent = t; }
   const left = Math.ceil((alarmState.silenceUntil - now)/1000);
   document.getElementById('alarmTime').textContent = sil ? Math.floor(left/60)+':'+String(left%60).padStart(2,'0') : '';
@@ -7005,13 +7009,13 @@ const MANUAL = [
    <li><b>Gestionar preguntas</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, {i:trash} eliminar o {i:restart} volver a la versión original de una predefinida. ★ marca las propias.</li>
   </ul>` },
 
- { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de constantes: parámetro alterado y tendencia'], ['alarmas_fv', 'Alarma de ritmo: campana roja, sin diagnóstico']], who:'all', t:'Sonido y alarmas', h:`
+ { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de constantes con «Mostrar el parámetro alterado» activado'], ['alarmas_fv', 'Alarma de ritmo: campana roja, sin diagnóstico']], who:'all', t:'Sonido y alarmas', h:`
   <p>Se activan en ☰ › General › <b>Sonido</b>, en cada dispositivo por separado (vienen apagados).</p>
   <ul>
    <li><b>Beep con cada latido:</b> su tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</li>
    <li><b>Alarma de prioridad alta</b> (rojo, 5 pitidos cada 4 s): FV, TV, sin pulso y asistolia.</li>
    <li><b>Alarma de prioridad media</b> (amarillo, 3 tonos cada 9 s): FC &lt;50 o &gt;120 · SpO₂ &lt;90 · TAS &lt;90 o &gt;180 · FR &lt;8 o &gt;30 · T² &lt;35 o &gt;38,5.</li>
-   <li><b>Campana del monitor:</b> se pone roja o amarilla según la prioridad; en las de constantes aparece arriba en el monitor un aviso amarillo con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»); en las de ritmo no se muestra el diagnóstico. La silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
+   <li><b>Campana del monitor:</b> se pone roja o amarilla según la prioridad; por defecto no muestra texto. Si el instructor activa ☰ › Alumno › <b>Mostrar el parámetro alterado</b>, en las alarmas de constantes aparece arriba en el monitor un aviso amarillo con el parámetro y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»). El diagnóstico del ritmo nunca se muestra. La silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
   </ul>
   <p class="mn-who-i">Si silencias desde la consola del instructor, también se silencia en los alumnos.</p>
   <h4>Volumen</h4>
@@ -7032,7 +7036,7 @@ const MANUAL = [
   <ul>
    <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla siempre encendida en clase.</li>
    <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (preguntas, editor de casos, administrador del banco).</li>
-   <li><b>Alumno:</b> lo que ve el alumno (caso, sus controles, nombre del ritmo en el ECG, temperatura) y el parpadeo rojo al perder el pulso.</li>
+   <li><b>Alumno:</b> lo que ve el alumno (caso, sus controles, nombre del ritmo en el ECG, temperatura), si las alarmas muestran el parámetro alterado y el parpadeo rojo al perder el pulso.</li>
   </ul>
   <p>Toca ⓘ junto a una opción para ver su explicación. El menú recuerda la última pestaña.</p>` },
 
