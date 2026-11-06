@@ -1214,6 +1214,30 @@
   body .waves.expanded .waves-remote-btn{ width:min(36px,9cqh); height:min(36px,9cqh); right:calc(12px + min(36px,9cqh)); bottom:6px; }
   body.role-instructor .waves.expanded .wx-vitals{ padding-right:calc(2*min(36px,9cqh) + 6px + 1.5cqw); }
 
+  /* botón de alarmas del monitor: silencia 2 min (instructor y alumno) */
+  .alarm-btn{ position:absolute; right:78px; bottom:6px; z-index:4; height:30px; min-width:30px; padding:0 7px; display:none; align-items:center; gap:6px;
+    justify-content:center; cursor:pointer; background:rgba(5,8,10,.55); color:#c9d3d6; border:1px solid rgba(255,255,255,.18); border-radius:6px;
+    font-family:inherit; font-size:11.5px; font-weight:800; letter-spacing:.04em; opacity:.75; transition:opacity .15s, background .15s; }
+  body.snd-on .alarm-btn{ display:flex; }
+  body.role-monitor .alarm-btn{ right:42px; }
+  .alarm-btn svg{ width:17px; height:17px; flex-shrink:0; }
+  .alarm-btn .ic-bell-off{ display:none; }
+  .alarm-btn.silenced .ic-bell{ display:none; } .alarm-btn.silenced .ic-bell-off{ display:block; }
+  .alarm-btn .al-msg:empty, .alarm-btn .al-time:empty{ display:none; }
+  .alarm-btn:hover, .alarm-btn:focus-visible{ opacity:1; background:rgba(5,8,10,.85); }
+  .alarm-btn.lv-2{ opacity:1; color:#ffd23f; border-color:#ffd23f; background:rgba(255,210,63,.12); }
+  .alarm-btn.lv-3{ opacity:1; color:#fff; border-color:#ff4d5e; background:#c8202f; animation:alBlink 1s steps(1) infinite; }
+  .alarm-btn.silenced{ animation:none; background:rgba(5,8,10,.75); color:#c9d3d6; border-color:rgba(255,255,255,.3); }
+  .alarm-btn.silenced.lv-3{ color:#ff8a95; border-color:#ff4d5e; } .alarm-btn.silenced.lv-2{ color:#ffd23f; border-color:#ffd23f; }
+  @keyframes alBlink{ 50%{ background:rgba(200,32,47,.35); } }
+  body .waves.expanded .alarm-btn{ height:min(36px,9cqh); min-width:min(36px,9cqh); right:calc(18px + 2*min(36px,9cqh)); }
+  body.role-monitor .waves.expanded .alarm-btn{ right:calc(12px + min(36px,9cqh)); }
+  body .waves.expanded .alarm-btn .al-msg{ display:none; }
+  body.snd-on.role-instructor .waves.expanded .wx-vitals{ padding-right:calc(3*min(36px,9cqh) + 52px + 1.5cqw); }
+  body.snd-on.role-monitor .waves.expanded .wx-vitals{ padding-right:calc(2*min(36px,9cqh) + 52px + 1.5cqw); }
+  .st-vol{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .st-vol input{ width:120px; accent-color:var(--ecg); }
+
   /* ---------- Menú de configuración (instructor) ---------- */
   .settings-btn svg{ width:17px; height:17px; }
   header .helpBtn, header .themeToggle{ display:none !important; }
@@ -1853,6 +1877,11 @@
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
         </div>
         <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true">⚠ Sin pulso — RCP</div>
+        <button type="button" class="alarm-btn" id="alarmBtn" onclick="toggleAlarmSilence()" aria-label="Silenciar alarmas 2 minutos" title="Silenciar alarmas 2 minutos">
+          <svg class="ic-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 1.5h-13z"/><path d="M8.3 17.5a1.8 1.8 0 0 0 3.4 0"/></svg>
+          <svg class="ic-bell-off" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 8.2-3.8M15 9v5l1.5 1.5H6"/><path d="M8.3 17.5a1.8 1.8 0 0 0 3.4 0"/><path d="M3 3l14 14"/></svg>
+          <span class="al-msg" id="alarmMsg"></span><span class="al-time mono" id="alarmTime"></span>
+        </button>
         <button type="button" class="waves-remote-btn" id="wavesRemoteBtn" onclick="toggleStudentWaves()" aria-pressed="false" aria-label="Ampliar el monitor del alumno" title="Ampliar el monitor del alumno">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="16" height="11" rx="1.6"/><path d="M7 17.5h6M10 14v3.5"/><path d="M11.5 6h3v3M8.5 11.2h-3v-3M14.5 6l-3 3M5.5 11.2l3-3"/></svg>
         </button>
@@ -2239,6 +2268,11 @@
         <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
         <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
+      <section class="st-sec"><h3>Sonido</h3>
+        <div class="st-row"><span class="st-l">Beep con cada latido <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">El tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</small></span><button type="button" class="st-sw" role="switch" data-set="beep" aria-label="Beep con cada latido"></button></div>
+        <div class="st-row"><span class="st-l">Alarmas <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Alta prioridad (rojo): parada, FV, TV y asistolia. Media (amarillo): FC &lt;50 o &gt;120, SpO₂ &lt;90, TAS &lt;90 o &gt;180, FR &lt;8 o &gt;30, T² &lt;35 o &gt;38,5. El botón de la campana del monitor las silencia 2 min; el del instructor también silencia al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="alarms" aria-label="Alarmas"></button></div>
+        <div class="st-row"><span class="st-l">Volumen <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Es relativo al volumen multimedia del dispositivo: súbelo también con sus botones. En iPhone/iPad, comprueba el modo silencio.</small></span><span class="st-vol"><input type="range" id="stVol" min="0" max="1" step="0.05" aria-label="Volumen" oninput="setSoundVol(this.value)" onchange="testSound()"></span></div>
+      </section>
       <section class="st-sec st-room"><h3>Sala</h3>
         <div class="st-row"><span>Sala actual<small class="mono" id="stRoom">—</small></span><button type="button" class="st-go" onclick="leaveRoom(true)">Cambiar</button></div>
         <div class="st-row instructor-only"><span class="st-l">Avisar al conectarse un alumno <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Notificación discreta en la esquina de la pantalla.</small></span><button type="button" class="st-sw" role="switch" data-set="notifyJoin" aria-label="Avisar cuando se conecte un alumno"></button></div>
@@ -2539,6 +2573,7 @@ function connectRoom(){
     channel.on('broadcast', {event:'waves_expand'}, (msg)=> toggleWavesExpand(!!(msg.payload && msg.payload.open)));
     channel.on('broadcast', {event:'case_view'}, (msg)=> applyRemoteCaseView(msg.payload));
     channel.on('broadcast', {event:'student_prefs'}, (msg)=> applyStudentPrefs(msg.payload));
+    channel.on('broadcast', {event:'alarm_silence'}, (msg)=> setAlarmSilence(msg.payload && msg.payload.s || 0, false));
   } else {
     channel.on('broadcast', {event:'answer'}, (msg)=> onRemoteAnswer(msg.payload));
     channel.on('broadcast', {event:'waves_state'}, (msg)=> setStudentWavesBtn(!!(msg.payload && msg.payload.open)));
@@ -2873,7 +2908,7 @@ let ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
 const CPR_CTX_LABEL = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
 
 /* Preferencias del instructor (menú ⚙). ERC es el algoritmo de RCP por defecto. */
-var SETTINGS_DEF = { pauseOnArrest:true, noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true };
+var SETTINGS_DEF = { pauseOnArrest:true, noPulseFlash:true, notifyJoin:true, showFicha:true, showEcg12:true, cprAlgo:'ERC', quizCloseS:3, speed:1, showCase:true, caseButtons:true, ecgName:false, showTemp:true, wake:true, fichaCollapsed:true, beep:false, alarms:false, vol:0.7 };
 var settings = Object.assign({}, SETTINGS_DEF);
 try{ Object.assign(settings, JSON.parse(localStorage.getItem('monitor-settings')||'{}')); }catch(e){}
 let cprAlgo = settings.cprAlgo==='AHA' ? 'AHA' : 'ERC';
@@ -4224,7 +4259,13 @@ function frame(ts){
   let need = dtSec*1000*ppmE;
   let accum = (frame._accE||0) + need;
   while(accum>=1){
+    const _ph0 = state.beatPhase, _q0 = av.qAge;
     if(isAVBlock){ stepAVBlock(sampleDt); } else { stepBeat(sampleDt); }
+    // beep del monitor en cada QRS (solo con pulso: en AESP, FV y asistolia no suena)
+    if(state.pulsePresent && state.hr>0 && state.rhythm!=='vfib' && state.rhythm!=='asystole'){
+      const qrs = isAVBlock ? (av.qAge < _q0) : ((_ph0 < 0.29 && state.beatPhase >= 0.29) || (state.beatPhase < _ph0 && _ph0 < 0.29));
+      if(qrs) monitorBeep();
+    }
 
     let ecgVal;
     if(state.rhythm==='vfib') ecgVal = vfibSample(sampleDt);
@@ -4305,7 +4346,7 @@ const GUIDE_STEPS = {
     { sel:'#roomBadge', text:'Tu sala y cuántos alumnos hay conectados.', sub:'Comparte el código para que se unan; te avisamos cuando entre alguien.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
     { sel:'#settingsBtn', text:'En ☰ Configuración tienes el resto de opciones.',
-      sub:'Tres pestañas: General (tema, guía, actualizar y sala), Clase (ficha del ritmo, RCP ERC/AHA, casos, preguntas y herramientas) y Alumno (lo que ve el alumno). Toca ⓘ para ver la explicación de cada opción.' }
+      sub:'Tres pestañas: General (tema, sonido y alarmas, guía, actualizar y sala), Clase (ficha del ritmo, RCP ERC/AHA, casos, preguntas y herramientas) y Alumno (lo que ve el alumno). Toca ⓘ para ver la explicación de cada opción.' }
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', sub:'El instructor controla lo que ves desde su dispositivo.' },
@@ -5595,6 +5636,7 @@ function refreshSettingsUI(){
     g.querySelectorAll('button').forEach(b=>{ const on = String(vals[g.dataset.set])===b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
   });
   document.querySelectorAll('#settingsPanel .st-sw').forEach(b=>b.setAttribute('aria-checked', settings[b.dataset.set]!==false ? 'true':'false'));
+  document.getElementById('stVol').value = settings.vol!=null ? settings.vol : 0.7;
   document.getElementById('stRoom').textContent = roomCode ? 'Sala '+roomCode+' · '+(studentCount===1 ? '1 alumno conectado' : studentCount+' alumnos conectados') : 'Sin sala';
 }
 /* pestañas del menú: General · Clase · Alumno (se recuerda la última) */
@@ -5646,6 +5688,7 @@ document.getElementById('settingsPanel').addEventListener('click', e=>{
   if(sw){
     const key = sw.dataset.set; settings[key] = settings[key]===false; saveSettings();
     if(key==='wake') updateWakeLock();
+    if(key==='beep' || key==='alarms'){ ensureAudio(); updateSoundUI(); if(settings[key]) testSound(key==='alarms' ? 2 : 0); }
     if(key==='showFicha' || key==='showEcg12'){ updateRhythmInfo(state.rhythm); syncInstructorColumns(); }
     if(['showCase','caseButtons','showTemp','noPulseFlash'].includes(key)) sendStudentPrefs();
     refreshSettingsUI();
@@ -6550,6 +6593,113 @@ document.addEventListener('pointerdown', e=>{
   const mo = new MutationObserver(upd);
   ['ecg12CalBtn','ecg12NotesBtn'].forEach(id=>mo.observe(document.getElementById(id), { attributes:true, attributeFilter:['aria-pressed'] }));
 })();
+
+/* ---------- Sonido del monitor: beep por latido y alarmas ----------
+   Se genera con Web Audio (sin archivos). El volumen final depende del volumen multimedia del
+   dispositivo, que una web no puede leer ni cambiar; el control de la app es relativo a él. */
+var audioCtx = null, audioOut = null;
+const ALARM_LIMITS = { hr:[50,120], spo2:[90,101], sys:[90,180], rr:[8,30], temp:[35,38.5] };
+var alarmState = { level:0, msg:'', nextAt:0, silenceUntil:0, silencedLevel:0 };
+function ensureAudio(){
+  try{
+    if(!audioCtx){
+      const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
+      try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}   // iOS: sonar aunque esté en silencio
+      audioCtx = new AC(); audioOut = audioCtx.createGain(); audioOut.connect(audioCtx.destination);
+      setSoundVol(settings.vol!=null ? settings.vol : 0.7);
+    }
+    if(audioCtx.state==='suspended') audioCtx.resume();
+  }catch(e){}
+  return audioCtx;
+}
+// los navegadores solo dejan sonar tras un toque del usuario
+['pointerdown','keydown','touchend'].forEach(ev=>document.addEventListener(ev, ()=>{ if(settings.beep || settings.alarms) ensureAudio(); }, { capture:true, passive:true }));
+function setSoundVol(v){
+  settings.vol = +v; saveSettings();
+  if(audioOut) audioOut.gain.setTargetAtTime(Math.pow(+v, 1.6), audioCtx.currentTime, 0.02);
+}
+function tone(freq, start, dur, peak, type){
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(peak, start + 0.008);
+  g.gain.setValueAtTime(peak, start + Math.max(0.01, dur - 0.025));
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g); g.connect(audioOut); o.start(start); o.stop(start + dur + 0.02);
+}
+function soundReady(){ return audioCtx && audioCtx.state==='running' && !document.hidden; }
+function monitorBeep(){
+  if(!settings.beep || !soundReady()) return;
+  // tono según la SpO₂: ~880 Hz al 100 %, más grave al desaturar
+  const f = 880 - (100 - clamp(state.spo2, 50, 100)) * 14;
+  tone(f, audioCtx.currentTime + 0.005, 0.075, 0.35, 'sine');
+}
+// patrones de alarma (IEC 60601-1-8): alta = 3+2 pulsos agudos; media = 3 pulsos más graves y lentos
+function playAlarm(level){
+  if(!soundReady()) return;
+  const t = audioCtx.currentTime + 0.02;
+  if(level===3){
+    const f = 960, st = [0, 0.2, 0.4, 0.95, 1.15];
+    st.forEach(d=>{ tone(f, t+d, 0.15, 0.32, 'triangle'); tone(f*2, t+d, 0.15, 0.08, 'sine'); });
+  } else {
+    [0, 0.32, 0.64].forEach(d=>{ tone(600, t+d, 0.22, 0.28, 'triangle'); tone(1200, t+d, 0.22, 0.05, 'sine'); });
+  }
+}
+function testSound(kind){
+  if(!ensureAudio()) return;
+  setTimeout(()=>{ if(kind===2) playAlarm(2); else { const b = settings.beep; settings.beep = true; monitorBeep(); settings.beep = b; } }, 60);
+}
+function evalAlarms(){
+  const r = state.rhythm;
+  if(r==='asystole') return { level:3, msg:'ASISTOLIA' };
+  if(r==='vfib') return { level:3, msg:'FV' };
+  if(r==='vtach') return { level:3, msg: state.pulsePresent ? 'TV' : 'TV SIN PULSO' };
+  if(!state.pulsePresent) return { level:3, msg:'SIN PULSO' };
+  const L = ALARM_LIMITS, m = [];
+  const chk = (v, k, name)=>{ if(v < L[k][0]) m.push(name+' ↓'); else if(v > L[k][1]) m.push(name+' ↑'); };
+  chk(state.hr,'hr','FC'); chk(state.spo2,'spo2','SpO₂'); chk(state.sys,'sys','TAS'); chk(state.rr,'rr','FR');
+  if(!(role==='monitor' && studentPrefs.showTemp===false)) chk(state.temp,'temp','T²');
+  return m.length ? { level:2, msg:m.join(' · ') } : { level:0, msg:'' };
+}
+function alarmSilenced(){ return Date.now() < alarmState.silenceUntil; }
+function setAlarmSilence(sec, broadcast){
+  alarmState.silenceUntil = sec ? Date.now() + sec*1000 : 0;
+  alarmState.silencedLevel = sec ? Math.max(alarmState.level, 2) : 0;
+  alarmState.nextAt = 0;
+  if(broadcast && role==='instructor' && channel) channel.send({ type:'broadcast', event:'alarm_silence', payload:{ s: sec } });
+  alarmTick();
+}
+function toggleAlarmSilence(){
+  ensureAudio();
+  if(alarmSilenced()){ setAlarmSilence(0, true); showToast('Alarmas reactivadas.'); }
+  else { setAlarmSilence(120, true); showToast(role==='instructor' ? 'Alarmas silenciadas 2 min (también en el alumno).' : 'Alarmas silenciadas 2 min.'); }
+}
+function alarmTick(){
+  const a = settings.alarms ? evalAlarms() : { level:0, msg:'' };
+  const now = Date.now();
+  // una alarma nueva más grave que la silenciada vuelve a sonar
+  if(alarmSilenced() && a.level > alarmState.silencedLevel){ alarmState.silenceUntil = 0; alarmState.silencedLevel = 0; }
+  if(a.level > alarmState.level) alarmState.nextAt = 0;
+  alarmState.level = a.level; alarmState.msg = a.msg;
+  const sil = alarmSilenced();
+  if(a.level && !sil && now >= alarmState.nextAt){
+    playAlarm(a.level); alarmState.nextAt = now + (a.level===3 ? 4000 : 9000);
+  }
+  const b = document.getElementById('alarmBtn'); if(!b) return;
+  b.classList.toggle('lv-2', a.level===2); b.classList.toggle('lv-3', a.level===3); b.classList.toggle('silenced', sil);
+  document.getElementById('alarmMsg').textContent = a.msg;
+  const left = Math.ceil((alarmState.silenceUntil - now)/1000);
+  document.getElementById('alarmTime').textContent = sil ? Math.floor(left/60)+':'+String(left%60).padStart(2,'0') : '';
+  const lbl = sil ? 'Alarmas silenciadas: reactivar' : 'Silenciar alarmas 2 minutos';
+  b.setAttribute('aria-label', (a.msg ? 'Alarma: '+a.msg+'. ' : '') + lbl); b.title = lbl;
+}
+setInterval(alarmTick, 250);
+function updateSoundUI(){
+  document.body.classList.toggle('snd-on', !!(settings.beep || settings.alarms));
+  document.getElementById('alarmBtn').hidden = !settings.alarms && !settings.beep;
+  alarmTick();
+}
+updateSoundUI();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
