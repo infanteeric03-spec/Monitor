@@ -5327,7 +5327,7 @@ function undoInk(){
   const del = [it];   // las medidas fijadas del compás (varios trazos con el mismo grupo) se deshacen juntas
   if(it.g) while(e12Ink.length && e12Ink[e12Ink.length-1].g===it.g) del.push(e12Ink.pop());
   drawInk(); del.forEach(x=>sendInk({ op:'del', id:x.id }));
-  if(it.g) hideFixUndo();
+  if(it.g){ hideFixUndo(); restoreCaliperFrom(it.g); }
 }
 function clearInk(){ if(!e12Ink.length) return; hideFixUndo(); e12Ink = []; drawInk(); sendInk({ op:'clear' }); }
 function drawInk(){
@@ -6533,12 +6533,21 @@ function caliperFix(){
         { id:id(), k:'s', c:col, w:w*1.5, p:[[e12Cal.o,e12Cal.a],[e12Cal.o,e12Cal.b]] },
         { id:id(), k:'t', c:col, s:+(15/g.mm).toFixed(2), p:[[e12Cal.o + 8/g.mm, (e12Cal.a+e12Cal.b)/2]], t:lab } ];
   const grp = 'm'+Date.now().toString(36);
+  e12FixCal[grp] = Object.assign({}, e12Cal);   // para recuperar el compás tal cual al deshacer
   items.forEach(it=>{ it.g = grp; e12Ink.push(it); sendInk({ op:'set', item:it }); });
   toggleCaliper(false);
   showFixUndo(grp);
 }
 /* aviso «Medida fijada · Deshacer» tras fijar el compás */
-var e12FixUndoT = 0;
+var e12FixUndoT = 0, e12FixCal = {};
+// al deshacer una medida fijada, vuelve el compás abierto en la misma posición
+function restoreCaliperFrom(grp){
+  const snap = e12FixCal[grp]; delete e12FixCal[grp];
+  if(!snap || !ecg12Rhythm) return;
+  toggleCaliper(true); if(!e12Cal) return;
+  e12Cal = Object.assign({}, snap);
+  caliperRead(); drawInk(); e12SendCal(true);
+}
 function showFixUndo(grp){
   const el = document.getElementById('ecg12FixUndo'); el.dataset.g = grp; el.hidden = false;
   clearTimeout(e12FixUndoT); e12FixUndoT = setTimeout(hideFixUndo, 8000);
@@ -6551,8 +6560,9 @@ function undoCaliperFix(){
   else {   // si ya hay otras anotaciones encima, se borra solo ese grupo
     const del = e12Ink.filter(x=>x.g===g); e12Ink = e12Ink.filter(x=>x.g!==g);
     drawInk(); del.forEach(x=>sendInk({ op:'del', id:x.id }));
+    restoreCaliperFrom(g);
   }
-  hideFixUndo(); showToast('Medida eliminada.');
+  hideFixUndo(); showToast('Medida deshecha: puedes seguir midiendo.');
 }
 function e12SendCal(now){
   if(!ecg12Mirror) return;
@@ -6867,7 +6877,7 @@ const MANUAL = [
   <p>Proyecta el ECG en el monitor del alumno con tu mismo encuadre, zoom y anotaciones. La casilla junto al nombre decide si el alumno ve el nombre del ritmo (desmarcada al principio).</p>
   <h4>⋯ Más</h4>
   <ul>
-   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ mV», <b>mV y mm</b> (y «↔ ms» para volver). En su barra: <b>»</b> repite la medida un intervalo a la derecha para comprobar la regularidad, la cuadrícula superpone cuadros de 5 mm, el <b>alfiler</b> fija la medida como anotación (justo después aparece «Medida fijada · Deshacer»), la <b>cruz de flechas</b> mueve la barra abajo, a la izquierda o a la derecha (se recuerda) y ✕ cierra el compás.</li>
+   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ mV», <b>mV y mm</b> (y «↔ ms» para volver). En su barra: <b>»</b> repite la medida un intervalo a la derecha para comprobar la regularidad, la cuadrícula superpone cuadros de 5 mm, el <b>alfiler</b> fija la medida como anotación (justo después aparece «Medida fijada · Deshacer», que la quita y vuelve a abrir el compás donde estaba), la <b>cruz de flechas</b> mueve la barra abajo, a la izquierda o a la derecha (se recuerda) y ✕ cierra el compás.</li>
    <li><b>Interpretación</b> {i:notes} (ECG del banco): el comentario del autor, visible solo para el instructor.</li>
    <li><b>Calibrar escala</b> {i:ruler} (administrador, ECG del banco): ver <a href="#mn-banco">Banco de ECG</a>.</li>
   </ul>` },
