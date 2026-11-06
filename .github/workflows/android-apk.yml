@@ -82,11 +82,12 @@ jobs:
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
         run: |
+          chmod +x gradlew
           if [ -z "$KEYSTORE_PASS" ]; then
+            ./gradlew --no-daemon assembleRelease   # comprueba que compila, pero sin firma no se publica
             echo "::error::Falta el secreto ANDROID_KEYSTORE_PASS (Settings › Secrets and variables › Actions)."; exit 1
           fi
           export KEYSTORE_FILE="$GITHUB_WORKSPACE/android-app/keystore/simulador-release.jks" KEY_ALIAS=simulador
-          chmod +x gradlew
           ./gradlew --no-daemon assembleRelease
           mkdir -p "$GITHUB_WORKSPACE/dist"
           cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/dist/SimuladorUrgencias-$APK_NAME.apk"
