@@ -1235,6 +1235,19 @@
   body .waves.expanded .alarm-btn .al-msg{ display:none; }
   body.snd-on.role-instructor .waves.expanded .wx-vitals{ padding-right:calc(3*min(36px,9cqh) + 52px + 1.5cqw); }
   body.snd-on.role-monitor .waves.expanded .wx-vitals{ padding-right:calc(2*min(36px,9cqh) + 52px + 1.5cqw); }
+  /* botones dentro del monitor: algo más pequeños y con fondo opaco para no confundirse con las ondas */
+  .waves-expand-btn, .waves-remote-btn, .alarm-btn{ width:26px; height:26px; bottom:5px; opacity:1; background:#0b1214; border-color:#26343a; border-radius:5px; }
+  .alarm-btn{ width:auto; min-width:26px; height:26px; padding:0 5px; font-size:10.5px; }
+  .waves-expand-btn{ right:5px; } .waves-remote-btn{ right:35px; } .alarm-btn{ right:65px; } body.role-monitor .alarm-btn{ right:35px; }
+  .waves-expand-btn svg{ width:14px; height:14px; } .waves-remote-btn svg, .alarm-btn svg{ width:15px; height:15px; }
+  .waves-expand-btn:hover, .waves-expand-btn:focus-visible, .waves-remote-btn:hover, .waves-remote-btn:focus-visible, .alarm-btn:hover, .alarm-btn:focus-visible{ background:#141e21; }
+  body .waves.expanded .waves-expand-btn{ width:min(30px,8cqh); height:min(30px,8cqh); opacity:1; }
+  body .waves.expanded .waves-expand-btn svg{ width:15px; height:15px; }
+  body .waves.expanded .waves-remote-btn{ width:min(30px,8cqh); height:min(30px,8cqh); right:calc(10px + min(30px,8cqh)); }
+  body .waves.expanded .alarm-btn{ height:min(30px,8cqh); min-width:min(30px,8cqh); right:calc(15px + 2*min(30px,8cqh)); }
+  body.role-monitor .waves.expanded .alarm-btn{ right:calc(10px + min(30px,8cqh)); }
+  .waves-remote-btn.on{ background:#0f2a18; }
+  .alarm-btn.lv-2{ background:#2a2410; } .alarm-btn.lv-3{ background:#c8202f; } .alarm-btn.silenced{ background:#0b1214; }
   .st-vol{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
   .st-vol input{ width:120px; accent-color:var(--ecg); }
 
@@ -2348,7 +2361,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -2412,7 +2425,7 @@
       </section>
       <section class="st-sec"><h3>Sonido</h3>
         <div class="st-row"><span class="st-l">Beep con cada latido <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">El tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</small></span><button type="button" class="st-sw" role="switch" data-set="beep" aria-label="Beep con cada latido"></button></div>
-        <div class="st-row"><span class="st-l">Alarmas <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Alta prioridad (rojo): parada, FV, TV y asistolia. Media (amarillo): FC &lt;50 o &gt;120, SpO₂ &lt;90, TAS &lt;90 o &gt;180, FR &lt;8 o &gt;30, T² &lt;35 o &gt;38,5. El botón de la campana del monitor las silencia 2 min; el del instructor también silencia al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="alarms" aria-label="Alarmas"></button></div>
+        <div class="st-row"><span class="st-l">Alarmas <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Alta prioridad (rojo): parada, FV, TV y asistolia. Media (amarillo): FC &lt;50 o &gt;120, SpO₂ &lt;90, TAS &lt;90 o &gt;180, FR &lt;8 o &gt;30, T² &lt;35 o &gt;38,5. La campana del monitor no muestra el diagnóstico del ritmo y las silencia 2 min; el del instructor también silencia al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="alarms" aria-label="Alarmas"></button></div>
         <div class="st-row"><span class="st-l">Volumen <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Es relativo al volumen multimedia del dispositivo: súbelo también con sus botones. En iPhone/iPad, comprueba el modo silencio.</small></span><span class="st-vol"><input type="range" id="stVol" min="0" max="1" step="0.05" aria-label="Volumen" oninput="setSoundVol(this.value)" onchange="testSound()"></span></div>
       </section>
       <section class="st-sec st-room"><h3>Sala</h3>
@@ -2421,7 +2434,7 @@
         <div class="st-row"><span>Salir al inicio</span><button type="button" class="st-go st-red" onclick="leaveRoom(false)">Salir</button></div>
       </section>
       <section class="st-sec instructor-only"><h3>Este dispositivo</h3>
-        <div class="st-row"><span class="st-l">Pantalla encendida al ampliar <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Evita que la pantalla se apague mientras el monitor o el ECG están ampliados.</small></span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla encendida al ampliar"></button></div>
+        <div class="st-row"><span class="st-l">Pantalla siempre encendida en clase <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Evita que la pantalla se apague mientras hay un caso en marcha o el monitor o el ECG están ampliados.</small></span><button type="button" class="st-sw" role="switch" data-set="wake" aria-label="Pantalla siempre encendida en clase"></button></div>
       </section>
       </div>
       <div class="st-pane instructor-only" data-pane="clase" role="tabpanel">
@@ -5770,8 +5783,10 @@ function toggleStudentWaves(){
 var wakeLock = null;
 function wakeWanted(){
   if(role!=='monitor' && settings.wake===false) return false;
-  return !!document.querySelector('.waves.expanded') || !!(document.getElementById('ecg12Overlay') && document.getElementById('ecg12Overlay').classList.contains('open'));
+  const caseOn = role==='monitor' ? !!(typeof csState!=='undefined' && csState) : !!(scenario && scenario.active);
+  return caseOn || !!document.querySelector('.waves.expanded') || !!(document.getElementById('ecg12Overlay') && document.getElementById('ecg12Overlay').classList.contains('open'));
 }
+setInterval(updateWakeLock, 3000);   // p. ej. al iniciar o terminar un caso
 async function updateWakeLock(){
   try{
     if(!('wakeLock' in navigator)) return;
@@ -6825,10 +6840,8 @@ function testSound(kind){
 }
 function evalAlarms(){
   const r = state.rhythm;
-  if(r==='asystole') return { level:3, msg:'ASISTOLIA' };
-  if(r==='vfib') return { level:3, msg:'FV' };
-  if(r==='vtach') return { level:3, msg: state.pulsePresent ? 'TV' : 'TV SIN PULSO' };
-  if(!state.pulsePresent) return { level:3, msg:'SIN PULSO' };
+  // las alarmas de ritmo no muestran el diagnóstico (lo debe identificar el alumno)
+  if(r==='asystole' || r==='vfib' || r==='vtach' || !state.pulsePresent) return { level:3, msg:'' };
   const L = ALARM_LIMITS, m = [];
   const chk = (v, k, name)=>{ if(v < L[k][0]) m.push(name+' ↓'); else if(v > L[k][1]) m.push(name+' ↑'); };
   chk(state.hr,'hr','FC'); chk(state.spo2,'spo2','SpO₂'); chk(state.sys,'sys','TAS'); chk(state.rr,'rr','FR');
@@ -6865,7 +6878,7 @@ function alarmTick(){
   const left = Math.ceil((alarmState.silenceUntil - now)/1000);
   document.getElementById('alarmTime').textContent = sil ? Math.floor(left/60)+':'+String(left%60).padStart(2,'0') : '';
   const lbl = sil ? 'Alarmas silenciadas: reactivar' : 'Silenciar alarmas 2 minutos';
-  b.setAttribute('aria-label', (a.msg ? 'Alarma: '+a.msg+'. ' : '') + lbl); b.title = lbl;
+  b.setAttribute('aria-label', (a.level ? 'Alarma de prioridad '+(a.level===3?'alta':'media')+(a.msg ? ': '+a.msg : '')+'. ' : '') + lbl); b.title = lbl;
 }
 setInterval(alarmTick, 250);
 function updateSoundUI(){
@@ -6897,7 +6910,7 @@ const MANUAL = [
   <ul>
    <li><b>Derivación:</b> toca «ECG · II ▾» para cambiarla; cambia en todos los dispositivos de la sala.</li>
    <li><b>Constantes:</b> TA (con TAM), FC, SpO₂, FR y temperatura. Si una sale de rango, su tarjeta se marca en rojo.</li>
-   <li><b>Ampliar ⤢:</b> el monitor pasa a pantalla completa (en el móvil se gira en horizontal) y la pantalla no se apaga mientras está ampliado.</li>
+   <li><b>Ampliar ⤢:</b> el monitor pasa a pantalla completa (en el móvil se gira en horizontal). La pantalla no se apaga mientras está ampliado ni mientras hay un caso en marcha.</li>
    <li><b>Campana:</b> aparece al activar sonido o alarmas; ver <a href="#mn-sonido">Sonido y alarmas</a>.</li>
   </ul>
   <div class="mn-who-i"><h4>Instructor</h4>
@@ -6985,7 +6998,7 @@ const MANUAL = [
    <li><b>Beep con cada latido:</b> su tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</li>
    <li><b>Alarma de prioridad alta</b> (rojo, 5 pitidos cada 4 s): FV, TV, sin pulso y asistolia.</li>
    <li><b>Alarma de prioridad media</b> (amarillo, 3 tonos cada 9 s): FC &lt;50 o &gt;120 · SpO₂ &lt;90 · TAS &lt;90 o &gt;180 · FR &lt;8 o &gt;30 · T² &lt;35 o &gt;38,5.</li>
-   <li><b>Campana del monitor:</b> muestra el motivo de la alarma y la silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
+   <li><b>Campana del monitor:</b> se pone roja o amarilla según la prioridad; en las de constantes indica cuál (p. ej. «FC ↑»), pero en las de ritmo no muestra el diagnóstico. La silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
   </ul>
   <p class="mn-who-i">Si silencias desde la consola del instructor, también se silencia en los alumnos.</p>
   <h4>Volumen</h4>
@@ -7004,7 +7017,7 @@ const MANUAL = [
 
  { id:'config', shots:[['config', '☰ Configuración, pestaña Clase']], who:'i', t:'Menú ☰ Configuración', h:`
   <ul>
-   <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla encendida al ampliar.</li>
+   <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla siempre encendida en clase.</li>
    <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (preguntas, editor de casos, administrador del banco).</li>
    <li><b>Alumno:</b> lo que ve el alumno (caso, sus controles, nombre del ritmo en el ECG, temperatura) y el parpadeo rojo al perder el pulso.</li>
   </ul>
@@ -7015,7 +7028,7 @@ const MANUAL = [
    <dt>El alumno no ve los cambios</dt><dd>Comprueba que está en la misma sala (código) y que <b>Sinc</b> está activado o que has pulsado {i:send} Enviar. Al enviar sin alumnos conectados, la app avisa.</dd>
    <dt>No veo la versión nueva</dt><dd>☰ › General › <b>Actualizar la app</b>. En el iPad con la app instalada no basta con cerrar y abrir.</dd>
    <dt>No suena</dt><dd>Activa sonido o alarmas en ☰, toca la pantalla una vez, sube el volumen multimedia y, en iPhone/iPad, revisa el modo silencio.</dd>
-   <dt>La pantalla se apaga</dt><dd>Con el monitor o el ECG ampliados se mantiene encendida (☰ › General › Pantalla encendida al ampliar).</dd>
+   <dt>La pantalla se apaga</dt><dd>Con un caso en marcha o con el monitor o el ECG ampliados se mantiene encendida (☰ › General › Pantalla siempre encendida en clase).</dd>
    <dt>El compás no mide en ms/mV</dt><dd>El ECG del banco no está calibrado: el administrador puede hacerlo desde ⋯ Más › Calibrar escala.</dd>
   </dl>` }
 ];
