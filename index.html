@@ -1325,7 +1325,7 @@
   .pcr-mini b{ color:#ff8a95; } .pcr-mini-dot{ width:9px; height:9px; border-radius:50%; background:#ff4d5e; animation:alBlink 1s steps(1) infinite; }
   @media (max-width:760px){
     #pcrOverlay.open{ padding:0; } .pcr-panel{ border-radius:0; border:none; }
-    .pcr-cols{ grid-template-columns:1fr; overflow:auto; } .pcr-cols > .pcr-col{ overflow:visible !important; } .pcr-rh{ grid-template-columns:repeat(3,1fr); } .pcr-big{ font-size:38px; }
+    .pcr-cols{ grid-template-columns:1fr; grid-auto-rows:max-content; align-content:start; overflow:auto; } .pcr-cols > .pcr-col{ overflow:visible !important; min-height:auto !important; } .pcr-rh{ grid-template-columns:repeat(3,1fr); } .pcr-big{ font-size:38px; }
     .pcr-total{ margin-left:0; }
   }
   /* alumno */
@@ -1424,16 +1424,32 @@
   .xa-t{ color:#c9d3d6; }
   .pcr-xacts{ width:min(230px,36cqw); }
   [data-a="shock"]{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  /* alumno (todos los dispositivos): los contadores son los botones; las opciones se despliegan hacia arriba */
+  body.role-monitor .pcr-card .pc-acts{ display:none; }
+  body.role-monitor .pcr-card .pc-hint{ display:block; }
+  body.role-monitor .pcr-card .pc-tile{ cursor:pointer; border-color:rgba(255,255,255,.18); background:var(--panel); transition:transform .08s; }
+  body.role-monitor .pcr-card .pc-tile:hover{ border-color:rgba(255,255,255,.32); }
+  body.role-monitor .pcr-card .pc-tile:active{ transform:scale(.97); }
+  body.role-monitor .pcr-card .pc-tile[data-a="shock"]{ border-color:#ff4d5e; }
+  body.role-monitor .pcr-card .pc-tile[data-a="shock"] span{ color:#ff8a95; }
+  body.role-monitor .pcr-card .pc-tile.off{ opacity:.4; cursor:default; }
+  .pc-pulse{ width:100%; margin-top:8px; height:42px; }
+  .pc-pulse[hidden]{ display:none; }
   @media (orientation:landscape) and (max-height:560px){
-    body.role-monitor .monitor > .pcr-card .pc-acts{ display:none; }
-    body.role-monitor .monitor > .pcr-card .pc-hint{ display:block; }
-    body.role-monitor .monitor > .pcr-card .pc-tile{ cursor:pointer; border-color:rgba(255,255,255,.18); background:var(--panel); transition:transform .08s; }
-    body.role-monitor .monitor > .pcr-card .pc-tile:active{ transform:scale(.97); }
-    body.role-monitor .monitor > .pcr-card .pc-tile[data-a="shock"]{ border-color:#ff4d5e; }
-    body.role-monitor .monitor > .pcr-card .pc-tile[data-a="shock"] span{ color:#ff8a95; }
-    body.role-monitor .monitor > .pcr-card .pc-tile.off{ opacity:.4; cursor:default; }
     body.role-monitor .monitor > .pcr-card .pc-tile small{ font-size:10px; }
   }
+  /* monitor ampliado del alumno en la PCR: botones en fila encima de las constantes (más pequeñas) */
+  body.role-monitor.pcr-on .waves.expanded{ grid-template-rows:5fr 3fr 2.4fr auto 1.55fr; }
+  body.role-monitor.pcr-on .waves.expanded .wx-vitals{ grid-row:5; }
+  body.role-monitor .waves.expanded .pcr-xacts.on{ position:static; transform:none; grid-column:1; grid-row:4; flex-direction:row; width:auto;
+    gap:1cqw; padding:.8cqh calc(min(30px,8cqh) + 10px + 1cqw) 0 0; }
+  body.role-monitor .waves.expanded .pcr-xacts > *{ flex:1 1 0; min-width:0; }
+  body.role-monitor .waves.expanded .pcr-xacts .xa-adr[hidden]{ display:none; }
+  body.role-monitor .waves.expanded .pcr-xacts .pc-act{ height:min(38px,8.5cqh); font-size:min(13px,3.1cqh); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 6px; }
+  body.role-monitor .waves.expanded .pcr-xacts .xa-n, body.role-monitor .waves.expanded .pcr-xacts .xa-t{ min-width:min(36px,6cqw); }
+  body.role-monitor.pcr-on .waves.expanded .wx-val{ font-size:min(8.6cqh,4.4cqw); }
+  body.role-monitor.pcr-on .waves.expanded .wx-card[data-src="Bp"] .wx-val{ font-size:min(7.4cqh,3.3cqw); }
+  body.role-monitor.pcr-on .waves.expanded .pcr-fbox.docked .pb-big{ font-size:min(7.6cqh,3.9cqw); }
   /* menú de dosis desplegado hacia arriba desde el contador (móvil en horizontal) */
   .pcr-card{ position:relative; }
   .pc-dose.pop{ position:absolute; z-index:12; margin:0; padding:8px; box-shadow:0 -10px 30px rgba(0,0,0,.6); border-color:rgba(255,255,255,.25); }
@@ -2254,10 +2270,11 @@
         <div class="pcr-check-tag" id="pcrCheckTag" aria-live="assertive"></div>
         <div class="pcr-hud" id="pcrHud" aria-hidden="true"></div>
         <div class="pcr-xacts" id="pcrXActs">
-          <button type="button" class="pc-act sh" data-a="shock" onclick="pcrStudentAct('shock')">⚡ Descarga</button>
+          <div class="xa-adr xa-sh"><span class="xa-n" id="xaShN" title="Descargas">×0</span><button type="button" class="pc-act sh" data-a="shock" onclick="pcrStudentAct('shock')">⚡ Descarga</button></div>
           <div class="xa-adr"><span class="xa-n" id="xaAdrN" title="Dosis de adrenalina">0</span><button type="button" class="pc-act" data-a="adr" onclick="pcrStudentAct('adr')">Adrenalina</button><span class="xa-t" id="xaAdrT" title="Desde la última dosis">—</span></div>
           <button type="button" class="pc-act" data-a="amio" onclick="pcrStudentAct('amio')">Amiodarona</button>
           <button type="button" class="pc-act" data-a="lido" onclick="pcrStudentAct('lido')">Lidocaína</button>
+          <button type="button" class="pc-act np" data-a="pulse" onclick="pcrPulseSelf()" hidden>Comprobar pulso</button>
         </div>
         <div class="pc-dose pcr-xdose" id="pcrDoseX" hidden></div>
         <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg> Sin pulso — RCP</div>
@@ -2612,7 +2629,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -2648,8 +2665,9 @@
   <button type="button" class="pb-open" onclick="pcrMinimize(false)">Abrir</button>
 </div>
 <div id="pcrPulseQ" class="pcr-pulseq" role="dialog" aria-modal="true" aria-labelledby="pqTitle">
-  <div class="pq-card"><div class="pq-k">Comprobación de ritmo</div><div class="pq-t" id="pqTitle">¿Tiene pulso?</div>
-    <div class="pq-b"><button type="button" class="pq-yes" onclick="pcrStudentPulse(true)">Sí, tiene pulso</button><button type="button" class="pq-no" onclick="pcrStudentPulse(false)">No, no tiene pulso</button></div></div>
+  <div class="pq-card"><div class="pq-k" id="pqK">Comprobación de ritmo</div><div class="pq-t" id="pqTitle">¿Tiene pulso?</div>
+    <div class="pq-b"><button type="button" class="pq-yes" onclick="pcrStudentPulse(true)">Sí, tiene pulso</button><button type="button" class="pq-no" onclick="pcrStudentPulse(false)">No, no tiene pulso</button></div>
+    <button type="button" class="pd-x pq-x" id="pqX" onclick="pcrPulseForce=false; pcrPulseQuestion(pcrRemote)" hidden>Cancelar</button></div>
 </div>
 <div id="pcrReportOverlay" class="instructor-only" onclick="if(event.target===this) closePcrReport()">
   <div id="pcrReportPanel" role="dialog" aria-modal="true" aria-labelledby="rpTitle">
@@ -7325,14 +7343,14 @@ const MANUAL = [
   <p>Repaso guiado del manejo de una parada según <b>ERC 2025</b> o <b>AHA 2025</b> (el algoritmo elegido en ☰ › Clase). Por ahora solo está disponible para el <b>administrador</b>: ☰ › Clase › Herramientas › <b>Circuito de PCR</b>.</p>
   <ol>
    <li><b>Iniciar PCR</b> arranca el cronómetro de la parada con la comprobación del ritmo inicial.</li>
-   <li><b>Comprobación de ritmo</b> (10 s): elige lo que verá el alumno (FV, TVSP, asistolia, AESP o RCE). Los botones no indican si es desfibrilable: es una de las preguntas orales. El alumno ve el aviso «COMPROBACIÓN DE RITMO» con el trazado limpio (sin pulso, su TA queda en blanco y sin la etiqueta «sin pulso»); al elegir tú el ritmo, le aparece «Comprobación del ritmo finalizada» y el aviso se retira. En cuanto eliges el ritmo se te pregunta si se reanuda la RCP (o si confirmas la RCE). Con un ritmo organizado (AESP o RCE), antes se le pregunta al alumno en grande <b>«¿Tiene pulso?»</b>; su respuesta te queda valorada en el registro y aparece en tu pregunta. Si dice que no, se añade el aviso «sin pulso» a su monitor. Durante el circuito no salen los avisos rojos de «sin pulso».</li>
+   <li><b>Comprobación de ritmo</b> (10 s): elige lo que verá el alumno (FV, TV, asistolia, AESP o RCE). Los botones no indican si es desfibrilable: es una de las preguntas orales. El alumno ve el aviso «COMPROBACIÓN DE RITMO» con el trazado limpio (sin pulso, su TA queda en blanco y sin la etiqueta «sin pulso»); al elegir tú el ritmo, le aparece «Comprobación del ritmo finalizada» y el aviso se retira. En cuanto eliges el ritmo se te pregunta si se reanuda la RCP (o si confirmas la RCE). Con un ritmo organizado (<b>TV</b>, AESP o RCE), antes se le pregunta al alumno en grande <b>«¿Tiene pulso?»</b> y <b>su respuesta decide el algoritmo</b>, que tú confirmas: TV con pulso → RCE con la TV como ritmo de salida; TV sin pulso → TVSP (desfibrilable); RCE sin pulso → AESP; AESP con pulso → RCE. Si no aceptas su respuesta, queda como error en el registro. Sin alumnos conectados (o si no responde en 15 s), en la TV eres tú quien indica si tiene pulso. Si dice que no, se añade el aviso «sin pulso» a su monitor. Durante el circuito no salen los avisos rojos de «sin pulso».</li>
    <li>Según lo que decida el alumno, marca <b>⚡ Descarga</b>, <b>Reanudar RCP</b> o <b>Confirmar RCE</b>. Con <b>Reanudar RCP</b>: empieza un ciclo de 2 minutos y el ECG del alumno muestra el artefacto de las compresiones. Al terminar el ciclo vuelve sola la comprobación de ritmo.</li>
    <li>Registra adrenalina, amiodarona o lidocaína, acceso IV/IO y vía aérea avanzada. «Deshacer» quita la última descarga o fármaco.</li>
    <li><b>Ahora toca</b> te recuerda lo que indica la guía en cada momento (p. ej. adrenalina y amiodarona tras la 3.ª descarga en ERC; adrenalina tras la 2.ª en AHA; repetir adrenalina cada 4 min, dentro del rango de 3–5 min de las guías).</li>
    <li><b>Preguntas para el alumno</b>: preguntas orales del momento (ritmo, fármacos y dosis, causas reversibles, cuidados tras la RCE) con su respuesta desplegable y botones ✓/✗, y preguntas tipo test del banco de RCP que llegan a su pantalla.</li>
-   <li><b>RCE</b>: al confirmarla eliges el <b>ritmo de salida</b> (sinusal, taquicardia o bradicardia sinusal, SCACEST, FA, flutter, BAV completo o BRIHH) y el monitor del alumno lo muestra con constantes acordes. Si vuelve a parar, «Nueva parada».</li>
+   <li><b>RCE</b>: al confirmarla eliges el <b>ritmo de salida</b> (sinusal, taquicardia o bradicardia sinusal, SCACEST, FA, flutter, BAV completo o BRIHH) y el monitor del alumno lo muestra con constantes acordes. Durante la recuperación el alumno puede <b>comprobar el pulso</b> otra vez; si dice que no lo tiene, se te propone una nueva parada como <b>AESP</b> y sigue su algoritmo. Si vuelve a parar por otro motivo, «Nueva parada».</li>
   </ol>
-  <p>El alumno ve el tiempo total, el ciclo y su cuenta atrás, y las descargas y fármacos administrados. Además <b>administra él mismo</b> las descargas (eligiendo la energía) y los fármacos (eligiendo la dosis) con sus botones, también con el monitor ampliado (ahí, junto a la adrenalina, ve las dosis puestas y el tiempo desde la última). En el móvil en horizontal los propios contadores son pulsables: cada toque es una descarga o una dosis. La energía de la primera descarga se recuerda (mantener pulsada la descarga vuelve a mostrar las energías) y, si la primera adrenalina la pone a 1 mg, las siguientes se administran sin volver a preguntar; si empieza con amiodarona ya no se le ofrece lidocaína (y al revés): en tu registro aparece «Alumno · …» con ✓ si es correcto según la guía o ✗ con el motivo (dosis, momento o ritmo no indicado). No se le muestra el nombre del ritmo ni si es desfibrilable. «Ver monitor» deja el circuito en una caja con el ciclo y su cuenta atrás en grande, que se puede arrastrar a cualquier sitio. Con el monitor ampliado (instructor y alumno), el tiempo se coloca en la fila de constantes, a la derecha de la FR. Mientras dura la parada la pantalla no se apaga, ni en tu dispositivo ni en el del alumno. El selector <b>Velocidad</b> (x1 a x8) acelera el escenario para probarlo; «Terminar» lo cierra, borra el contador del alumno, devuelve los monitores a ritmo sinusal con constantes normales y abre el <b>informe</b> de la simulación: resumen (duración, RCE y ritmo de salida, ciclos, descargas y fármacos con su minuto), ritmos de cada comprobación, actuaciones del alumno y preguntas con su valoración y la cronología completa. Con los iconos de su cabecera se puede imprimir o guardar como PDF, descargar, compartir o copiar como texto; el último queda en «Ver el último informe» al abrir el circuito. Al empezar la parada (y en una nueva parada) suena una alarma en el instructor y en los alumnos. En el <b>Registro</b> queda la cronología completa.</p>
+  <p>El alumno ve el tiempo total, el ciclo y su cuenta atrás, y las descargas y fármacos administrados. Además <b>administra él mismo</b> las descargas (eligiendo la energía) y los fármacos (eligiendo la dosis) con sus botones, también con el monitor ampliado (ahí, junto a la adrenalina, ve las dosis puestas y el tiempo desde la última). En todos los dispositivos los propios contadores son pulsables: cada toque es una descarga o una dosis, y las opciones se despliegan hacia arriba desde el contador. Con el monitor ampliado los botones van en fila encima de las constantes, con el número de descargas a la izquierda de «Descarga». La energía de la primera descarga se recuerda (mantener pulsada la descarga vuelve a mostrar las energías) y, si la primera adrenalina la pone a 1 mg, las siguientes se administran sin volver a preguntar; si empieza con amiodarona ya no se le ofrece lidocaína (y al revés): en tu registro aparece «Alumno · …» con ✓ si es correcto según la guía o ✗ con el motivo (dosis, momento o ritmo no indicado). No se le muestra el nombre del ritmo ni si es desfibrilable. «Ver monitor» deja el circuito en una caja con el ciclo y su cuenta atrás en grande, que se puede arrastrar a cualquier sitio. Con el monitor ampliado (instructor y alumno), el tiempo se coloca en la fila de constantes, a la derecha de la FR. Mientras dura la parada la pantalla no se apaga, ni en tu dispositivo ni en el del alumno. El selector <b>Velocidad</b> (x1 a x8) acelera el escenario para probarlo; «Terminar» lo cierra, borra el contador del alumno, devuelve los monitores a ritmo sinusal con constantes normales y abre el <b>informe</b> de la simulación: resumen (duración, RCE y ritmo de salida, ciclos, descargas y fármacos con su minuto), ritmos de cada comprobación, actuaciones del alumno y preguntas con su valoración y la cronología completa. Con los iconos de su cabecera se puede imprimir o guardar como PDF, descargar, compartir o copiar como texto; el último queda en «Ver el último informe» al abrir el circuito. Al empezar la parada (y en una nueva parada) suena una alarma en el instructor y en los alumnos. En el <b>Registro</b> queda la cronología completa.</p>
   <p class="mn-note">Más adelante podrá abrirse automáticamente cuando un caso clínico llegue a una parada.</p>` },
 
  { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de constantes con «Mostrar el parámetro alterado» activado'], ['alarmas_fv', 'Alarma de ritmo: campana roja, sin diagnóstico']], who:'all', t:'Sonido y alarmas', h:`
@@ -7491,11 +7509,14 @@ var pcrRemote = null;           // último estado recibido (alumno)
 const PCR_CYCLE = 120000, PCR_CHECK = 10000, PCR_ADR = 240000;   // adrenalina cada 4 min (dentro del rango 3–5 min de las guías)
 const PCR_RHYTHMS = {
   vf:   { name:'FV', long:'Fibrilación ventricular', shock:true },
-  pvt:  { name:'TVSP', long:'Taquicardia ventricular sin pulso', shock:true },
+  vt:   { name:'TV', long:'Taquicardia ventricular (ritmo organizado: comprobar el pulso)', shock:false, org:true },
   asys: { name:'Asistolia', long:'Asistolia', shock:false },
-  pea:  { name:'AESP', long:'Actividad eléctrica sin pulso', shock:false },
-  rosc: { name:'RCE', long:'Ritmo organizado con pulso (RCE)', shock:false }
+  pea:  { name:'AESP', long:'Actividad eléctrica sin pulso', shock:false, org:true },
+  rosc: { name:'RCE', long:'Ritmo organizado con pulso (RCE)', shock:false, org:true },
+  // la TVSP no tiene botón: se llega a ella desde «TV» cuando no hay pulso
+  pvt:  { name:'TVSP', long:'Taquicardia ventricular sin pulso', shock:true, hidden:true }
 };
+function pcrIsOrg(k){ return !!(k && PCR_RHYTHMS[k] && PCR_RHYTHMS[k].org); }
 function pcrAlgo(){ return cprAlgo==='AHA' ? 'AHA' : 'ERC'; }
 function pcrFmt(ms){ ms = Math.max(0, ms|0); const s = Math.floor(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 // reloj virtual del circuito: permite acelerar el escenario (beta)
@@ -7544,8 +7565,8 @@ function pcrQuestions(){
   return {
     check:[
       { q:'¿Qué ritmo ves?', a: r ? r.long+'.' : 'Elige primero el ritmo que verá el alumno.' },
-      { q:'¿Es desfibrilable? ¿Qué harías ahora?', a: r ? (r.shock ? 'Sí: descarga y reanudar las compresiones de inmediato 2 minutos.' : (pcr.rhythm==='rosc' ? 'No: ritmo organizado; comprobar pulso y signos de vida. Si los hay, RCE y cuidados posteriores.' : 'No: reanudar RCP 2 minutos y adrenalina 1 mg lo antes posible si aún no se ha puesto.')) : 'Elige primero el ritmo que verá el alumno.' },
-      ...((pcr && (pcr.rhythm==='pea' || pcr.rhythm==='rosc')) ? [{ q:'Ritmo organizado: ¿has comprobado el pulso?', a: pcr.rhythm==='pea' ? 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → AESP. RCP 2 minutos y adrenalina 1 mg lo antes posible.' : 'Sí, debe comprobarlo (máx. 10 s): hay pulso y signos de vida → RCE.' }] : []),
+      { q:'¿Es desfibrilable? ¿Qué harías ahora?', a: r ? (r.shock ? 'Sí: descarga y reanudar las compresiones de inmediato 2 minutos.' : (pcr.rhythm==='rosc' ? 'No: ritmo organizado; comprobar pulso y signos de vida. Si los hay, RCE y cuidados posteriores.' : pcr.rhythm==='vt' ? 'Depende del pulso: sin pulso es una TVSP (descarga y RCP 2 minutos); con pulso no es una parada (RCE: tratar la taquicardia).' : 'No: reanudar RCP 2 minutos y adrenalina 1 mg lo antes posible si aún no se ha puesto.')) : 'Elige primero el ritmo que verá el alumno.' },
+      ...((pcr && (pcrIsOrg(pcr.rhythm) || pcr.rhythm==='pvt')) ? [{ q:'Ritmo organizado: ¿has comprobado el pulso?', a: pcr.rhythm==='pea' ? 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → AESP. RCP 2 minutos y adrenalina 1 mg lo antes posible.' : pcr.rhythm==='rosc' ? 'Sí, debe comprobarlo (máx. 10 s): hay pulso y signos de vida → RCE.' : 'Sí, debe comprobarlo (máx. 10 s): sin pulso → TVSP (desfibrilable); con pulso → RCE con TV.' }] : []),
       { q:'¿Cuánto puede durar la pausa para comprobar el ritmo?', a:'Menos de 10 segundos, y reanudar las compresiones cuanto antes.' }
     ],
     shock:[
@@ -7593,7 +7614,7 @@ function pcrAdvice(){
   if(pcr.phase==='check'){
     if(!pcr.rhythm) out.push(['warn','Comprobación de ritmo (< 10 s): elige el ritmo que verá el alumno.']);
     else out.push(['info','Pregunta al alumno qué ritmo ve y qué haría; registra su decisión (descarga, reanudar RCP o RCE).']);
-    if(pcr.rhythm==='pea' || pcr.rhythm==='rosc') out.push(['warn','Ritmo organizado: el alumno debe comprobar el pulso; se le pregunta en su pantalla si lo tiene.']);
+    if(pcrIsOrg(pcr.rhythm) && !pcr.pulseAns) out.push(['warn','Ritmo organizado: el alumno debe comprobar el pulso; se le pregunta en su pantalla si lo tiene. Su respuesta decide el algoritmo (lo confirmas tú).']);
   }
   if(pcrIsShock() && pcr.phase==='cpr'){
     if(pcr.shocks >= T.adrAt && adrN===0) out.push(['warn', pcrAlgo()==='ERC' ? 'Adrenalina 1 mg IV/IO (tras la 3.ª descarga).' : 'Epinefrina 1 mg IV/IO (tras la 2.ª descarga).']);
@@ -7764,31 +7785,79 @@ function pcrCheck(){
 function pcrSetRhythm(k){
   if(!pcr || pcr.phase!=='check') return;
   pcr.rhythm = k;
-  const map = { vf:['vfib',false], pvt:['vtach',true], asys:['asystole',false], pea:['sbrady',true], rosc:['stach',false] };
+  const map = { vf:['vfib',false], vt:['vtach',true], pvt:['vtach',true], asys:['asystole',false], pea:['sbrady',true], rosc:['stach',false] };
   const [r, noPulse] = map[k];
   setRhythm(r); pulseManuallyDisabled = noPulse;
   if(k==='rosc'){ state.hr = 105; state.sys = 100; state.dia = 62; state.spo2 = 93; syncInputs(); }
   broadcastState();
   pcrLog('Ritmo: '+PCR_RHYTHMS[k].long, 'rhythm');
-  pcr.pulseAns = null;
+  pcr.pulseAns = null; pcr.pulseGraded = false;
   pcrSend(true); pcrRender();
   // ritmo organizado: primero el alumno responde si tiene pulso (máx. 15 s); después se pregunta al instructor
   clearTimeout(pcrSetRhythm._t);
-  if((k==='pea' || k==='rosc') && pcrStudents()>0){ pcr.waitPulse = pcr.checkStart; pcrSetRhythm._t = setTimeout(()=>{ if(pcr && pcr.waitPulse===pcr.checkStart){ pcr.waitPulse = null; pcrAskResume(); } }, 15000); }
+  if(pcrIsOrg(k) && pcrStudents()>0){ pcr.waitPulse = pcr.checkStart; pcrSetRhythm._t = setTimeout(()=>{ if(pcr && pcr.waitPulse===pcr.checkStart){ pcr.waitPulse = null; pcrAskResume(); } }, 15000); }
   else setTimeout(pcrAskResume, 120);
 }
 function pcrStudents(){ return (typeof studentCount==='number') ? studentCount : 1; }
 async function pcrAskResume(){
   if(!pcr || pcr.phase!=='check' || !pcr.rhythm || pcrAskResume._busy) return;
   pcrAskResume._busy = true;
-  const r = PCR_RHYTHMS[pcr.rhythm], ans = pcr.pulseAns ? '\n\nEl alumno dice: '+(pcr.pulseAns==='yes' ? 'tiene pulso' : 'no tiene pulso')+'.' : '';
   try{
-    if(pcr.rhythm==='rosc'){
-      if(await appConfirm('Ritmo organizado con pulso.'+ans+'\n\n¿Confirmar la recuperación (RCE)?', { ok:'Confirmar RCE', cancel:'Aún no' })) pcrRosc();
+    const ans = pcr.pulseAns, ansT = ans ? '\n\nEl alumno dice: '+(ans==='yes' ? 'tiene pulso' : 'no tiene pulso')+'.' : '';
+    // la respuesta del alumno sobre el pulso decide el algoritmo; el instructor lo confirma (si no la acepta, cuenta como error)
+    const grade = (ok, why)=>{ if(!ans || pcr.pulseGraded) return; pcr.pulseGraded = true; pcr.acts = pcr.acts || { ok:0, ko:0 }; pcr.acts[ok ? 'ok' : 'ko']++;
+      if(!ok) pcrLog('✗ Comprobación del pulso: '+why, 'qko'); };
+    let k = pcr.rhythm;
+    if(k==='vt'){
+      const pulse = ans ? ans==='yes' : await appConfirm('Taquicardia ventricular (ritmo organizado).\n\n¿Tiene pulso?', { ok:'Con pulso', cancel:'Sin pulso (TVSP)' });
+      if(!pcr || pcr.phase!=='check') return;
+      grade(true);
+      if(pulse){
+        if(await appConfirm('Taquicardia ventricular con pulso.'+ansT+'\n\n¿Confirmar la recuperación (RCE) con la TV como ritmo de salida?', { ok:'Confirmar RCE', cancel:'Aún no' })){ if(pcr && pcr.phase==='check') pcrRoscWith('vt'); }
+        return;
+      }
+      pcrToPulseless('pvt'); k = 'pvt';
+    } else if(k==='rosc' && ans==='no'){
+      if(await appConfirm('Ritmo organizado. El alumno dice que no tiene pulso.\n\n¿Se trata como una AESP?', { ok:'Pasar a AESP', cancel:'Mantener RCE' })){ grade(true); pcrToPulseless('pea'); k = 'pea'; }
+      else grade(false, 'tenía pulso (RCE)');
+    } else if(k==='pea' && ans==='yes'){
+      if(await appConfirm('AESP. El alumno dice que tiene pulso.\n\n¿Se trata como una recuperación (RCE)?', { ok:'Pasar a RCE', cancel:'Mantener AESP' })){
+        grade(true); pcr.rhythm = 'rosc'; pulseManuallyDisabled = false; broadcastState(); pcrLog('Con pulso → RCE', 'rhythm'); pcrRosc(); return;
+      }
+      grade(false, 'no tenía pulso (AESP)');
+    } else grade(true);
+    if(!pcr || pcr.phase!=='check') return;
+    if(k==='rosc'){
+      if(await appConfirm('Ritmo organizado con pulso.'+ansT+'\n\n¿Confirmar la recuperación (RCE)?', { ok:'Confirmar RCE', cancel:'Aún no' })) pcrRosc();
     } else {
-      if(await appConfirm('Ritmo: '+r.long+'.'+ans+'\n\n¿Se reanuda la RCP?', { ok:'Reanudar RCP', cancel:'Aún no' })){ if(pcr && pcr.phase==='check') pcrResume(); }
+      if(await appConfirm('Ritmo: '+PCR_RHYTHMS[k].long+'.'+ansT+'\n\n¿Se reanuda la RCP?', { ok:'Reanudar RCP', cancel:'Aún no' })){ if(pcr && pcr.phase==='check') pcrResume(); }
     }
   } finally { pcrAskResume._busy = false; }
+}
+// ritmo organizado sin pulso: TV → TVSP, RCE → AESP (el ECG del monitor no cambia, solo se quita el pulso)
+function pcrToPulseless(k){
+  if(!pcr) return;
+  pcr.rhythm = k; pulseManuallyDisabled = true; broadcastState();
+  pcrLog('Sin pulso → '+PCR_RHYTHMS[k].long, 'rhythm');
+  pcrSend(true); pcrRender();
+}
+// en la recuperación, el alumno comprueba el pulso y dice que no lo tiene: nueva parada como AESP
+async function pcrAskRelapse(){
+  if(!pcr || pcr.phase!=='rosc' || pcrAskRelapse._busy) return;
+  pcrAskRelapse._busy = true;
+  try{
+    const yes = await appConfirm('El alumno comprueba el pulso: no tiene pulso.\n\nRitmo organizado sin pulso: ¿nueva parada (AESP)?', { ok:'Nueva parada · AESP', cancel:'Mantener RCE', danger:true });
+    if(!pcr || pcr.phase!=='rosc') return;
+    pcr.acts = pcr.acts || { ok:0, ko:0 }; pcr.acts[yes ? 'ok' : 'ko']++;
+    if(!yes){ pcrLog('✗ Comprobación del pulso: tenía pulso (RCE)', 'qko'); pcrRender(true); return; }
+    pcrLog('Nueva parada tras la RCE (sin pulso)', 'check'); pcrArrestAlarm();
+    pcrCheck();
+    pcr.rhythm = 'pea'; pcr.pulseAns = 'no'; pcr.pulseGraded = true;
+    pulseManuallyDisabled = true; broadcastState();
+    pcrLog('Ritmo: '+PCR_RHYTHMS.pea.long+' (sin pulso)', 'rhythm');
+    pcrSend(true); pcrRender();
+  } finally { pcrAskRelapse._busy = false; }
+  setTimeout(pcrAskResume, 150);
 }
 function pcrShock(){
   if(!pcr || pcr.phase==='idle' || pcr.phase==='rosc') return;
@@ -7811,7 +7880,8 @@ const PCR_EXIT = {
   afib:  ['Fibrilación auricular', 'afib', 122, 98, 62, 93, 0],
   aflutter:['Flutter auricular', 'aflutter', 150, 94, 58, 92, 0],
   avb3:  ['BAV completo', 'avb3', 90, 86, 50, 92, 0],
-  brihh: ['Bloqueo de rama izquierda', 'brihh', 92, 102, 62, 93, 0]
+  brihh: ['Bloqueo de rama izquierda', 'brihh', 92, 102, 62, 93, 0],
+  vt:    ['Taquicardia ventricular con pulso', 'vtach', 165, 94, 58, 92, 0]
 };
 function pcrRosc(){
   if(!pcr) return;
@@ -7894,7 +7964,7 @@ function pcrPayload(){
     shocks:pcr.shocks, adr:pcr.adr.length, adrAgo: pcr.adr.length ? n-pcr.adr[pcr.adr.length-1] : null,
     amio:pcr.amio.slice(), lido:pcr.lido.slice(), iv:pcr.iv, airway:pcr.airway, rosc: pcr.phase==='rosc' ? n-pcr.roscAt : 0,
     rsel: !!pcr.rhythm, chkId: pcr.checkStart, speed: pcrSpeed, id: pcr.startReal,
-    org: pcr.rhythm==='pea' || pcr.rhythm==='rosc' };
+    org: pcrIsOrg(pcr.rhythm) && !pcr.pulseAns };
 }
 function pcrSend(){ if(role==='instructor' && channel) channel.send({ type:'broadcast', event:'pcr_state', payload:pcrPayload() }); }
 var pcrLastId = null;
@@ -7933,7 +8003,7 @@ function pcrRender(keepTest){
   } else if(pcr.phase==='check'){
     const left = PCR_CHECK - (pcrNow()-pcr.checkStart);
     h = '<div class="pcr-k">Comprobación de ritmo</div><div class="pcr-big '+(left<0 ? 'late' : '')+'">'+(left>=0 ? Math.ceil(left/1000)+' s' : '+'+Math.ceil(-left/1000)+' s')+'</div>'
-      + '<div class="pcr-rh">'+Object.keys(PCR_RHYTHMS).map(k=>'<button type="button" class="pcr-rb'+(pcr.rhythm===k?' on':'')+'" onclick="pcrSetRhythm(\''+k+'\')" title="'+PCR_RHYTHMS[k].long+'">'+PCR_RHYTHMS[k].name+'</button>').join('')+'</div>'
+      + '<div class="pcr-rh">'+Object.keys(PCR_RHYTHMS).filter(k=>!PCR_RHYTHMS[k].hidden).map(k=>'<button type="button" class="pcr-rb'+(pcr.rhythm===k || (k==='vt' && pcr.rhythm==='pvt')?' on':'')+'" onclick="pcrSetRhythm(\''+k+'\')" title="'+PCR_RHYTHMS[k].long+'">'+PCR_RHYTHMS[k].name+'</button>').join('')+'</div>'
       + '<div class="pcr-row">'
       + (pcr.rhythm ? '<button type="button" class="pcr-cta sh'+(pcr.shockedThisCheck?' done':'')+'" onclick="pcrShock()">⚡ Descarga'+(pcr.shockedThisCheck?' dada':'')+'</button>' : '')
       + (pcr.rhythm ? '<button type="button" class="pcr-cta" onclick="pcrResume()">'+IC('play')+' Reanudar RCP</button>' : '')
@@ -8034,13 +8104,20 @@ function pcrEval(a, dose){
   return notes;
 }
 function pcrRemoteCmd(p){
-  if(role!=='instructor' || !pcr || !p || pcr.phase==='idle' || pcr.phase==='rosc') return;
+  if(role!=='instructor' || !pcr || !p || pcr.phase==='idle') return;
+  if(pcr.phase==='rosc'){
+    if(p.a!=='pulse') return;
+    const yes = p.dose==='yes';
+    pcrLog('Alumno · comprueba el pulso en la RCE: '+(yes ? 'tiene pulso' : 'no tiene pulso'), 'misc', 'pulse');
+    showToast('Alumno: '+(yes ? 'tiene pulso' : 'no tiene pulso')); pcrRender(true);
+    if(!yes) pcrAskRelapse();
+    return;
+  }
   if(p.a==='pulse'){
-    const yes = p.dose==='yes', ok = pcr.rhythm==='rosc' ? yes : (!!pcr.rhythm && !yes);
-    pcr.acts = pcr.acts || { ok:0, ko:0 }; pcr.acts[ok ? 'ok' : 'ko']++;
+    const yes = p.dose==='yes';
     pcr.pulseAns = yes ? 'yes' : 'no';
-    pcrLog('Alumno · ¿tiene pulso?: '+(yes ? 'sí' : 'no')+(ok ? ' ✓' : ' ✗'), 'misc', 'pulse');
-    showToast('Alumno: '+(yes ? 'tiene pulso' : 'no tiene pulso')+(ok ? ' ✓' : ' ✗')); pcrRender(true);
+    pcrLog('Alumno · ¿tiene pulso?: '+(yes ? 'sí' : 'no'), 'misc', 'pulse');
+    showToast('Alumno: '+(yes ? 'tiene pulso' : 'no tiene pulso')); pcrSend(true); pcrRender(true);
     if(pcr.waitPulse===pcr.checkStart){ pcr.waitPulse = null; clearTimeout(pcrSetRhythm._t); setTimeout(pcrAskResume, 300); }
     return;
   }
@@ -8088,25 +8165,33 @@ function pcrStudentAct(a, pick){
   } else { sh.style.width = sh.style.left = sh.style.bottom = ''; }
 }
 // ritmo organizado: se pregunta al alumno, en grande, si el paciente tiene pulso
-var pcrPulseAsked = null;
+var pcrPulseAsked = null, pcrPulseForce = false;
 function pcrPulseQuestion(p){
   const q = document.getElementById('pcrPulseQ'); if(!q) return;
-  const show = p && p.phase==='check' && p.rsel && p.org && pcrPulseAsked!==p.chkId;
+  if(!p || p.phase!=='rosc') pcrPulseForce = false;
+  const show = (p && p.phase==='rosc' && pcrPulseForce) || (p && p.phase==='check' && p.rsel && p.org && pcrPulseAsked!==p.chkId);
   q.classList.toggle('open', !!show);
+  const k = document.getElementById('pqK'); if(k) k.textContent = pcrPulseForce ? 'Recuperación (RCE)' : 'Comprobación de ritmo';
+  const x = document.getElementById('pqX'); if(x) x.hidden = !pcrPulseForce;
 }
+// en la recuperación el alumno puede volver a comprobar el pulso
+function pcrPulseSelf(){ if(!pcrRemote || pcrRemote.phase!=='rosc') return; pcrPulseForce = true; pcrPulseQuestion(pcrRemote); }
 function pcrStudentPulse(yes){
   const p = pcrRemote; if(!p || !channel) return;
-  pcrPulseAsked = p.chkId;
-  if(!yes){ pcrNoPulseMarked = true; pcrNoPulseChk = p.chkId; document.body.classList.add('pcr-nopulse'); }
+  const inRosc = pcrPulseForce && p.phase==='rosc'; pcrPulseForce = false;
+  if(!inRosc) pcrPulseAsked = p.chkId;
+  if(!yes && !inRosc){ pcrNoPulseMarked = true; pcrNoPulseChk = p.chkId; document.body.classList.add('pcr-nopulse'); }
   channel.send({ type:'broadcast', event:'pcr_cmd', payload:{ a:'pulse', dose: yes ? 'yes' : 'no' } });
   pcrPulseQuestion(p);
-  showToast(yes ? 'Respuesta: tiene pulso.' : 'Respuesta: no tiene pulso. Aviso añadido al monitor.');
+  showToast(yes ? 'Respuesta: tiene pulso.' : inRosc ? 'Respuesta: no tiene pulso. Avisado el instructor.' : 'Respuesta: no tiene pulso. Aviso añadido al monitor.');
 }
 function pcrDoseClose(){ ['pcrDose','pcrDoseX'].forEach(id=>{ const sh = document.getElementById(id); if(sh) sh.hidden = true; }); }
 // botones del alumno: tras amiodarona no se ofrece lidocaína (y al revés); máximo 2 dosis de cada
 function pcrUpdateStudentBtns(p){
   document.querySelectorAll('#pcrCard .pc-act, #pcrXActs .pc-act').forEach(b=>{
     const a = b.dataset.a; let off = !p || p.phase==='rosc', hide = false;
+    if(a==='pulse'){ b.hidden = !(p && p.phase==='rosc'); b.disabled = false; return; }
+    if(p && p.phase==='rosc' && b.closest('#pcrXActs')) hide = true;
     if(p && a==='lido'){ hide = p.amio.length>0; off = off || p.lido.length>=2; }
     if(p && a==='amio'){ hide = p.lido.length>0; off = off || p.amio.length>=2; }
     b.hidden = hide; b.disabled = off;
@@ -8114,7 +8199,7 @@ function pcrUpdateStudentBtns(p){
     if(a==='shock') b.textContent = '⚡ Descarga'+(pcrShockEnergy ? ' '+pcrShockEnergy : '');
 
   });
-  const xa = document.getElementById('pcrXActs'); if(xa) xa.classList.toggle('on', !!p);
+  const xa = document.getElementById('pcrXActs'); if(xa){ xa.classList.toggle('on', !!p); xa.querySelectorAll('.xa-adr').forEach(g=>g.hidden = !!(p && p.phase==='rosc')); }
 }
 function pcrStudentSend(a, dose){
   pcrDoseClose();
@@ -8213,7 +8298,7 @@ try{ pcrLandMQ.addEventListener('change', placePcrCard); }catch(e){ pcrLandMQ.ad
 /* contadores pulsables (móvil en horizontal) y pulsación larga en la descarga para cambiar la energía */
 (function(){
   let lpT = 0, lpFired = false;
-  const isTileMode = ()=> role==='monitor' && pcrLandMQ.matches;
+  const isTileMode = ()=> role==='monitor';   // contadores pulsables en todos los dispositivos del alumno
   document.addEventListener('pointerdown', e=>{
     const el = e.target.closest('[data-a="shock"]'); if(!el || role!=='monitor') return;
     if(el.classList.contains('pc-tile') && !isTileMode()) return;
@@ -8256,7 +8341,8 @@ function pcrRenderStudent(){
       + '<div class="pc-tile" data-a="adr"><span>Adrenalina</span><b id="pcvAdr"></b><small id="pcsAdr"></small></div>'
       + '<div class="pc-tile" data-a="amio"><span>Amiodarona</span><b class="sm" id="pcvAmio"></b><small id="pcsAmio"></small></div>'
       + '<div class="pc-tile" data-a="lido"><span>Lidocaína</span><b class="sm" id="pcvLido"></b><small id="pcsLido"></small></div>'
-      + '</div><p class="pc-hint">Toca un contador para administrar. Mantén pulsada la descarga para cambiar la energía.</p></div>'
+      + '</div><p class="pc-hint">Toca un contador para administrar. Mantén pulsada la descarga para cambiar la energía.</p>'
+      + '<button type="button" class="pc-act np pc-pulse" data-a="pulse" onclick="pcrPulseSelf()" hidden>Comprobar pulso</button></div>'
       + '<div class="pc-acts">'
       + '<button type="button" class="pc-act sh" data-a="shock" onclick="pcrStudentAct(\'shock\')">⚡ Descarga</button>'
       + '<button type="button" class="pc-act" data-a="adr" onclick="pcrStudentAct(\'adr\')">Adrenalina</button>'
@@ -8278,7 +8364,7 @@ function pcrRenderStudent(){
     const off = offA || (a==='amio' && (p.lido.length>0 || p.amio.length>=2)) || (a==='lido' && (p.amio.length>0 || p.lido.length>=2));
     t.classList.toggle('off', off); });
   // monitor ampliado: dosis de adrenalina a la izquierda y tiempo desde la última a la derecha
-  set('xaAdrN', '×'+p.adr); set('xaAdrT', adrAgo!=null ? pcrFmt(adrAgo) : '—');
+  set('xaShN', '×'+p.shocks); set('xaAdrN', '×'+p.adr); set('xaAdrT', adrAgo!=null ? pcrFmt(adrAgo) : '—');
   hud.classList.add('on');
   hud.textContent = 'PCR '+pcrFmt(el)+' · '+(p.phase==='cpr' ? 'C'+p.cycle+' '+pcrFmt(cyc) : p.phase==='check' ? 'Ritmo' : 'RCE')+' · ⚡'+p.shocks+' · Adr '+p.adr+(p.amio.length ? ' · Amio '+p.amio.reduce((a,b)=>a+b,0) : '')+(p.lido.length ? ' · Lido '+p.lido.length : '');
   // al elegir el instructor el ritmo: «Comprobación del ritmo finalizada» unos segundos y se quita el aviso
