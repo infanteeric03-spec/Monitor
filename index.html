@@ -1711,6 +1711,7 @@
      queda debajo de ella. Con un color liso en esa franja (sin cuadrícula ni contenido) no se ve borroso. */
   .safe-top{ position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top, 0px); background:#05080a;
     z-index:120; pointer-events:none; }
+  html.ipad-app .guide-close{ top:calc(max(14px, env(safe-area-inset-top, 0px)) + 0.5cm); }
   html.ipad-app .safe-top{ height:max(env(safe-area-inset-top, 0px), 24px); }
   body.theme-light.role-instructor .safe-top, body.theme-light.role-monitor .safe-top{ background:var(--bg); }
 
@@ -2160,7 +2161,7 @@
               <!-- interruptor "Sinc" y botón de enviar -->
               <rect x="26" y="81" width="19" height="10" rx="5" fill="#35ff6b" opacity=".9"/>
               <circle cx="40" cy="86" r="3.6" fill="#ffffff"/>
-              <text x="49" y="89" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="7.6" fill="#7fc0ff">Sinc</text>
+              <text x="49" y="89" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="7.6" fill="#7fc0ff">Sincro</text>
               <rect x="76" y="79" width="18" height="14" rx="4" fill="none" stroke="#35ff6b" stroke-width="1.6"/>
               <path d="M80 86.4 L90.5 82 L87.2 90.6 L85.4 87.1 Z" fill="#ffffff"/>
               <circle cx="93.5" cy="79.5" r="2.4" fill="#ff4d5e"/>
@@ -2251,8 +2252,8 @@
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
         <div class="sync-toggle instructor-only">
-          <span class="sync-label" id="syncLabel" hidden>Sinc</span>
-          <button type="button" class="sync-pill on" id="syncSwitch" role="switch" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo"><span class="sp-dot" aria-hidden="true"></span>Sinc</button>
+          <span class="sync-label" id="syncLabel" hidden>Sincro</span>
+          <button type="button" class="sync-pill on" id="syncSwitch" role="switch" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo"><span class="sp-dot" aria-hidden="true"></span>Sincro</button>
           <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()" aria-label="Enviar cambios al monitor">
             <span id="btnSendNowLabel"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
@@ -2353,8 +2354,8 @@
                   <option value="avb3">BAV completo (3er grado)</option>
                   <option value="brihh">Bloqueo de rama izquierda (BRIHH)</option>
                   <option value="brdhh">Bloqueo de rama derecha (BRDHH)</option>
-                  <option value="pvcs">Extrasístoles ventriculares (PVCs)</option>
-                  <option value="vtach">Taquicardia ventricular (con pulso)</option>
+                  <option value="pvcs">Extrasístoles ventriculares</option>
+                  <option value="vtach">Taquicardia ventricular monomorfa</option>
                   <option value="vfib">Fibrilación ventricular</option>
                   <option value="asystole">Asistolia</option>
                 </select>
@@ -2663,7 +2664,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.33", "d": "6 nov 2026", "items": ["Lista de ritmos: «Extrasístoles ventriculares» y «Taquicardia ventricular monomorfa».", "«Sinc» pasa a llamarse «Sincro».", "Guía rápida: el aviso del manual queda solo en el primer paso; en el iPad, la parte de arriba de la guía medio centímetro más abajo."]}, {"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -3930,8 +3931,8 @@ const RHYTHM_OPTIONS = [
   { v:'avb3', l:'BAV completo (3er grado)' },
   { v:'brihh', l:'Bloqueo de rama izquierda (BRIHH)' },
   { v:'brdhh', l:'Bloqueo de rama derecha (BRDHH)' },
-  { v:'pvcs', l:'Extrasístoles ventriculares (PVCs)' },
-  { v:'vtach', l:'Taquicardia ventricular (con pulso)' },
+  { v:'pvcs', l:'Extrasístoles ventriculares' },
+  { v:'vtach', l:'Taquicardia ventricular monomorfa' },
   { v:'vfib', l:'Fibrilación ventricular' },
   { v:'asystole', l:'Asistolia' }
 ];
@@ -4280,7 +4281,7 @@ function togglePlay(){
   // si no, los cambios que va generando el caso no llegarán al monitor hasta pulsar "Enviar".
   if(scenario.playing && !syncEnabled && !scenario.syncPrompted){
     scenario.syncPrompted = true;
-    appConfirm('¿Activar la sincronización?\n\n«Sinc» está desactivado: los cambios del caso no llegarán al monitor del alumno hasta que pulses «Enviar». Actívalo para que el monitor siga el caso en directo.', { ok:'Activar Sinc', cancel:'Ahora no' })
+    appConfirm('¿Activar la sincronización?\n\n«Sincro» está desactivado: los cambios del caso no llegarán al monitor del alumno hasta que pulses «Enviar». Actívalo para que el monitor siga el caso en directo.', { ok:'Activar Sincro', cancel:'Ahora no' })
       .then(ok=>{ if(ok && !syncEnabled) toggleSync(); });
   }
 }
@@ -4895,20 +4896,18 @@ const GUIDE_STEPS = {
     { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
       sub:'Ábrela para enviar al alumno preguntas de la fase en curso: FV/TVSP, asistolia/AESP o tras la RCE.', before:()=>switchTab('case') },
     { sel:'#quizCat + .csel-btn', text:'Elige una categoría y una pregunta, y envíala al monitor.', sub:'Al contestar, el alumno ve su respuesta enviada y la pregunta se cierra sola.', before:()=>switchTab('quiz') },
-    { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con {i:send} Enviar.' },
+    { sel:'#syncSwitch', text:'Con Sincro activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con {i:send} Enviar.' },
     { sel:'#roomBadge', text:'Tu sala y cuántos alumnos hay conectados.', sub:'Comparte el código para que se unan; te avisamos cuando entre alguien.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
     { sel:'#settingsBtn', text:'En ☰ Configuración tienes el resto de opciones.',
-      sub:'Tres pestañas: General (tema, sonido y alarmas, guía, actualizar y sala), Clase (ficha del ritmo, RCP ERC/AHA, casos, preguntas y herramientas) y Alumno (lo que ve el alumno). Toca ⓘ para ver la explicación de cada opción.' },
-    { sel:'#settingsBtn', hand:false, manual:true, text:'Y si quieres el detalle de cada apartado, abre el Manual de uso.', sub:'Está en ☰ › General › Manual de uso, con capturas ampliables y las novedades de cada versión.' }
+      sub:'Tres pestañas: General (tema, sonido y alarmas, guía, actualizar y sala), Clase (ficha del ritmo, RCP ERC/AHA, casos, preguntas y herramientas) y Alumno (lo que ve el alumno). Toca ⓘ para ver la explicación de cada opción.' }
   ],
   monitor: [
     { text:'Esta pantalla es el monitor del paciente.', manual:true, sub:'El instructor controla lo que ves desde su dispositivo. Para el detalle de cada apartado tienes además el Manual de uso, en ☰ › General.' },
     ...GUIDE_MONITOR_PARTS,
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.' },
     { sel:'#wavesExpandBtn', text:'Amplía el monitor a pantalla completa.', sub:'El instructor también puede ampliarlo desde su consola, y enviarte preguntas, fichas de ritmos o un ECG en directo.' },
-    { sel:'#settingsBtn', text:'En ☰ tienes el tema, esta guía y «Actualizar la app».', sub:'La pantalla del monitor siempre queda oscura, aunque elijas el tema claro.' },
-    { sel:'#settingsBtn', hand:false, manual:true, text:'Y si quieres el detalle de cada apartado, abre el Manual de uso.', sub:'Está en ☰ › General › Manual de uso, con capturas ampliables y las novedades de cada versión.' }
+    { sel:'#settingsBtn', text:'En ☰ tienes el tema, esta guía y «Actualizar la app».', sub:'La pantalla del monitor siempre queda oscura, aunque elijas el tema claro.' }
   ]
 };
 let guideSteps = [], guideIdx = 0;
@@ -4954,6 +4953,8 @@ function guideGo(d){
   guideShow();
 }
 
+// iPad: la parte de arriba de la guía (✕ y texto) medio centímetro más abajo; la barra inferior no se mueve
+function guideTopOff(){ return document.documentElement.classList.contains('ipad-app') ? 19 : 0; }
 function guideShow(){
   const st = guideSteps[guideIdx];
   if(!st) return;
@@ -4982,7 +4983,7 @@ function guideLayout(){
   const showHand = !!el && st.hand !== false;
   guide.classList.toggle('no-hand', !showHand);
   if(!el){
-    txt.style.top = Math.max(80, vh*0.5 - txt.offsetHeight/2 - 30) + 'px';
+    txt.style.top = Math.max(80 + guideTopOff(), vh*0.5 - txt.offsetHeight/2 - 30) + 'px';
     return;
   }
   const r = el.getBoundingClientRect();
@@ -5010,7 +5011,8 @@ function guideLayout(){
   if(!showHand){
     let top = r.bottom + 20;
     if(top + th0 > vh - 90) top = r.top - 20 - th0;
-    if(top < 60) top = Math.max(60, Math.min(vh - 100 - th0, r.bottom + 20)); // elemento muy alto: el texto encima
+    const t0 = 60 + guideTopOff();
+    if(top < t0) top = Math.max(t0, Math.min(vh - 100 - th0, r.bottom + 20)); // elemento muy alto: el texto encima
     txt.style.top = top+'px';
     return;
   }
@@ -5936,7 +5938,7 @@ var RHYTHM_INFO = {
     d:'Latidos prematuros que nacen en los ventrículos antes del siguiente latido sinusal.',
     e:['QRS adelantado, ancho (≥ 120 ms) y sin P previa','ST-T opuesta al QRS','Pausa compensadora completa tras el latido','Pueden ser monomorfas o polimorfas, aisladas, en bigeminismo, trigeminismo o parejas'],
     c:'Son frecuentes en personas sanas. Importan si hay cardiopatía estructural, si son muy frecuentes (carga > 10–20 %), polimorfas, en salvas o con fenómeno de R sobre T. Corrige potasio y magnesio y descarta isquemia o toxicidad farmacológica.' },
-  vtach:{ t:'Taquicardia ventricular (con pulso)',
+  vtach:{ t:'Taquicardia ventricular monomorfa',
     d:'Tres o más latidos ventriculares seguidos a más de 100 lpm. Es sostenida si dura más de 30 s o produce inestabilidad.',
     e:['QRS ancho (≥ 120 ms), regular y monomorfo','Disociación AV: P sin relación con el QRS','Latidos de captura y de fusión','Concordancia de los QRS en las precordiales'],
     c:'Toda taquicardia regular de QRS ancho debe tratarse como TV mientras no se demuestre lo contrario. Con pulso y signos adversos (shock, síncope, isquemia, insuficiencia cardiaca): cardioversión eléctrica sincronizada. Si está estable: tratamiento antiarrítmico según guías y consulta con Cardiología. Sin pulso se trata como un ritmo desfibrilable de parada.' },
@@ -7313,10 +7315,10 @@ const MANUAL = [
    <li>{i:cast} amplía o reduce <b>el monitor del alumno</b> sin tocar el tuyo; queda encendido mientras el alumno lo tiene ampliado.</li>
   </ul></div>` },
 
- { id:'sinc', shots:[['sinc', 'Sinc desactivado: el punto rojo en «Enviar» indica cambios pendientes']], who:'i', t:'Sincronización y envío', h:`
+ { id:'sinc', shots:[['sinc', 'Sincro desactivado: el punto rojo en «Enviar» indica cambios pendientes']], who:'i', t:'Sincronización y envío', h:`
   <ul>
-   <li><b>Sinc</b> en verde: cada cambio llega al alumno al instante.</li>
-   <li><b>Sinc</b> en gris: preparas los cambios sin que el alumno los vea. Un punto avisa de que hay cambios pendientes; pulsa {i:send} <b>Enviar</b> para mandarlos todos juntos.</li>
+   <li><b>Sincro</b> en verde: cada cambio llega al alumno al instante.</li>
+   <li><b>Sincro</b> en gris: preparas los cambios sin que el alumno los vea. Un punto avisa de que hay cambios pendientes; pulsa {i:send} <b>Enviar</b> para mandarlos todos juntos.</li>
   </ul>
   <p>Útil para preparar un cambio brusco (por ejemplo, pasar a FV) y lanzarlo en el momento justo.</p>` },
 
@@ -7434,7 +7436,7 @@ const MANUAL = [
 
  { id:'problemas', who:'all', t:'Problemas frecuentes', h:`
   <dl>
-   <dt>El alumno no ve los cambios</dt><dd>Comprueba que está en la misma sala (código) y que <b>Sinc</b> está activado o que has pulsado {i:send} Enviar. Al enviar sin alumnos conectados, la app avisa.</dd>
+   <dt>El alumno no ve los cambios</dt><dd>Comprueba que está en la misma sala (código) y que <b>Sincro</b> está activado o que has pulsado {i:send} Enviar. Al enviar sin alumnos conectados, la app avisa.</dd>
    <dt>No veo la versión nueva</dt><dd>☰ › General › <b>Actualizar la app</b>. En el iPad con la app instalada no basta con cerrar y abrir.</dd>
    <dt>No suena</dt><dd>Activa sonido o alarmas en ☰, toca la pantalla una vez, sube el volumen multimedia y, en iPhone/iPad, revisa el modo silencio.</dd>
    <dt>La pantalla se apaga</dt><dd>Con un caso en marcha o con el monitor o el ECG ampliados se mantiene encendida (☰ › General › Pantalla siempre encendida en clase).</dd>
