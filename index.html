@@ -1426,7 +1426,9 @@
   html.ipad-app #appWrap header{ padding-top:max(calc(6px + env(safe-area-inset-top, 0px)), 46px); }
   html.ipad-app .gate-bar{ top:max(16px, env(safe-area-inset-top, 0px), 48px); }
   html.ipad-app #gate .gate-theme{ top:max(9px, env(safe-area-inset-top, 0px), 41px); }
-  html.ipad-app .st-head{ padding-top:max(14px, env(safe-area-inset-top, 0px), 48px); }
+  html.ipad-app .st-head{ padding-top:calc(max(14px, env(safe-area-inset-top, 0px), 48px) + 0.5cm); }
+  html.ipad-app #manualOverlay.open, html.ipad-app #changesOverlay.open{ padding-top:calc(max(env(safe-area-inset-top, 0px), 24px) + 0.5cm + 10px); align-items:flex-start; }
+  html.ipad-app #manualPanel{ height:min(760px, calc(100dvh - max(env(safe-area-inset-top, 0px), 24px) - 0.5cm - 30px)); }
 
   /* Franja bajo la barra de estado del sistema (hora, wifi, batería): iOS/iPadOS 26 difumina lo que
      queda debajo de ella. Con un color liso en esa franja (sin cuadrícula ni contenido) no se ve borroso. */
@@ -1630,6 +1632,13 @@
     box-shadow:0 0 10px rgba(255,77,94,.35); }
   body.role-monitor .no-pulse-tag.on{ display:block; }
   body .waves.expanded .no-pulse-tag{ font-size:min(14px,3.4cqh); }
+  /* aviso de alarma de constantes (parámetro y tendencia), arriba en el monitor */
+  .alarm-tag{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:5; display:none; pointer-events:none;
+    font-family:var(--font-num); font-size:12px; font-weight:700; letter-spacing:.04em; white-space:nowrap;
+    color:#ffd23f; background:rgba(36,30,6,.92); border:1px solid #ffd23f; border-radius:6px; padding:3px 10px; }
+  .alarm-tag.on{ display:block; }
+  .alarm-tag.sil{ opacity:.7; border-style:dashed; }
+  body .waves.expanded .alarm-tag{ font-size:min(15px,3.6cqh); top:6px; }
   .case-name-chk-old{ display:inline-flex; align-items:center; gap:5px; margin-left:auto; font-size:11px; color:var(--text-dim);
     text-transform:none; letter-spacing:0; cursor:pointer; white-space:nowrap; font-weight:500; }
   .case-name-chk input{ width:15px; height:15px; margin:0; accent-color:var(--ecg); cursor:pointer; }
@@ -2010,6 +2019,7 @@
           <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
         </div>
+        <div class="alarm-tag" id="alarmTag" aria-hidden="true"></div>
         <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg> Sin pulso — RCP</div>
         <button type="button" class="alarm-btn" id="alarmBtn" onclick="toggleAlarmSilence()" aria-label="Silenciar alarmas 2 minutos" title="Silenciar alarmas 2 minutos">
           <svg class="ic-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 1.5h-13z"/><path d="M8.3 17.5a1.8 1.8 0 0 0 3.4 0"/></svg>
@@ -2361,7 +2371,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -6874,7 +6884,10 @@ function alarmTick(){
   }
   const b = document.getElementById('alarmBtn'); if(!b) return;
   b.classList.toggle('lv-2', a.level===2); b.classList.toggle('lv-3', a.level===3); b.classList.toggle('silenced', sil);
-  document.getElementById('alarmMsg').textContent = a.msg;
+  document.getElementById('alarmMsg').textContent = '';   // el parámetro alterado se muestra arriba (#alarmTag)
+  const tag = document.getElementById('alarmTag');
+  if(tag){ const on = a.level===2 && !!a.msg; tag.classList.toggle('on', on); tag.classList.toggle('sil', on && sil);
+    const t = on ? a.msg : ''; if(tag.textContent!==t) tag.textContent = t; }
   const left = Math.ceil((alarmState.silenceUntil - now)/1000);
   document.getElementById('alarmTime').textContent = sil ? Math.floor(left/60)+':'+String(left%60).padStart(2,'0') : '';
   const lbl = sil ? 'Alarmas silenciadas: reactivar' : 'Silenciar alarmas 2 minutos';
@@ -6992,13 +7005,13 @@ const MANUAL = [
    <li><b>Gestionar preguntas</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, {i:trash} eliminar o {i:restart} volver a la versión original de una predefinida. ★ marca las propias.</li>
   </ul>` },
 
- { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de prioridad alta (FV) en la campana del monitor']], who:'all', t:'Sonido y alarmas', h:`
+ { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de constantes: parámetro alterado y tendencia'], ['alarmas_fv', 'Alarma de ritmo: campana roja, sin diagnóstico']], who:'all', t:'Sonido y alarmas', h:`
   <p>Se activan en ☰ › General › <b>Sonido</b>, en cada dispositivo por separado (vienen apagados).</p>
   <ul>
    <li><b>Beep con cada latido:</b> su tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</li>
    <li><b>Alarma de prioridad alta</b> (rojo, 5 pitidos cada 4 s): FV, TV, sin pulso y asistolia.</li>
    <li><b>Alarma de prioridad media</b> (amarillo, 3 tonos cada 9 s): FC &lt;50 o &gt;120 · SpO₂ &lt;90 · TAS &lt;90 o &gt;180 · FR &lt;8 o &gt;30 · T² &lt;35 o &gt;38,5.</li>
-   <li><b>Campana del monitor:</b> se pone roja o amarilla según la prioridad; en las de constantes indica cuál (p. ej. «FC ↑»), pero en las de ritmo no muestra el diagnóstico. La silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
+   <li><b>Campana del monitor:</b> se pone roja o amarilla según la prioridad; en las de constantes aparece arriba en el monitor un aviso amarillo con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»); en las de ritmo no se muestra el diagnóstico. La silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
   </ul>
   <p class="mn-who-i">Si silencias desde la consola del instructor, también se silencia en los alumnos.</p>
   <h4>Volumen</h4>
