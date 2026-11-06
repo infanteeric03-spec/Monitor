@@ -1697,7 +1697,18 @@
     border:1px solid rgba(160,120,120,.35); border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.14); padding:6px 10px; }
   .ecg12-float[hidden]{ display:none !important; }
   .ecg12-calbar, .ecg12-calibbar{ bottom:34px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; }
-  .cb-read{ font-family:var(--font-num); font-size:13px; font-weight:700; color:#b2444b; white-space:nowrap; }
+  .cb-read{ font-family:var(--font-num); font-size:11.5px; font-weight:700; color:#b2444b; white-space:nowrap; }
+  /* compás: barra compacta, colocable abajo o en los laterales */
+  .ecg12-calbar{ padding:3px 5px 3px 9px; gap:6px; flex-wrap:nowrap; border-radius:9px; background:rgba(255,255,255,.8); }
+  .ecg12-calbar .cb-btns{ flex-wrap:nowrap; gap:3px; }
+  .ecg12-calbar .ecg12-b{ height:28px; min-width:28px; padding:0 6px; font-size:12px; display:inline-flex; align-items:center; justify-content:center; }
+  .ecg12-calbar .ecg12-b svg{ width:15px; height:15px; }
+  .ecg12-calbar[data-pos="left"], .ecg12-calbar[data-pos="right"]{ bottom:auto; top:50%; transform:translateY(-50%); flex-direction:column;
+    padding:6px 4px; max-width:none; }
+  .ecg12-calbar[data-pos="left"]{ left:8px; } .ecg12-calbar[data-pos="right"]{ left:auto; right:8px; }
+  .ecg12-calbar[data-pos="left"] .cb-btns, .ecg12-calbar[data-pos="right"] .cb-btns{ flex-direction:column; }
+  .ecg12-calbar[data-pos="left"] .cb-read, .ecg12-calbar[data-pos="right"] .cb-read{ display:none; }
+  @media (max-width:760px) and (orientation:portrait), (max-height:520px){ .ecg12-calbar .cb-read{ display:none; } .ecg12-calbar{ padding:3px 4px; } }
   .cb-btns, .cbb-btns{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
   .ecg12-calbar .ecg12-b[aria-pressed="true"]{ background:#2b2f33; color:#fff; border-color:#2b2f33; }
   .ecg12-calibbar{ flex-direction:column; max-width:min(560px, calc(100% - 16px)); }
@@ -2510,14 +2521,15 @@
       <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5 3.5 9l4 4"/><path d="M3.8 9H12a4.5 4.5 0 0 1 0 9h-2"/></svg></button>
       <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.5 8.5v5M11.5 8.5v5"/></svg><span class="lbl"> Borrar</span></button>
     </div>
-    <div class="ecg12-float ecg12-calbar instructor-only" id="ecg12CalBar" hidden>
+    <div class="ecg12-float ecg12-calbar instructor-only" id="ecg12CalBar" data-pos="bottom" hidden>
       <div class="cb-read" id="cbRead" aria-live="polite">—</div>
       <div class="cb-btns">
-        <button type="button" class="ecg12-b" id="cbAxis" onclick="caliperAxis()">↕ Voltaje</button>
-        <button type="button" class="ecg12-b" onclick="caliperRepeat()" title="Desplazar un intervalo a la derecha">Repetir ›</button>
-        <button type="button" class="ecg12-b" id="cbGrid" onclick="toggleCalibGrid()" aria-pressed="false" title="Cuadrícula de comprobación de 5 mm">▦</button>
-        <button type="button" class="ecg12-b" onclick="caliperFix()" title="Dejar la medida dibujada">Fijar</button>
-        <button type="button" class="ecg12-b" onclick="toggleCaliper(false)" aria-label="Cerrar compás">✕</button>
+        <button type="button" class="ecg12-b" id="cbAxis" onclick="caliperAxis()" title="Medir voltaje (vertical)">↕ mV</button>
+        <button type="button" class="ecg12-b" onclick="caliperRepeat()" title="Repetir: desplazar un intervalo a la derecha" aria-label="Repetir un intervalo"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5l5 5-5 5M10 5l5 5-5 5"/></svg></button>
+        <button type="button" class="ecg12-b" id="cbGrid" onclick="toggleCalibGrid()" aria-pressed="false" title="Cuadrícula de comprobación de 5 mm" aria-label="Cuadrícula de 5 mm"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="1"/><path d="M3 7.7h14M3 12.3h14M7.7 3v14M12.3 3v14"/></svg></button>
+        <button type="button" class="ecg12-b" onclick="caliperFix()" title="Fijar: dejar la medida dibujada" aria-label="Fijar la medida"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 2.5l5 5-3 1-3.5 3.5.5 4-2 1-3-3-4 4M5.5 8.5l6 6M8.5 5.5l-3 3"/></svg></button>
+        <button type="button" class="ecg12-b cb-move" onclick="cycleCalBarPos()" title="Mover la barra: abajo, izquierda o derecha" aria-label="Mover la barra del compás"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5v15M2.5 10h15M10 2.5 8 4.5M10 2.5l2 2M10 17.5l-2-2M10 17.5l2-2M2.5 10l2-2M2.5 10l2 2M17.5 10l-2-2M17.5 10l-2 2"/></svg></button>
+        <button type="button" class="ecg12-b" onclick="toggleCaliper(false)" aria-label="Cerrar compás" title="Cerrar compás">✕</button>
       </div>
     </div>
     <div class="ecg12-float ecg12-calibbar instructor-only" id="ecg12CalibBar" hidden>
@@ -6503,7 +6515,7 @@ function caliperLabel(cal){
 }
 function caliperRead(){
   const r = document.getElementById('cbRead'); if(r) r.textContent = e12Cal ? caliperLabel(e12Cal) : '—';
-  const ax = document.getElementById('cbAxis'); if(ax && e12Cal) ax.textContent = e12Cal.axis==='h' ? '↕ Voltaje' : '↔ Tiempo';
+  const ax = document.getElementById('cbAxis'); if(ax && e12Cal) { ax.textContent = e12Cal.axis==='h' ? '↕ mV' : '↔ ms'; ax.title = e12Cal.axis==='h' ? 'Medir voltaje (vertical)' : 'Medir tiempo (horizontal)'; }
 }
 function toggleCalibGrid(){
   if(!e12Calib(ecg12Rhythm)) return;
@@ -6855,10 +6867,9 @@ const MANUAL = [
   <p>Proyecta el ECG en el monitor del alumno con tu mismo encuadre, zoom y anotaciones. La casilla junto al nombre decide si el alumno ve el nombre del ritmo (desmarcada al principio).</p>
   <h4>⋯ Más</h4>
   <ul>
-   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ Voltaje», <b>mV y mm</b>. «Repetir» desplaza la medida un intervalo para comprobar la regularidad. <b>Fijar</b> la deja dibujada como anotación; justo después aparece «Medida fijada · Deshacer» (también se deshace con el botón de deshacer de Anotar).</li>
+   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ mV», <b>mV y mm</b> (y «↔ ms» para volver). En su barra: <b>»</b> repite la medida un intervalo a la derecha para comprobar la regularidad, la cuadrícula superpone cuadros de 5 mm, el <b>alfiler</b> fija la medida como anotación (justo después aparece «Medida fijada · Deshacer»), la <b>cruz de flechas</b> mueve la barra abajo, a la izquierda o a la derecha (se recuerda) y ✕ cierra el compás.</li>
    <li><b>Interpretación</b> {i:notes} (ECG del banco): el comentario del autor, visible solo para el instructor.</li>
    <li><b>Calibrar escala</b> {i:ruler} (administrador, ECG del banco): ver <a href="#mn-banco">Banco de ECG</a>.</li>
-   <li><b>Cuadrícula</b> (en la barra del compás): superpone cuadros de 5 mm para comprobar la calibración.</li>
   </ul>` },
 
  { id:'banco', shots:[['banco', 'Banco de ECG con búsqueda y categorías'], ['banco_editor', 'Editor para subir un ECG (administrador)']], who:'i', t:'Banco de ECG', h:`
@@ -6982,6 +6993,15 @@ document.getElementById('manualPanel').addEventListener('click', e=>{
   e.preventDefault(); const t = document.getElementById(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({ behavior:'smooth' });
 });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('manualOverlay').classList.contains('open')){ e.stopImmediatePropagation(); if(!closeManualShot()) closeManual(); } }, true);
+
+/* barra del compás: abajo · izquierda · derecha (se recuerda) */
+function cycleCalBarPos(){
+  const bar = document.getElementById('ecg12CalBar'), order = ['bottom','left','right'];
+  const next = order[(order.indexOf(bar.dataset.pos)+1) % 3];
+  bar.dataset.pos = next; try{ localStorage.setItem('monitor-calbar-pos', next); }catch(e){}
+}
+(function(){ let p = 'bottom'; try{ p = localStorage.getItem('monitor-calbar-pos') || 'bottom'; }catch(e){}
+  const bar = document.getElementById('ecg12CalBar'); if(bar) bar.dataset.pos = ['bottom','left','right'].includes(p) ? p : 'bottom'; })();
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
