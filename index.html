@@ -1238,6 +1238,45 @@
   .st-vol{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
   .st-vol input{ width:120px; accent-color:var(--ecg); }
 
+  /* iconos de línea (sprite #icoSprite): heredan el color del botón */
+  .ic{ width:1.15em; height:1.15em; vertical-align:-0.2em; flex-shrink:0; display:inline-block; }
+  .ic-spin{ animation:icSpin .9s linear infinite; }
+  @keyframes icSpin{ to{ transform:rotate(360deg); } }
+  .mi-ic .ic{ width:18px; height:18px; vertical-align:0; }
+  /* ---------- Manual de uso ---------- */
+  #manualOverlay{ position:fixed; inset:0; z-index:99; background:rgba(0,0,0,.55); display:none; overscroll-behavior:contain; }
+  #manualOverlay.open{ display:flex; align-items:center; justify-content:center; }
+  #manualPanel{ width:min(980px,100vw); height:min(760px,100dvh); background:var(--panel); color:var(--text); border:1px solid var(--line);
+    border-radius:14px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .mn-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); padding-top:max(12px, env(safe-area-inset-top)); }
+  .mn-head h2{ margin:0; font-size:16px; font-weight:800; flex:1; }
+  .mn-ic{ color:var(--ecg); display:flex; } .mn-ic .ic{ width:20px; height:20px; }
+  .mn-wrap{ flex:1; display:flex; min-height:0; }
+  .mn-nav{ width:220px; flex-shrink:0; border-right:1px solid var(--line); overflow-y:auto; padding:10px 8px; display:flex; flex-direction:column; gap:2px; }
+  .mn-nav a{ display:block; padding:8px 10px; border-radius:7px; color:var(--text-dim); text-decoration:none; font-size:13px; font-weight:600; }
+  .mn-nav a:hover{ background:var(--field); color:var(--text); }
+  .mn-nav a.on{ background:color-mix(in srgb, var(--ecg) 14%, transparent); color:var(--ecg); }
+  .mn-body{ flex:1; overflow-y:auto; padding:6px 26px 40vh; font-size:14px; line-height:1.6; -webkit-overflow-scrolling:touch; }
+  .mn-body section{ padding:18px 0 8px; border-bottom:1px solid var(--line); }
+  .mn-body h3{ display:flex; align-items:center; gap:10px; margin:0 0 8px; font-size:17px; font-weight:800; }
+  .mn-n{ width:24px; height:24px; border-radius:50%; background:color-mix(in srgb, var(--ecg) 16%, transparent); color:var(--ecg); font-size:12px;
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-num); }
+  .mn-body h4{ margin:14px 0 4px; font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:6px; }
+  .mn-body p{ margin:6px 0; } .mn-body ul, .mn-body ol{ margin:6px 0; padding-left:20px; } .mn-body li{ margin:4px 0; }
+  .mn-body b{ color:var(--text); font-weight:700; }
+  .mn-body a{ color:var(--ecg); }
+  .mn-body .ic{ color:var(--ecg); }
+  .mn-body dl{ margin:6px 0; } .mn-body dt{ font-weight:700; margin-top:10px; } .mn-body dd{ margin:2px 0 0; color:var(--text-dim); }
+  .mn-note{ font-size:12.5px; color:var(--text-dim); border-left:3px solid var(--line); padding-left:10px; }
+  .mn-body.is-student .mn-who-i{ display:none; }
+  @media (max-width:760px){
+    #manualPanel{ width:100vw; height:100dvh; border-radius:0; border:none; }
+    .mn-wrap{ flex-direction:column; }
+    .mn-nav{ width:auto; flex-direction:row; border-right:none; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; padding:8px 10px; gap:4px; scrollbar-width:none; }
+    .mn-nav a{ white-space:nowrap; padding:6px 10px; font-size:12.5px; border:1px solid var(--line); }
+    .mn-body{ padding:0 16px 50vh; }
+    .mn-guide{ display:none; }
+  }
   /* ---------- Menú de configuración (instructor) ---------- */
   .settings-btn svg{ width:17px; height:17px; }
   header .helpBtn, header .themeToggle{ display:none !important; }
@@ -1669,6 +1708,29 @@
 </style>
 </head>
 <body>
+<svg id="icoSprite" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-send" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 2.5 8.6 11.4"/><path d="M17.5 2.5 12 17.5l-3.4-6.1-6.1-3.4z"/></g></symbol>
+<symbol id="i-cast" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="16" height="11" rx="1.6"/><path d="M7 17.5h6M10 14v3.5"/><path d="M6.5 10.5l2.2-2.2 1.8 1.6 3-3.2"/></g></symbol>
+<symbol id="i-save" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9.5L17 6.5V16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M6.5 3v4h6V3M6 17v-5h8v5"/></g></symbol>
+<symbol id="i-trash" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.2 5.5l.8 11h8l.8-11M8.5 8.5v5M11.5 8.5v5"/></g></symbol>
+<symbol id="i-pen" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5l3 3L7 16H4v-3z"/><path d="M11.5 5.5l3 3"/></g></symbol>
+<symbol id="i-notes" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h7l3.5 3.5V17a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5z"/><path d="M11.5 2.5V6.5h4M7.5 10h5M7.5 13h5"/></g></symbol>
+<symbol id="i-ruler" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="6" rx="1"/><path d="M5.5 7v2.5M9 7v3.5M12.5 7v2.5M16 7v1.5"/></g></symbol>
+<symbol id="i-camera" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5a1 1 0 0 1 1-1h2.7l1.3-2h5l1.3 2h2.7a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1z"/><circle cx="10" cy="10.5" r="3"/></g></symbol>
+<symbol id="i-file" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5V15a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V7.5a1 1 0 0 0-1-1H10L8.3 4.5H3.5a1 1 0 0 0-1 1z"/><path d="M10 9.2v4.6M7.8 11.5 10 9.2l2.2 2.3"/></g></symbol>
+<symbol id="i-crop" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 2v12.5H18M2 5.5h12.5V18"/></g></symbol>
+<symbol id="i-redact" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="15" height="12" rx="1.5"/><rect x="5" y="8" width="10" height="4" rx=".5" fill="currentColor"/></g></symbol>
+<symbol id="i-lock" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="8.5" rx="1.5"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9"/></g></symbol>
+<symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.8 18 16.5H2z"/><path d="M10 8v4M10 14.3v.2"/></g></symbol>
+<symbol id="i-spin" viewBox="0 0 20 20"><path d="M10 2.5a7.5 7.5 0 1 1-7.5 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-prev" viewBox="0 0 20 20"><g fill="currentColor"><path d="M15 4.5v11L7.5 10z"/><rect x="4.5" y="4.5" width="2" height="11" rx=".6"/></g></symbol>
+<symbol id="i-play" viewBox="0 0 20 20"><path d="M6 4l10 6-10 6z" fill="currentColor"/></symbol>
+<symbol id="i-pause" viewBox="0 0 20 20"><g fill="currentColor"><rect x="5" y="4" width="3.3" height="12" rx=".8"/><rect x="11.7" y="4" width="3.3" height="12" rx=".8"/></g></symbol>
+<symbol id="i-next" viewBox="0 0 20 20"><g fill="currentColor"><path d="M5 4.5v11L12.5 10z"/><rect x="13.5" y="4.5" width="2" height="11" rx=".6"/></g></symbol>
+<symbol id="i-restart" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10a6.5 6.5 0 1 0 2-4.7"/><path d="M3.5 3v3.5H7"/></g></symbol>
+<symbol id="i-rotate" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 10a6.5 6.5 0 1 1-2-4.7"/><path d="M16.5 3v3.5H13"/></g></symbol>
+<symbol id="i-book" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.5C8.5 4 6 3.5 3 3.8v11.4c3-.3 5.5.2 7 1.7 1.5-1.5 4-2 7-1.7V3.8c-3-.3-5.5.2-7 1.7zM10 5.5v11.4"/></g></symbol>
+</defs></svg>
 <script>
   // Tema guardado en este dispositivo (claro/oscuro); se aplica antes de pintar nada para que no "parpadee"
   (function(){
@@ -1830,7 +1892,7 @@
           <span class="sync-label" id="syncLabel" hidden>Sinc</span>
           <button type="button" class="sync-pill on" id="syncSwitch" role="switch" aria-checked="true" aria-label="Sincronizar con el monitor" onclick="toggleSync()" title="Sincronizado: los cambios llegan al monitor en directo"><span class="sp-dot" aria-hidden="true"></span>Sinc</button>
           <button class="btn-send-now sync-hidden" id="btnSendNow" onclick="sendNow()" aria-label="Enviar cambios al monitor">
-            <span id="btnSendNowLabel"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
+            <span id="btnSendNowLabel"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span class="lbl"> Enviar</span></span><span class="pending-dot"></span>
           </button>
         </div>
         <button type="button" class="theme-btn settings-btn" id="settingsBtn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsPanel" title="Menú de configuración" aria-label="Menú de configuración">
@@ -1876,7 +1938,7 @@
           <div class="wx-card" data-src="Bp"><div class="wx-top"><span>TA</span><span>mmHg</span></div><div class="wx-val c-bp"></div><div class="wx-sub"></div></div>
           <div class="wx-card" data-src="Resp"><div class="wx-top"><span>FR</span><span>rpm</span></div><div class="wx-val c-resp"></div></div>
         </div>
-        <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true">⚠ Sin pulso — RCP</div>
+        <div class="no-pulse-tag" id="noPulseTag" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg> Sin pulso — RCP</div>
         <button type="button" class="alarm-btn" id="alarmBtn" onclick="toggleAlarmSilence()" aria-label="Silenciar alarmas 2 minutos" title="Silenciar alarmas 2 minutos">
           <svg class="ic-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 10 0v5l1.5 1.5h-13z"/><path d="M8.3 17.5a1.8 1.8 0 0 0 3.4 0"/></svg>
           <svg class="ic-bell-off" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14V9a5 5 0 0 1 8.2-3.8M15 9v5l1.5 1.5H6"/><path d="M8.3 17.5a1.8 1.8 0 0 0 3.4 0"/><path d="M3 3l14 14"/></svg>
@@ -1923,7 +1985,7 @@
                   <option value="vfib">Fibrilación ventricular</option>
                   <option value="asystole">Asistolia</option>
                 </select>
-                <button type="button" class="casebtn primary rhythm-send" id="btnSendRhythm" onclick="sendRhythmName()" title="Enviar al alumno el nombre del ritmo" aria-label="Enviar al alumno el nombre del ritmo"><span aria-hidden="true">📨</span><span class="lbl"> Enviar</span></button>
+                <button type="button" class="casebtn primary rhythm-send" id="btnSendRhythm" onclick="sendRhythmName()" title="Enviar al alumno el nombre del ritmo" aria-label="Enviar al alumno el nombre del ritmo"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span class="lbl"> Enviar</span></button>
                 </div>
               </div>
               <button type="button" class="badge pulse-btn live" id="pulseBadge" onclick="onPulseBtn()" aria-pressed="true" title="Pulsa para quitar el pulso (AESP)">● pulso presente</button>
@@ -1960,10 +2022,10 @@
                   <div class="case-name-info" id="caseNameInfo" hidden>Marca la casilla para que el alumno vea el <b>nombre del caso</b>. Si está desmarcada, solo verá la descripción de cada fase, el tiempo y los botones del caso.</div>
                 </div>
                 <div class="case-player">
-                  <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior" aria-label="Fase anterior"><span aria-hidden="true">⏮</span></button>
-                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled aria-label="Iniciar caso"><span aria-hidden="true">▶</span><span class="play-lbl"> Iniciar</span></button>
-                  <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente" aria-label="Fase siguiente"><span aria-hidden="true">⏭</span></button>
-                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso" aria-label="Reiniciar el caso"><span aria-hidden="true">⟲</span><span class="lbl"> Reiniciar</span></button>
+                  <button class="casebtn" id="btnPrevStep" onclick="stepScenario(-1)" disabled title="Fase anterior" aria-label="Fase anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+                  <button class="casebtn primary" id="btnPlay" onclick="togglePlay()" disabled aria-label="Iniciar caso"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span class="play-lbl"> Iniciar</span></button>
+                  <button class="casebtn" id="btnNextStep" onclick="stepScenario(1)" disabled title="Fase siguiente" aria-label="Fase siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+                  <button class="casebtn" id="btnReset" onclick="resetScenario()" disabled title="Reiniciar el caso" aria-label="Reiniciar el caso"><svg class="ic" aria-hidden="true"><use href="#i-restart"/></svg><span class="lbl"> Reiniciar</span></button>
                   <button class="casebtn" id="btnStop" onclick="stopScenario()" disabled title="Salir del caso (modo manual)" aria-label="Salir del caso"><span aria-hidden="true">✕</span><span class="lbl"> Salir</span></button>
                   <!-- velocidad del caso (en el móvil en vertical; en pantallas grandes está junto a "Cronología") -->
                   <select id="speedSelect" class="speed-select" data-popw="130" onchange="setCaseSpeed(parseFloat(this.value))" disabled aria-label="Velocidad del caso">
@@ -1975,8 +2037,8 @@
                 </div>
               </div>
               <div class="casebtns case-edit-btns">
-                <button class="casebtn" id="btnEditCase" onclick="editSelectedCase()" style="display:none;"><span aria-hidden="true">✎</span> Editar</button>
-                <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;"><span aria-hidden="true">🗑</span> Eliminar</button>
+                <button class="casebtn" id="btnEditCase" onclick="editSelectedCase()" style="display:none;"><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg> Editar</button>
+                <button class="casebtn" id="btnDeleteCase" onclick="deleteSelectedCase()" style="display:none;"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Eliminar</button>
               </div>
               <div id="caseBox">
                 <div class="case-time">
@@ -2015,7 +2077,7 @@
                   <div class="quiz-answer-status" id="cprAnswerStatus"></div>
                 </div>
                 <div class="casebtns" style="margin-top:8px;">
-                  <button class="casebtn primary" id="cprBtnSend" onclick="sendQuestion('cpr')" disabled><span aria-hidden="true">📨</span> Enviar al monitor</button>
+                  <button class="casebtn primary" id="cprBtnSend" onclick="sendQuestion('cpr')" disabled><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg> Enviar al monitor</button>
                   <button class="casebtn" id="cprBtnClear" onclick="clearQuestion('cpr')" disabled><span aria-hidden="true">✕</span> Retirar</button>
                 </div>
                 </div>
@@ -2029,7 +2091,7 @@
               <div class="kf-scroll" id="builderRows"></div>
               <div class="kf-actions">
                 <button class="casebtn" id="btnAddKf" onclick="addBuilderKeyframe()">+ Añadir fase</button>
-                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()"><span aria-hidden="true">💾</span> Guardar</button>
+                <button class="casebtn primary" id="btnSaveCase" onclick="saveCaseBuilder()"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg> Guardar</button>
                 <button class="casebtn" id="btnCancelCase" onclick="cancelCaseBuilder()"><span aria-hidden="true">✕</span> Cancelar</button>
               </div>
               <div class="kf-status" id="kfStatus" role="status" aria-live="polite"></div>
@@ -2061,7 +2123,7 @@
                 </div>
               </div>
               <div class="casebtns">
-                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled><span aria-hidden="true">📨</span> Enviar al monitor</button>
+                <button class="casebtn primary" id="btnSendQuiz" onclick="sendQuestion('quiz')" disabled><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg> Enviar al monitor</button>
                 <button class="casebtn" id="btnClearQuiz" onclick="clearQuestion('quiz')" disabled><span aria-hidden="true">✕</span> Retirar</button>
               </div>
               </div>
@@ -2075,8 +2137,8 @@
             <div class="quiz-edit-bar" id="quizEditBar">
               <span class="qeb-k">Gestionar preguntas</span>
               <button class="casebtn" id="btnNewQ" onclick="openQuestionEditor(null)">+ Nueva pregunta</button>
-              <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled><span aria-hidden="true">✎</span> Editar</button>
-              <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled><span aria-hidden="true">🗑</span> Eliminar</button>
+              <button class="casebtn" id="btnEditQ" onclick="openQuestionEditor(quizShown.quiz)" disabled><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg> Editar</button>
+              <button class="casebtn" id="btnDelQ" onclick="deleteSelectedQuestion()" disabled><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Eliminar</button>
               <button class="casebtn qeb-close" onclick="toggleQuizEditBar()" aria-label="Terminar de gestionar preguntas" title="Terminar"><span aria-hidden="true">✕</span><span class="lbl"> Terminar</span></button>
             </div>
             <button type="button" class="quiz-restore-link" id="btnRestoreHidden" onclick="restoreHiddenQuestions()" style="display:none;"></button>
@@ -2110,8 +2172,8 @@
             <div class="qe-opts-label">Respuestas <span>· marca la correcta</span></div>
             <div id="qeOptions"></div>
             <div class="kf-actions">
-              <button class="casebtn" id="qeRevert" onclick="revertQuestion()"><span aria-hidden="true">↺</span> Original</button>
-              <button class="casebtn primary" onclick="saveQuestion()"><span aria-hidden="true">💾</span> Guardar</button>
+              <button class="casebtn" id="qeRevert" onclick="revertQuestion()"><svg class="ic" aria-hidden="true"><use href="#i-restart"/></svg> Original</button>
+              <button class="casebtn primary" onclick="saveQuestion()"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg> Guardar</button>
               <button class="casebtn" onclick="closeQuestionEditor()"><span aria-hidden="true">✕</span> Cancelar</button>
             </div>
             <div class="kf-status" id="qeStatus"></div>
@@ -2188,10 +2250,10 @@
     <div class="case-bar"><div class="case-bar-fill" id="csProgress"></div></div>
     <div class="cs-narr" id="csNarr" aria-live="polite"></div>
     <div class="cs-player">
-      <button type="button" class="casebtn" onclick="sendCaseCmd('prev')" aria-label="Fase anterior" title="Fase anterior"><span aria-hidden="true">⏮</span></button>
-      <button type="button" class="casebtn primary" id="csPlay" onclick="sendCaseCmd('play')" aria-label="Iniciar caso"><span aria-hidden="true">▶</span><span class="lbl"> Iniciar</span></button>
-      <button type="button" class="casebtn" onclick="sendCaseCmd('next')" aria-label="Fase siguiente" title="Fase siguiente"><span aria-hidden="true">⏭</span></button>
-      <button type="button" class="casebtn" onclick="sendCaseCmd('reset')" aria-label="Reiniciar el caso" title="Reiniciar el caso"><span aria-hidden="true">⟲</span><span class="lbl"> Reiniciar</span></button>
+      <button type="button" class="casebtn" onclick="sendCaseCmd('prev')" aria-label="Fase anterior" title="Fase anterior"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+      <button type="button" class="casebtn primary" id="csPlay" onclick="sendCaseCmd('play')" aria-label="Iniciar caso"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span class="lbl"> Iniciar</span></button>
+      <button type="button" class="casebtn" onclick="sendCaseCmd('next')" aria-label="Fase siguiente" title="Fase siguiente"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      <button type="button" class="casebtn" onclick="sendCaseCmd('reset')" aria-label="Reiniciar el caso" title="Reiniciar el caso"><svg class="ic" aria-hidden="true"><use href="#i-restart"/></svg><span class="lbl"> Reiniciar</span></button>
     </div>
   </section>
   <section id="rhythmShare" class="rhythm-info rhythm-share" aria-live="polite"></section>
@@ -2246,13 +2308,19 @@
 </div>
 <div id="noPulseAlert" role="alert" aria-live="assertive" onclick="hideNoPulseAlert()">
   <div class="np-card">
-    <div class="np-title">⚠ SIN PULSO</div>
+    <div class="np-title"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg> SIN PULSO</div>
     <div class="np-sub" id="npSub"></div>
     <div class="np-hint">Toca para cerrar</div>
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="joinNote" role="status" aria-live="polite"></div>
+<div id="manualOverlay" onclick="if(event.target===this) closeManual()">
+  <div id="manualPanel" role="dialog" aria-modal="true" aria-labelledby="mnTitle">
+    <div class="mn-head"><span class="mn-ic"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><h2 id="mnTitle">Manual de uso</h2><button type="button" class="mn-guide st-go" onclick="closeManual(); closeSettings(); startGuide();">Guía rápida</button><button type="button" class="st-x mn-x" onclick="closeManual()" aria-label="Cerrar manual">✕</button></div>
+    <div class="mn-wrap"><nav class="mn-nav" id="mnNav" aria-label="Apartados del manual"></nav><div class="mn-body" id="mnBody"></div></div>
+  </div>
+</div>
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
   <aside id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="st-head"><h2 id="settingsTitle">Configuración</h2><button type="button" class="st-x" onclick="closeSettings()" aria-label="Cerrar configuración">✕</button></div>
@@ -2265,7 +2333,8 @@
       <div class="st-pane" data-pane="general" role="tabpanel">
       <section class="st-sec"><h3>Aspecto y ayuda</h3>
         <div class="st-row"><span class="st-l">Tema <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">«Auto» sigue el modo claro u oscuro del dispositivo.</small></span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="auto">Auto</button><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button></div></div>
-        <div class="st-row"><span>Guía de uso</span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
+        <div class="st-row"><span>Guía rápida<small>Recorrido por la pantalla, paso a paso</small></span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
+        <div class="st-row"><span>Manual de uso<small>Todos los apartados de la app, explicados</small></span><button type="button" class="st-go" onclick="openManual()">Abrir</button></div>
         <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
       <section class="st-sec"><h3>Sonido</h3>
@@ -2303,7 +2372,7 @@
       <div class="st-pane instructor-only" data-pane="alumno" role="tabpanel">
       <section class="st-sec"><h3>Qué ve el alumno</h3>
         <div class="st-row"><span class="st-l">Caso clínico en curso</span><button type="button" class="st-sw" role="switch" data-set="showCase" aria-label="Ver el caso clínico en curso"></button></div>
-        <div class="st-row"><span class="st-l">Puede usar ⏮ ▶ ⏭ ⟲ del caso</span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
+        <div class="st-row"><span class="st-l">Alumno usa los controles del caso</span><button type="button" class="st-sw" role="switch" data-set="caseButtons" aria-label="El alumno puede usar los botones del caso"></button></div>
         <div class="st-row"><span class="st-l">Nombre del ritmo en el ECG <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">Valor inicial de la casilla al abrir un ECG para mostrarlo al alumno.</small></span><button type="button" class="st-sw" role="switch" data-set="ecgName" aria-label="Nombre del ritmo en el ECG proyectado"></button></div>
         <div class="st-row"><span class="st-l">Temperatura</span><button type="button" class="st-sw" role="switch" data-set="showTemp" aria-label="Mostrar la temperatura al alumno"></button></div>
       </section>
@@ -2338,14 +2407,14 @@
     <div class="ee-body">
       <div class="ee-left">
         <div class="ee-src">
-          <label class="casebtn ee-file"><input type="file" accept="image/*" capture="environment" onchange="eeLoadFile(this.files[0]); this.value=''"><span aria-hidden="true">📷</span> Hacer foto</label>
-          <label class="casebtn ee-file"><input type="file" accept="image/*,application/pdf" onchange="eeLoadFile(this.files[0]); this.value=''"><span aria-hidden="true">📁</span> Imagen o PDF</label>
+          <label class="casebtn ee-file"><input type="file" accept="image/*" capture="environment" onchange="eeLoadFile(this.files[0]); this.value=''"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg> Hacer foto</label>
+          <label class="casebtn ee-file"><input type="file" accept="image/*,application/pdf" onchange="eeLoadFile(this.files[0]); this.value=''"><svg class="ic" aria-hidden="true"><use href="#i-file"/></svg> Imagen o PDF</label>
           <label class="ee-page" id="eePageWrap" hidden>Página <select id="eePage" data-native onchange="eeRenderPdfPage(+this.value)"></select></label>
         </div>
         <div class="ee-stage" id="eeStage"><canvas id="eeCanvas"></canvas><div class="ee-empty" id="eeEmpty">Haz una foto del ECG o elige una imagen o un PDF.</div></div>
         <div class="ee-tools" id="eeTools">
-          <div class="st-seg" role="group" aria-label="Modo"><button type="button" data-m="crop" class="on" onclick="eeMode('crop')">✂ Recortar</button><button type="button" data-m="cover" onclick="eeMode('cover')">⬛ Tapar datos</button></div>
-          <button type="button" class="ecg12-b" onclick="eeRotate()" title="Girar 90°">↻ Girar</button>
+          <div class="st-seg" role="group" aria-label="Modo"><button type="button" data-m="crop" class="on" onclick="eeMode('crop')"><svg class="ic" aria-hidden="true"><use href="#i-crop"/></svg> Recortar</button><button type="button" data-m="cover" onclick="eeMode('cover')"><svg class="ic" aria-hidden="true"><use href="#i-redact"/></svg> Tapar datos</button></div>
+          <button type="button" class="ecg12-b" onclick="eeRotate()" title="Girar 90°"><svg class="ic" aria-hidden="true"><use href="#i-rotate"/></svg> Girar</button>
           <button type="button" class="ecg12-b" onclick="eeUndoCover()" title="Quitar el último tapado">Deshacer tapado</button>
           <button type="button" class="ecg12-b" onclick="eeResetEdits()">Restablecer</button>
           <label class="ee-sl">Enderezar <input type="range" id="eeAngle" min="-15" max="15" step="0.5" value="0" oninput="eeSet('angle',+this.value)"></label>
@@ -2391,23 +2460,23 @@
             <button type="button" class="ecg12-mi instructor-only" id="ecg12CalBtn" role="menuitemcheckbox" onclick="toggleCaliper(); closeEcg12More()" aria-pressed="false" aria-checked="false">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v14M15 3v14M5 10h10M7.5 7.5 5 10l2.5 2.5M12.5 7.5 15 10l-2.5 2.5"/></svg><span>Compás</span><i class="mi-on" aria-hidden="true">✓</i>
             </button>
-            <button type="button" class="ecg12-mi instructor-only bank-only" id="ecg12NotesBtn" role="menuitemcheckbox" onclick="toggleEcgNotes(); closeEcg12More()" aria-pressed="false"><span class="mi-ic" aria-hidden="true">📝</span><span>Interpretación</span><i class="mi-on" aria-hidden="true">✓</i></button>
-            <button type="button" class="ecg12-mi instructor-only bank-only admin-only" id="ecg12CalibBtn" role="menuitem" onclick="closeEcg12More(); startCalibration()"><span class="mi-ic" aria-hidden="true">📐</span><span>Calibrar escala</span></button>
+            <button type="button" class="ecg12-mi instructor-only bank-only" id="ecg12NotesBtn" role="menuitemcheckbox" onclick="toggleEcgNotes(); closeEcg12More()" aria-pressed="false"><span class="mi-ic" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-notes"/></svg></span><span>Interpretación</span><i class="mi-on" aria-hidden="true">✓</i></button>
+            <button type="button" class="ecg12-mi instructor-only bank-only admin-only" id="ecg12CalibBtn" role="menuitem" onclick="closeEcg12More(); startCalibration()"><span class="mi-ic" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-ruler"/></svg></span><span>Calibrar escala</span></button>
             <div class="ecg12-mz" role="group" aria-label="Zoom">
               <span class="mz-l">Zoom</span>
               <button type="button" class="ecg12-b" onclick="zoomEcg12(-1)" aria-label="Reducir">−</button>
               <span class="ecg12-z" id="ecg12Zoom" aria-live="polite">100 %</span>
               <button type="button" class="ecg12-b" onclick="zoomEcg12(1)" aria-label="Ampliar">+</button>
-              <button type="button" class="ecg12-b" onclick="resetEcg12View()" aria-label="Ver completo" title="Ver completo">⟲</button>
+              <button type="button" class="ecg12-b" onclick="resetEcg12View()" aria-label="Ver completo" title="Ver completo"><svg class="ic" aria-hidden="true"><use href="#i-restart"/></svg></button>
             </div>
           </div>
         </div>
-        <button type="button" class="ecg12-b ecg12-mirror instructor-only" id="ecg12MirrorBtn" onclick="toggleEcg12Mirror()" aria-pressed="false"><span aria-hidden="true">📺</span><span class="lbl"> Mostrar al alumno</span></button>
+        <button type="button" class="ecg12-b ecg12-mirror instructor-only" id="ecg12MirrorBtn" onclick="toggleEcg12Mirror()" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-cast"/></svg><span class="lbl"> Mostrar al alumno</span></button>
       </div>
       <button type="button" class="ecg12-close" onclick="closeEcg12()" aria-label="Cerrar ECG">✕</button>
     </div>
     <div class="ecg12-tools instructor-only" id="ecg12Tools" role="toolbar" aria-label="Anotar sobre el ECG" hidden>
-      <button type="button" class="ecg12-b ecg12-tool" data-tool="pen" onclick="setInkTool('pen')" aria-pressed="false" title="Dibujar"><span aria-hidden="true">✏️</span><span class="lbl"> Dibujar</span></button>
+      <button type="button" class="ecg12-b ecg12-tool" data-tool="pen" onclick="setInkTool('pen')" aria-pressed="false" title="Dibujar"><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg><span class="lbl"> Dibujar</span></button>
       <button type="button" class="ecg12-b ecg12-tool" data-tool="text" onclick="setInkTool('text')" aria-pressed="false" title="Escribir texto"><b aria-hidden="true">T</b><span class="lbl"> Texto</span></button>
       <span class="ecg12-sep"></span>
       <button type="button" class="ecg12-sw on" data-c="#e0263a" style="--c:#e0263a" onclick="setInkColor(this)" aria-label="Color rojo"></button>
@@ -2704,11 +2773,11 @@ function updatePulseBadge(){
   const locked = role==='instructor' && pulseToggleLocked();
   const present = !!state.pulsePresent;
   let txt;
-  if(forcedOff) txt = '⚠ sin pulso — RCP';
+  if(forcedOff) txt = '{alert}sin pulso — RCP';
   else if(present) txt = '● pulso presente';
-  else txt = scenario.active ? '⚠ sin pulso — RCP' : '● sin pulso (AESP)';
-  if(locked) txt = '🔒 ' + txt.replace(/^[●⚠]\s*/, '');
-  if(b.textContent !== txt) b.textContent = txt;
+  else txt = scenario.active ? '{alert}sin pulso — RCP' : '● sin pulso (AESP)';
+  if(locked) txt = '{lock}' + txt.replace(/^(●\s*|\{alert\})/, '');
+  if(b.dataset.txt !== txt){ b.dataset.txt = txt; b.innerHTML = txt.replace(/\{(\w+)\}/, (m0,n)=>IC(n)+' '); }
   const cls = 'badge pulse-btn ' + (present ? 'live' : 'noflow') + (locked ? ' locked' : '');
   if(b.className !== cls) b.className = cls;
   b.setAttribute('aria-pressed', present ? 'true' : 'false');
@@ -2741,8 +2810,10 @@ function currentStateSnapshot(){
 }
 
 // El texto del botón va en un <span class="lbl"> que se oculta en móvil (queda solo el icono)
+function IC(n, cls){ return '<svg class="ic'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+n+'"/></svg>'; }
 function setSendLabel(icon, text){
-  document.getElementById('btnSendNowLabel').innerHTML = '<span aria-hidden="true">' + icon + '</span><span class="lbl"> ' + text + '</span>';
+  const ico = { '📨':IC('send'), '⏳':IC('spin','ic-spin') }[icon] || '<span aria-hidden="true">'+icon+'</span>';
+  document.getElementById('btnSendNowLabel').innerHTML = ico + '<span class="lbl"> ' + text + '</span>';
 }
 
 function resetSendButton(){
@@ -3369,9 +3440,9 @@ function setCaseSpeed(v){
 
 // Botón de iniciar/pausar: el texto va en un <span> que en el móvil en vertical se oculta (solo icono)
 function setPlayLabel(mode){
-  const m = { start:['▶','Iniciar'], resume:['▶','Continuar'], pause:['⏸','Pausar'] }[mode];
+  const m = { start:['play','Iniciar'], resume:['play','Continuar'], pause:['pause','Pausar'] }[mode];
   const b = document.getElementById('btnPlay');
-  b.innerHTML = '<span aria-hidden="true">'+m[0]+'</span><span class="play-lbl"> '+m[1]+'</span>';
+  b.innerHTML = IC(m[0])+'<span class="play-lbl"> '+m[1]+'</span>';
   b.setAttribute('aria-label', m[1]+' caso');
 }
 
@@ -3588,7 +3659,7 @@ function renderBuilderRows(){
         <div class="kf-row-actions" onclick="event.stopPropagation()">
           <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},-1)" ${idx===0?'disabled':''} title="Subir" aria-label="Subir fase">↑</button>
           <button type="button" class="kf-mini-btn" onclick="moveBuilderKeyframe(${idx},1)" ${idx===n-1?'disabled':''} title="Bajar" aria-label="Bajar fase">↓</button>
-          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${n<=2?'disabled':''} title="Eliminar fase" aria-label="Eliminar fase">🗑</button>
+          <button type="button" class="kf-mini-btn" onclick="removeBuilderKeyframe(${idx})" ${n<=2?'disabled':''} title="Eliminar fase" aria-label="Eliminar fase"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg></button>
         </div>
       </div>
       <div class="kf-body">
@@ -4331,18 +4402,18 @@ const GUIDE_STEPS = {
     { text:'¡Bienvenido al simulador!', sub:'Te enseñamos lo básico en unos pocos pasos.' },
     ...GUIDE_MONITOR_PARTS,
     { sel:'.vitals', hand:false, text:'Ahora, los controles del instructor.', sub:'Con − y + cambias cada constante; el alumno lo ve en su monitor al momento.' },
-    { sel:'#wavesRemoteBtn', text:'📺 amplía el monitor del alumno; ⤢ amplía solo el tuyo.', sub:'Mientras el alumno lo tiene ampliado, el botón 📺 se queda encendido.' },
+    { sel:'#wavesRemoteBtn', text:'{i:cast} amplía el monitor del alumno; ⤢ amplía solo el tuyo.', sub:'Mientras el alumno lo tiene ampliado, el botón {i:cast} se queda encendido.' },
     { sel:'.tab-nav', text:'Elige el ritmo, lanza un caso clínico o envía preguntas al alumno.', before:()=>switchTab('rhythm') },
     { sel:'#bankOpenBtn', text:'La onda verde abre el Banco de ECG.', sub:'ECG reales anonimizados, por categorías. Ábrelos en el visor y muéstralos al alumno. El administrador los sube con su PIN desde ☰.' },
     { sel:'#btnSendRhythm', text:'Con «Enviar» el alumno ve el nombre del ritmo y su ficha.', sub:'Vuelve a pulsarlo (✕ Retirar) para quitárselo; también se retira solo al cambiar de ritmo.', before:()=>switchTab('rhythm') },
     { sel:'#pulseBadge', text:'Pulsa aquí para quitar el pulso y simular una AESP.', sub:'Pide confirmación. En FV, asistolia y durante los casos queda bloqueado.', before:()=>switchTab('rhythm') },
-    { sel:'#rhythmInfo', hand:false, text:'La ficha del ritmo y su ECG de 12 derivaciones.', sub:'Toca la miniatura para ampliarlo. Arriba: ✏️ Anotar, ⋯ Más (compás para medir, zoom e interpretación) y 📺 para mostrarlo en directo al alumno. Una medida fijada se puede deshacer.', before:()=>switchTab('rhythm') },
+    { sel:'#rhythmInfo', hand:false, text:'La ficha del ritmo y su ECG de 12 derivaciones.', sub:'Toca la miniatura para ampliarlo. Arriba: {i:pen} Anotar, ⋯ Más (compás para medir, zoom e interpretación) y {i:cast} para mostrarlo en directo al alumno. Una medida fijada se puede deshacer.', before:()=>switchTab('rhythm') },
     { sel:'#caseSelect + .csel-btn', alt:'#tabBtnCase', text:'Lanza un caso clínico paso a paso.', sub:'El alumno ve la evolución del caso, el tiempo y, si lo permites, sus botones.', before:()=>switchTab('case') },
     // RCP: si hay un caso con parada en marcha se señala la propia barra "Q. RCP"; si no, la pestaña del caso
     { sel:'#cprPanel', alt:'#tabBtnCase', text:'En los casos con parada aparece la barra «Q. RCP».',
       sub:'Ábrela para enviar al alumno preguntas de la fase en curso: FV/TVSP, asistolia/AESP o tras la RCE.', before:()=>switchTab('case') },
     { sel:'#quizCat + .csel-btn', text:'Elige una categoría y una pregunta, y envíala al monitor.', sub:'Al contestar, el alumno ve su respuesta enviada y la pregunta se cierra sola.', before:()=>switchTab('quiz') },
-    { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con 📨.' },
+    { sel:'#syncSwitch', text:'Con Sinc activado, el monitor del alumno cambia al instante.', sub:'Desactívalo para preparar cambios y mandarlos con {i:send} Enviar.' },
     { sel:'#roomBadge', text:'Tu sala y cuántos alumnos hay conectados.', sub:'Comparte el código para que se unan; te avisamos cuando entre alguien.' },
     { sel:'#ecgLeadBtn', text:'Toca aquí para cambiar la derivación del ECG.', sub:'También cambia en el monitor del alumno.' },
     { sel:'#settingsBtn', text:'En ☰ Configuración tienes el resto de opciones.',
@@ -4403,7 +4474,8 @@ function guideShow(){
   const st = guideSteps[guideIdx];
   if(!st) return;
   if(st.before) st.before();
-  document.getElementById('guideText').innerHTML = escapeHtml(st.text) + (st.sub ? '<small>'+escapeHtml(st.sub)+'</small>' : '');
+  const gf = t=>escapeHtml(t).replace(/\{i:(\w+)\}/g, (m0,n)=>IC(n));
+  document.getElementById('guideText').innerHTML = gf(st.text) + (st.sub ? '<small>'+gf(st.sub)+'</small>' : '');
   document.getElementById('guideDots').textContent = (guideIdx+1)+' / '+guideSteps.length;
   document.getElementById('guidePrev').disabled = guideIdx===0;
   document.getElementById('guideNext').textContent = guideIdx===guideSteps.length-1 ? '¡Entendido!' : 'Siguiente ›';
@@ -5103,7 +5175,7 @@ function refreshEcg12MirrorBtn(){
   b.classList.toggle('on', ecg12Mirror);
   b.setAttribute('aria-pressed', ecg12Mirror?'true':'false');
   b.innerHTML = ecg12Mirror ? '<span aria-hidden="true">✕</span><span class="lbl"> Dejar de mostrar</span>'
-                            : '<span aria-hidden="true">📺</span><span class="lbl"> Mostrar al alumno</span>';
+                            : '<svg class="ic" aria-hidden="true"><use href="#i-cast"/></svg><span class="lbl"> Mostrar al alumno</span>';
   const t = ecg12Mirror ? 'Dejar de mostrar el ECG al alumno' : 'Mostrar este ECG en grande al alumno';
   b.title = t; b.setAttribute('aria-label', t);
 }
@@ -5459,7 +5531,7 @@ function refreshSendRhythmBtn(){
   const on = !!sharedRhythm;
   btn.classList.toggle('sharing', on);
   btn.innerHTML = on ? '<span aria-hidden="true">✕</span><span class="lbl"> Retirar</span>'
-                     : '<span aria-hidden="true">📨</span><span class="lbl"> Enviar</span>';
+                     : '<svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span class="lbl"> Enviar</span>';
   const t = on ? 'Dejar de mostrar la ficha al alumno' : 'Enviar al alumno el nombre y la ficha del ritmo';
   btn.title = t; btn.setAttribute('aria-label', t); btn.setAttribute('aria-pressed', on?'true':'false');
 }
@@ -5532,8 +5604,8 @@ function applyRemoteCaseView(p){
   document.getElementById('csTitle').textContent = p.title;
   document.getElementById('csNarr').textContent = p.label;
   const pl = document.getElementById('csPlay');
-  const m = p.playing ? ['⏸','Pausar'] : (p.t>0 && p.t<p.total ? ['▶','Continuar'] : ['▶','Iniciar']);
-  pl.innerHTML = '<span aria-hidden="true">'+m[0]+'</span><span class="lbl"> '+m[1]+'</span>';
+  const m = p.playing ? ['pause','Pausar'] : (p.t>0 && p.t<p.total ? ['play','Continuar'] : ['play','Iniciar']);
+  pl.innerHTML = IC(m[0])+'<span class="lbl"> '+m[1]+'</span>';
   pl.setAttribute('aria-label', m[1]+' caso');
   document.querySelectorAll('.cs-player .casebtn').forEach(b=>b.classList.remove('sent'));
   box.classList.add('open');
@@ -5865,7 +5937,7 @@ function showToast(msg, ms){
 function warnIfNoStudents(){
   if(role!=='instructor') return;
   if(!channel){ showToast('No estás conectado a ninguna sala: el alumno no recibirá nada.'); return; }
-  if(studentCount===0) showToast('⚠ No hay alumnos conectados a la sala '+roomCode+'. Comparte el código para que se unan.');
+  if(studentCount===0) showToast('No hay alumnos conectados a la sala '+roomCode+'. Comparte el código para que se unan.');
 }
 
 
@@ -6100,7 +6172,7 @@ function renderEcgBank(){
   g.innerHTML = list.map(x=>'<div class="eb-card">'
     + '<button type="button" class="eb-open" onclick="openBankEcg(\''+x.id+'\')" aria-label="Abrir '+escapeHtml(x.title)+'">'+(x.thumb?'<img src="'+x.thumb+'" alt="" loading="lazy">':'')+'</button>'
     + '<div class="eb-meta"><span class="eb-t">'+escapeHtml(x.title)+'</span><span class="eb-c">'+escapeHtml(ECG_CATS[x.category]||'Otros')
-    + (x.calib && x.calib.ux ? ' <span class="eb-cal">· 📐 calibrado</span>' : '')+'</span></div>'
+    + (x.calib && x.calib.ux ? ' <span class="eb-cal">· <svg class="ic" aria-hidden="true"><use href="#i-ruler"/></svg> calibrado</span>' : '')+'</span></div>'
     + (admin ? '<div class="eb-acts"><button type="button" onclick="openEcgEditor(\''+x.id+'\')">Editar</button><button type="button" class="del" onclick="deleteBankEcg(\''+x.id+'\')">Eliminar</button></div>' : '')
     + '</div>').join('');
 }
@@ -6700,6 +6772,182 @@ function updateSoundUI(){
   alarmTick();
 }
 updateSoundUI();
+
+/* ---------- Manual de uso (menú ☰ › General) ----------
+   Contenido por apartados. «who»: 'i' solo instructor, 'm' solo alumno, 'all' ambos.
+   {i:nombre} inserta un icono del sprite. */
+const MANUAL = [
+ { id:'inicio', who:'all', t:'Primeros pasos', h:`
+  <p>El simulador conecta dos tipos de dispositivo en una <b>sala</b>: el del <b>instructor</b>, que controla al paciente, y el del <b>alumno</b>, que muestra el monitor como en un box de urgencias.</p>
+  <ol>
+   <li>El instructor elige <b>Instructor</b> y crea una sala: aparece un código de 4 cifras arriba («Sala 1234»).</li>
+   <li>Cada alumno elige <b>Alumno</b> e introduce ese código. Pueden conectarse varios a la vez.</li>
+   <li>El número junto al código indica cuántos alumnos hay conectados; el instructor recibe un aviso discreto cuando entra alguien.</li>
+  </ol>
+  <h4>Instalar como app</h4>
+  <p>En el navegador, usa «Añadir a pantalla de inicio» (iPhone/iPad: botón Compartir; Android: menú ⋮). Se abre a pantalla completa como una app.</p>
+  <h4>Actualizar</h4>
+  <p>Cuando hay una versión nueva aparece una barra para actualizar. También puedes hacerlo en ☰ › General › <b>Actualizar la app</b>; vuelves a entrar en la misma sala.</p>
+  <p class="mn-note">Herramienta formativa: las ondas son aproximaciones y no sirven para diagnóstico.</p>` },
+
+ { id:'monitor', who:'all', t:'El monitor', h:`
+  <p>Tres ondas, de arriba abajo: <b>ECG</b> (verde), <b>pletismografía de la SpO₂</b> (azul) y <b>respiración</b> (amarilla). Arriba a la derecha, la hora.</p>
+  <ul>
+   <li><b>Derivación:</b> toca «ECG · II ▾» para cambiarla; cambia en todos los dispositivos de la sala.</li>
+   <li><b>Constantes:</b> TA (con TAM), FC, SpO₂, FR y temperatura. Si una sale de rango, su tarjeta se marca en rojo.</li>
+   <li><b>Ampliar ⤢:</b> el monitor pasa a pantalla completa (en el móvil se gira en horizontal) y la pantalla no se apaga mientras está ampliado.</li>
+   <li><b>Campana:</b> aparece al activar sonido o alarmas; ver <a href="#mn-sonido">Sonido y alarmas</a>.</li>
+  </ul>
+  <div class="mn-who-i"><h4>Instructor</h4>
+  <ul>
+   <li>Cambia cada constante con <b>−</b> y <b>+</b>.</li>
+   <li>{i:cast} amplía o reduce <b>el monitor del alumno</b> sin tocar el tuyo; queda encendido mientras el alumno lo tiene ampliado.</li>
+  </ul></div>` },
+
+ { id:'sinc', who:'i', t:'Sincronización y envío', h:`
+  <ul>
+   <li><b>Sinc</b> en verde: cada cambio llega al alumno al instante.</li>
+   <li><b>Sinc</b> en gris: preparas los cambios sin que el alumno los vea. Un punto avisa de que hay cambios pendientes; pulsa {i:send} <b>Enviar</b> para mandarlos todos juntos.</li>
+  </ul>
+  <p>Útil para preparar un cambio brusco (por ejemplo, pasar a FV) y lanzarlo en el momento justo.</p>` },
+
+ { id:'ritmo', who:'i', t:'Pestaña Ritmo', h:`
+  <ul>
+   <li><b>Ritmo cardiaco:</b> elige el ritmo del desplegable; el ECG, el pulso y la pletismografía se adaptan.</li>
+   <li>{i:send} <b>Enviar</b> muestra al alumno el nombre del ritmo con su ficha y ECG. Vuelve a pulsarlo (✕ Retirar) para quitarlo; también se retira solo al cambiar de ritmo.</li>
+   <li><b>Pulso:</b> el botón «● pulso presente» quita el pulso para simular una <b>AESP</b> (pide confirmación). Al alumno le aparece el aviso «SIN PULSO». En FV, asistolia y durante los casos clínicos queda bloqueado {i:lock}.</li>
+   <li><b>Ficha del ritmo:</b> definición, claves del ECG y particularidades (guía principal: Sociedad Española de Cardiología). Se despliega y contrae tocando su cabecera.</li>
+   <li><b>ECG de 12 derivaciones:</b> la miniatura de la ficha abre el <a href="#mn-visor">visor de ECG</a>.</li>
+  </ul>
+  <p>En ☰ › Clase › <b>Ficha del ritmo</b> eliges si se muestra oculta, solo el ECG, contraída o desplegada.</p>` },
+
+ { id:'visor', who:'i', t:'Visor de ECG', h:`
+  <p>Se abre al tocar la miniatura del ECG o un ECG del banco. En el móvil en vertical se gira para verse en horizontal.</p>
+  <h4>Zoom</h4>
+  <p>Pellizca con dos dedos, haz doble toque (o doble clic) donde quieras ampliar, o usa ⋯ <b>Más</b> › Zoom (−, +, {i:restart} ver completo). Arrastra para moverte.</p>
+  <h4>{i:pen} Anotar</h4>
+  <p>Despliega la barra de anotación: dibujar, texto, colores, deshacer y borrar todo. Las anotaciones se ven en directo en el alumno si le estás mostrando el ECG.</p>
+  <h4>{i:cast} Mostrar al alumno</h4>
+  <p>Proyecta el ECG en el monitor del alumno con tu mismo encuadre, zoom y anotaciones. La casilla junto al nombre decide si el alumno ve el nombre del ritmo (desmarcada al principio).</p>
+  <h4>⋯ Más</h4>
+  <ul>
+   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ Voltaje», <b>mV y mm</b>. «Repetir» desplaza la medida un intervalo para comprobar la regularidad. <b>Fijar</b> la deja dibujada como anotación; justo después aparece «Medida fijada · Deshacer» (también se deshace con el botón de deshacer de Anotar).</li>
+   <li><b>Interpretación</b> {i:notes} (ECG del banco): el comentario del autor, visible solo para el instructor.</li>
+   <li><b>Calibrar escala</b> {i:ruler} (administrador, ECG del banco): ver <a href="#mn-banco">Banco de ECG</a>.</li>
+   <li><b>Cuadrícula</b> (en la barra del compás): superpone cuadros de 5 mm para comprobar la calibración.</li>
+  </ul>` },
+
+ { id:'banco', who:'i', t:'Banco de ECG', h:`
+  <p>ECG reales <b>anonimizados</b>, ordenados por categorías (ritmos y bloqueos, taquiarritmias, SCA/isquemia, alteraciones iónicas y otros). Se abre con el icono de la <b>onda verde</b> al final de las pestañas.</p>
+  <ul>
+   <li>Busca por título o interpretación, o filtra por categoría.</li>
+   <li>Toca una tarjeta para abrir el ECG en el visor, con todas sus herramientas.</li>
+  </ul>
+  <h4>Administrador</h4>
+  <p>En ☰ › Clase › Herramientas › <b>Banco de ECG · administrador</b>, desbloquea con el PIN. Queda activo 30 días en ese dispositivo y desde ahí puedes cambiar el PIN.</p>
+  <ol>
+   <li><b>+ Subir ECG:</b> {i:camera} haz una foto o {i:file} elige una imagen o PDF (si tiene varias páginas, eliges cuál).</li>
+   <li>{i:crop} <b>Recortar</b> el trazado, {i:redact} <b>Tapar datos</b> (nombre, NHC, fecha, centro…), {i:rotate} girar, enderezar y ajustar brillo y contraste.</li>
+   <li>Título, categoría, ritmo asociado, interpretación y si el alumno puede ver el título.</li>
+   <li>Confirma que el ECG es propio y está <b>anonimizado</b> (obligatorio) y guarda.</li>
+   <li><b>Calibra</b>: marca dos puntos en horizontal y dos en vertical separados por los cuadros grandes indicados y elige velocidad (25/50 mm/s) y ganancia. Sin calibrar, el compás mide en unidades aproximadas.</li>
+  </ol>
+  <p class="mn-note">Sube solo ECG propios y sin ningún dato que identifique al paciente.</p>` },
+
+ { id:'casos', who:'i', t:'Casos clínicos', h:`
+  <ul>
+   <li>Elige un caso en el desplegable. La casilla de al lado decide si el alumno ve su nombre (ⓘ lo explica).</li>
+   <li>Controles: {i:prev} fase anterior, {i:play} iniciar / {i:pause} pausar, {i:next} fase siguiente, {i:restart} reiniciar y ✕ salir del caso.</li>
+   <li>El caso cambia solo el ritmo, las constantes y el pulso de cada fase; la narrativa te dice qué está pasando.</li>
+   <li>El alumno ve la cronología y el tiempo; si lo permites (☰ › Alumno), también los controles.</li>
+   <li><b>Parada:</b> con ☰ › Clase › <b>Pausar el caso en la parada</b>, el caso se detiene antes de la PCR y espera tu confirmación; entonces el alumno recibe el aviso.</li>
+   <li><b>Q. RCP:</b> en los casos con parada aparece una barra para enviar preguntas de la fase en curso (FV/TVSP, asistolia/AESP, tras la RCE) según ERC o AHA.</li>
+  </ul>
+  <h4>Editor de casos</h4>
+  <p>☰ › Clase › Herramientas › <b>Editor de casos</b>: título y fases, cada una con su tiempo, ritmo, constantes, pulso y narrativa. Puedes reordenar ↑ ↓ y eliminar {i:trash} fases. Los casos propios se pueden {i:pen} editar o {i:trash} eliminar.</p>
+  <p>La velocidad (x0,5 a x4) se elige en ☰ › Clase.</p>` },
+
+ { id:'preguntas', who:'i', t:'Preguntas', h:`
+  <ol>
+   <li>Elige una <b>categoría</b> (o todas las del banco) y una <b>pregunta</b>.</li>
+   <li>{i:send} <b>Enviar al monitor</b>: el alumno la ve sobre su pantalla, aunque tenga el monitor ampliado.</li>
+   <li>Ves su respuesta y si es correcta. La pregunta del alumno se cierra sola a los segundos que elijas en ☰ › Clase.</li>
+  </ol>
+  <ul>
+   <li>Las preguntas de RCP siguen el algoritmo <b>ERC</b> por defecto; cámbialo a AHA en ☰ › Clase.</li>
+   <li><b>Gestionar preguntas</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, {i:trash} eliminar o {i:restart} volver a la versión original de una predefinida. ★ marca las propias.</li>
+  </ul>` },
+
+ { id:'sonido', who:'all', t:'Sonido y alarmas', h:`
+  <p>Se activan en ☰ › General › <b>Sonido</b>, en cada dispositivo por separado (vienen apagados).</p>
+  <ul>
+   <li><b>Beep con cada latido:</b> su tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</li>
+   <li><b>Alarma de prioridad alta</b> (rojo, 5 pitidos cada 4 s): FV, TV, sin pulso y asistolia.</li>
+   <li><b>Alarma de prioridad media</b> (amarillo, 3 tonos cada 9 s): FC &lt;50 o &gt;120 · SpO₂ &lt;90 · TAS &lt;90 o &gt;180 · FR &lt;8 o &gt;30 · T² &lt;35 o &gt;38,5.</li>
+   <li><b>Campana del monitor:</b> muestra el motivo de la alarma y la silencia <b>2 minutos</b> (cuenta atrás). Pulsa otra vez para reactivarla. Si aparece una alarma más grave, vuelve a sonar. El beep sigue sonando.</li>
+  </ul>
+  <p class="mn-who-i">Si silencias desde la consola del instructor, también se silencia en los alumnos.</p>
+  <h4>Volumen</h4>
+  <p>El control de la app es relativo al <b>volumen multimedia</b> del dispositivo: súbelo también con sus botones. Los navegadores solo dejan sonar después de tocar la pantalla una vez. En iPhone/iPad, si no suena, revisa el modo silencio.</p>` },
+
+ { id:'alumno', who:'all', t:'Pantalla del alumno', h:`
+  <p>Muestra el monitor del paciente y lo que el instructor le envía:</p>
+  <ul>
+   <li><b>Nombre y ficha del ritmo</b> con su ECG, debajo de las constantes.</li>
+   <li><b>ECG en directo</b>: el instructor lo proyecta, amplía y anota en tiempo real.</li>
+   <li><b>Preguntas</b>: se contestan tocando la opción; se cierran solas tras responder.</li>
+   <li><b>Caso clínico</b>: la cronología y el tiempo; a veces también los controles.</li>
+   <li><b>Aviso «SIN PULSO»</b>: aparece unos segundos (o hasta cerrarlo) y después queda una etiqueta discreta «Sin pulso — RCP» en el monitor.</li>
+  </ul>
+  <p>El alumno puede ampliar su monitor ⤢, cambiar la derivación y, en ☰, el tema, el sonido, la guía y actualizar la app.</p>` },
+
+ { id:'config', who:'i', t:'Menú ☰ Configuración', h:`
+  <ul>
+   <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla encendida al ampliar.</li>
+   <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (preguntas, editor de casos, administrador del banco).</li>
+   <li><b>Alumno:</b> lo que ve el alumno (caso, sus controles, nombre del ritmo en el ECG, temperatura) y el parpadeo rojo al perder el pulso.</li>
+  </ul>
+  <p>Toca ⓘ junto a una opción para ver su explicación. El menú recuerda la última pestaña.</p>` },
+
+ { id:'problemas', who:'all', t:'Problemas frecuentes', h:`
+  <dl>
+   <dt>El alumno no ve los cambios</dt><dd>Comprueba que está en la misma sala (código) y que <b>Sinc</b> está activado o que has pulsado {i:send} Enviar. Al enviar sin alumnos conectados, la app avisa.</dd>
+   <dt>No veo la versión nueva</dt><dd>☰ › General › <b>Actualizar la app</b>. En el iPad con la app instalada no basta con cerrar y abrir.</dd>
+   <dt>No suena</dt><dd>Activa sonido o alarmas en ☰, toca la pantalla una vez, sube el volumen multimedia y, en iPhone/iPad, revisa el modo silencio.</dd>
+   <dt>La pantalla se apaga</dt><dd>Con el monitor o el ECG ampliados se mantiene encendida (☰ › General › Pantalla encendida al ampliar).</dd>
+   <dt>El compás no mide en ms/mV</dt><dd>El ECG del banco no está calibrado: el administrador puede hacerlo desde ⋯ Más › Calibrar escala.</dd>
+  </dl>` }
+];
+function manualHtml(s){ return s.replace(/\{i:(\w+)\}/g, (m,n)=>IC(n)); }
+function openManual(sec){
+  const isI = role==='instructor';
+  const list = MANUAL.filter(x=>x.who==='all' || (x.who==='i')===isI);
+  document.getElementById('mnNav').innerHTML = list.map(x=>'<a href="#mn-'+x.id+'" data-id="'+x.id+'">'+escapeHtml(x.t)+'</a>').join('');
+  document.getElementById('mnBody').innerHTML = list.map((x,i)=>'<section id="mn-'+x.id+'"><h3><span class="mn-n">'+(i+1)+'</span>'+escapeHtml(x.t)+'</h3>'+manualHtml(x.h)+'</section>').join('');
+  document.getElementById('mnBody').classList.toggle('is-student', !isI);
+  const ov = document.getElementById('manualOverlay'); ov.classList.add('open');
+  openManual._opener = document.activeElement;
+  const body = document.getElementById('mnBody'); body.scrollTop = 0;
+  if(sec){ const t = document.getElementById('mn-'+sec); if(t) t.scrollIntoView(); }
+  manualSpy(); document.querySelector('#manualPanel .mn-x').focus({ preventScroll:true });
+}
+function closeManual(){
+  document.getElementById('manualOverlay').classList.remove('open');
+  const o = openManual._opener; if(o && o.focus && document.body.contains(o)) o.focus({ preventScroll:true });
+}
+function manualSpy(){
+  const body = document.getElementById('mnBody'), top = body.getBoundingClientRect().top + 40;
+  let cur = null; body.querySelectorAll('section').forEach(s=>{ if(s.getBoundingClientRect().top <= top) cur = s; });
+  if(!cur) cur = body.querySelector('section');
+  document.querySelectorAll('#mnNav a').forEach(a=>{ const on = cur && a.dataset.id===cur.id.slice(3); a.classList.toggle('on', on);
+    if(on && a.dataset.on!=='1'){ a.scrollIntoView({ block:'nearest', inline:'nearest' }); } a.dataset.on = on?'1':''; });
+}
+document.getElementById('mnBody').addEventListener('scroll', manualSpy, { passive:true });
+document.getElementById('manualPanel').addEventListener('click', e=>{
+  const a = e.target.closest('a[href^="#mn-"]'); if(!a) return;
+  e.preventDefault(); const t = document.getElementById(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({ behavior:'smooth' });
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('manualOverlay').classList.contains('open')){ e.stopImmediatePropagation(); closeManual(); } }, true);
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
