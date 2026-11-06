@@ -1324,7 +1324,8 @@
   .pc-phase{ margin:8px 0 10px; font-weight:800; font-size:15px; display:flex; align-items:baseline; gap:10px; }
   .pc-phase b{ margin-left:auto; font-family:var(--font-num); font-size:22px; font-variant-numeric:tabular-nums; }
   .pc-phase.check{ color:#ffd23f; } .pc-phase.rosc{ color:var(--ecg); }
-  .pc-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .pc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  @media (max-width:520px){ .pc-grid{ grid-template-columns:repeat(2,1fr); } }
   .pc-grid > div{ border:1px solid var(--line); border-radius:8px; padding:7px 9px; display:flex; flex-direction:column; gap:1px; }
   .pc-grid span{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
   .pc-grid b{ font-family:var(--font-num); font-size:22px; } .pc-grid b.sm{ font-size:14px; } .pc-grid small{ font-size:11px; color:var(--text-dim); }
@@ -2455,7 +2456,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -7132,14 +7133,14 @@ const MANUAL = [
   <p>Repaso guiado del manejo de una parada según <b>ERC 2025</b> o <b>AHA 2025</b> (el algoritmo elegido en ☰ › Clase). Por ahora solo está disponible para el <b>administrador</b>: ☰ › Clase › Herramientas › <b>Circuito de PCR</b>.</p>
   <ol>
    <li><b>Iniciar PCR</b> arranca el cronómetro de la parada con la comprobación del ritmo inicial.</li>
-   <li><b>Comprobación de ritmo</b> (10 s): elige lo que verá el alumno (FV, TVSP, asistolia, AESP o RCE). El alumno ve el aviso «COMPROBACIÓN DE RITMO» con el trazado limpio.</li>
-   <li>Si es desfibrilable, marca <b>⚡ Descarga</b>. Después, <b>Reanudar RCP</b>: empieza un ciclo de 2 minutos y el ECG del alumno muestra el artefacto de las compresiones. Al terminar el ciclo vuelve sola la comprobación de ritmo.</li>
+   <li><b>Comprobación de ritmo</b> (10 s): elige lo que verá el alumno (FV, TVSP, asistolia, AESP o RCE). Los botones no indican si es desfibrilable: es una de las preguntas orales. El alumno ve el aviso «COMPROBACIÓN DE RITMO» con el trazado limpio.</li>
+   <li>Según lo que decida el alumno, marca <b>⚡ Descarga</b>, <b>Reanudar RCP</b> o <b>Confirmar RCE</b>. Con <b>Reanudar RCP</b>: empieza un ciclo de 2 minutos y el ECG del alumno muestra el artefacto de las compresiones. Al terminar el ciclo vuelve sola la comprobación de ritmo.</li>
    <li>Registra adrenalina, amiodarona o lidocaína, acceso IV/IO y vía aérea avanzada. «Deshacer» quita la última descarga o fármaco.</li>
-   <li><b>Ahora toca</b> te recuerda lo que indica la guía en cada momento (p. ej. adrenalina y amiodarona tras la 3.ª descarga en ERC; adrenalina tras la 2.ª en AHA; repetir adrenalina cada 3–5 min).</li>
+   <li><b>Ahora toca</b> te recuerda lo que indica la guía en cada momento (p. ej. adrenalina y amiodarona tras la 3.ª descarga en ERC; adrenalina tras la 2.ª en AHA; repetir adrenalina cada 4 min, dentro del rango de 3–5 min de las guías).</li>
    <li><b>Preguntas para el alumno</b>: preguntas orales del momento (ritmo, fármacos y dosis, causas reversibles, cuidados tras la RCE) con su respuesta desplegable y botones ✓/✗, y preguntas tipo test del banco de RCP que llegan a su pantalla.</li>
    <li><b>RCE</b>: confirma la recuperación; si vuelve a parar, «Nueva parada».</li>
   </ol>
-  <p>El alumno ve el tiempo total, el ciclo y su cuenta atrás, las descargas, las adrenalinas (y cuándo fue la última), la amiodarona y la lidocaína. Durante la parada no se le muestra el nombre del ritmo. «Ver monitor» deja el circuito en una barra abajo sin pararlo; «Terminar» lo cierra y borra el contador del alumno. En el <b>Registro</b> queda la cronología completa.</p>
+  <p>El alumno ve el tiempo total, el ciclo y su cuenta atrás, y solo las descargas y las dosis de fármacos (adrenalina, con cuándo fue la última, amiodarona y lidocaína). No se le muestra el nombre del ritmo ni si es desfibrilable. «Ver monitor» deja el circuito en una barra abajo sin pararlo; «Terminar» lo cierra y borra el contador del alumno. En el <b>Registro</b> queda la cronología completa.</p>
   <p class="mn-note">Más adelante podrá abrirse automáticamente cuando un caso clínico llegue a una parada.</p>` },
 
  { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de constantes con «Mostrar el parámetro alterado» activado'], ['alarmas_fv', 'Alarma de ritmo: campana roja, sin diagnóstico']], who:'all', t:'Sonido y alarmas', h:`
@@ -7180,7 +7181,24 @@ const MANUAL = [
    <dt>No suena</dt><dd>Activa sonido o alarmas en ☰, toca la pantalla una vez, sube el volumen multimedia y, en iPhone/iPad, revisa el modo silencio.</dd>
    <dt>La pantalla se apaga</dt><dd>Con un caso en marcha o con el monitor o el ECG ampliados se mantiene encendida (☰ › General › Pantalla siempre encendida en clase).</dd>
    <dt>El compás no mide en ms/mV</dt><dd>El ECG del banco no está calibrado: el administrador puede hacerlo desde ⋯ Más › Calibrar escala.</dd>
-  </dl>` }
+  </dl>` },
+ { id:'fuentes', who:'all', t:'Fuentes', h:`
+  <p>Contenido clínico revisado con estas referencias. Es un simulador formativo: ante cualquier duda, prevalecen las guías oficiales y los protocolos de tu centro.</p>
+  <h4>Parada cardiaca y soporte vital avanzado</h4>
+  <ul>
+   <li><a href="https://www.erc.edu/media/vedoa2ga/gl2025-05-als-e.pdf" target="_blank" rel="noopener">European Resuscitation Council Guidelines 2025: Adult Advanced Life Support</a></li>
+   <li><a href="https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines" target="_blank" rel="noopener">Resuscitation Council UK 2025: Adult advanced life support (alineada con ERC 2025)</a></li>
+   <li><a href="https://www.resus.org.uk/node/36441" target="_blank" rel="noopener">Resuscitation Council UK 2025: Post-resuscitation care</a></li>
+   <li><a href="https://www.ahajournals.org/doi/10.1161/CIR.0000000000001376" target="_blank" rel="noopener">2025 AHA Guidelines, Part 9: Adult Advanced Life Support</a></li>
+   <li><a href="https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Accessible/Algorithm-ACLS-CA-LngDscrp-250725-Ed.pdf?sc_lang=en" target="_blank" rel="noopener">AHA 2025: Adult Cardiac Arrest Algorithm</a></li>
+   <li><a href="https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Accessible/Algorithm-ACLS-PCAC-LngDscrp-250726-Ed.pdf?sc_lang=en" target="_blank" rel="noopener">AHA 2025: Adult Post-Cardiac Arrest Care Algorithm</a></li>
+  </ul>
+  <h4>Fichas de ritmos</h4>
+  <ul>
+   <li>Guías de práctica clínica de la ESC, adaptadas por la Sociedad Española de Cardiología (SEC).</li>
+   <li>Jiménez Murillo L, Montero Pérez FJ. <i>Medicina de urgencias y emergencias: guía diagnóstica y protocolos de actuación</i> (Elsevier).</li>
+  </ul>
+  <p class="mn-note">Adrenalina cada 4 minutos en el circuito de PCR: elección docente dentro del intervalo de 3–5 minutos que recomiendan ERC y AHA.</p>` }
 ];
 function manualHtml(s){ return s.replace(/\{i:(\w+)\}/g, (m,n)=>IC(n)); }
 function openManual(sec){
@@ -7278,7 +7296,7 @@ function toggleCalHelp(force){
 var pcr = null;                 // estado del instructor
 var pcrCompress = false;        // artefacto de compresiones en el ECG (ambos roles)
 var pcrRemote = null;           // último estado recibido (alumno)
-const PCR_CYCLE = 120000, PCR_CHECK = 10000;
+const PCR_CYCLE = 120000, PCR_CHECK = 10000, PCR_ADR = 240000;   // adrenalina cada 4 min (dentro del rango 3–5 min de las guías)
 const PCR_RHYTHMS = {
   vf:   { name:'FV', long:'Fibrilación ventricular', shock:true },
   pvt:  { name:'TVSP', long:'Taquicardia ventricular sin pulso', shock:true },
@@ -7296,7 +7314,7 @@ function pcrTxt(){
   const A = pcrAlgo();
   return A==='ERC' ? {
     energy:'≥150 J bifásica (130–150 J si es bifásica pulsada); puede aumentarse si falla',
-    adrShock:'Adrenalina 1 mg IV/IO tras la 3.ª descarga; después cada 3–5 min',
+    adrShock:'Adrenalina 1 mg IV/IO tras la 3.ª descarga; después cada 4 min (las guías indican cada 3–5 min)',
     antiarr:'Amiodarona 300 mg IV/IO tras 3 descargas y 150 mg tras 5. Alternativa: lidocaína 100 mg y 50 mg tras 5 descargas',
     refract:'FV/TVSP tras 3 descargas: comprueba los parches y considera la posición anteroposterior (cambio de vector). La doble desfibrilación secuencial no se recomienda de rutina. Trata las causas reversibles.',
     causesQ:'Causas reversibles: 4H y 4T',
@@ -7308,7 +7326,7 @@ function pcrTxt(){
     src:'ERC 2025'
   } : {
     energy:'Bifásica según el fabricante (p. ej. 120–200 J; si se desconoce, la máxima). Monofásica 360 J',
-    adrShock:'Epinefrina 1 mg IV/IO tras la 2.ª descarga; después cada 3–5 min',
+    adrShock:'Epinefrina 1 mg IV/IO tras la 2.ª descarga; después cada 4 min (las guías indican cada 3–5 min)',
     antiarr:'Tras la 3.ª descarga: amiodarona 300 mg (2.ª dosis 150 mg) o lidocaína 1–1,5 mg/kg (2.ª dosis 0,5–0,75 mg/kg)',
     refract:'Revisa la calidad de la RCP, la posición de los parches y las causas reversibles. El cambio de vector y la doble desfibrilación secuencial no se recomiendan de forma rutinaria.',
     causesQ:'Causas reversibles: 5H y 5T',
@@ -7325,7 +7343,8 @@ function pcrQuestions(){
   const T = pcrTxt(), r = pcr && pcr.rhythm && PCR_RHYTHMS[pcr.rhythm];
   return {
     check:[
-      { q:'¿Qué ritmo ves? ¿Es desfibrilable?', a: r ? r.long+(r.shock ? ': desfibrilable.' : (pcr.rhythm==='rosc' ? ': comprobar pulso; si lo hay, RCE.' : ': no desfibrilable.')) : 'Elige primero el ritmo que verá el alumno.' },
+      { q:'¿Qué ritmo ves?', a: r ? r.long+'.' : 'Elige primero el ritmo que verá el alumno.' },
+      { q:'¿Es desfibrilable? ¿Qué harías ahora?', a: r ? (r.shock ? 'Sí: descarga y reanudar las compresiones de inmediato 2 minutos.' : (pcr.rhythm==='rosc' ? 'No: ritmo organizado; comprobar pulso y signos de vida. Si los hay, RCE y cuidados posteriores.' : 'No: reanudar RCP 2 minutos y adrenalina 1 mg lo antes posible si aún no se ha puesto.')) : 'Elige primero el ritmo que verá el alumno.' },
       { q:'¿Cuánto puede durar la pausa para comprobar el ritmo?', a:'Menos de 10 segundos, y reanudar las compresiones cuanto antes.' }
     ],
     shock:[
@@ -7336,7 +7355,7 @@ function pcrQuestions(){
       { q:'FV refractaria: ¿qué puedes considerar?', a:T.refract }
     ],
     noshock:[
-      { q:'¿Cuándo pones la adrenalina en asistolia o AESP?', a:'Lo antes posible: 1 mg IV/IO, y repetir cada 3–5 minutos.' },
+      { q:'¿Cuándo pones la adrenalina en asistolia o AESP?', a:'Lo antes posible: 1 mg IV/IO, y repetir cada 4 minutos (las guías indican cada 3–5 min).' },
       { q:'¿Está indicada la descarga?', a:'No. RCP durante 2 minutos y volver a comprobar el ritmo.' },
       { q:'En una AESP, ¿qué tienes que buscar?', a:'Causas reversibles (H y T), sin interrumpir la RCP.' }
     ],
@@ -7360,7 +7379,7 @@ function pcrIsShock(){ return !!(pcr && pcr.rhythm && PCR_RHYTHMS[pcr.rhythm].sh
 function pcrContexts(){
   if(!pcr || pcr.phase==='idle') return ['general'];
   if(pcr.phase==='rosc') return ['post'];
-  if(pcr.phase==='check') return ['check', pcrIsShock() ? 'shock' : 'noshock'];
+  if(pcr.phase==='check') return ['check', 'general'];
   return [pcrIsShock() ? 'shock' : 'noshock', 'general'];
 }
 // recomendaciones "ahora toca"
@@ -7372,20 +7391,18 @@ function pcrAdvice(){
   if(pcr.phase==='rosc'){ out.push(['ok','RCE: cuidados tras la recuperación (ABCDE), ECG de 12 derivaciones y causa de la parada.']); return out; }
   if(pcr.phase==='check'){
     if(!pcr.rhythm) out.push(['warn','Comprobación de ritmo (< 10 s): elige el ritmo que verá el alumno.']);
-    else if(pcrIsShock() && !pcr.shockedThisCheck) out.push(['warn','Ritmo desfibrilable: descarga ('+T.energy+').']);
-    else if(pcr.rhythm==='rosc') out.push(['ok','Comprueba pulso y signos de vida. Si se confirma: «Confirmar RCE».']);
-    else out.push(['info','Reanuda las compresiones: 2 minutos de RCP.']);
+    else out.push(['info','Pregunta al alumno qué ritmo ve y qué haría; registra su decisión (descarga, reanudar RCP o RCE).']);
   }
-  if(pcrIsShock()){
+  if(pcrIsShock() && pcr.phase==='cpr'){
     if(pcr.shocks >= T.adrAt && adrN===0) out.push(['warn', pcrAlgo()==='ERC' ? 'Adrenalina 1 mg IV/IO (tras la 3.ª descarga).' : 'Epinefrina 1 mg IV/IO (tras la 2.ª descarga).']);
     if(pcr.shocks >= 3 && anti===0) out.push(['warn', pcrAlgo()==='ERC' ? 'Amiodarona 300 mg IV/IO (o lidocaína 100 mg).' : 'Amiodarona 300 mg o lidocaína 1–1,5 mg/kg IV/IO.']);
     if(pcr.shocks >= T.amio2At && anti===1) out.push(['warn', pcr.amio.length ? 'Amiodarona 150 mg (2.ª dosis).' : 'Lidocaína '+T.lido2+' (2.ª dosis).']);
     if(pcr.shocks >= 3) out.push(['info', 'FV/TVSP persistente: '+(pcrAlgo()==='ERC' ? 'considera parches en posición anteroposterior.' : 'revisa parches, calidad de RCP y causas reversibles.')]);
-  } else if(pcr.rhythm && pcr.rhythm!=='rosc' && adrN===0){
+  } else if(pcr.phase==='cpr' && pcr.rhythm && pcr.rhythm!=='rosc' && adrN===0){
     out.push(['warn','Ritmo no desfibrilable: adrenalina 1 mg IV/IO lo antes posible.']);
   }
-  if(adrN){ if(since >= 180000) out.push(['warn','Repite la adrenalina 1 mg (cada 3–5 min): la última fue hace '+pcrFmt(since)+'.']);
-            else out.push(['info','Próxima adrenalina en '+pcrFmt(180000-since)+' (cada 3–5 min).']); }
+  if(adrN){ if(since >= PCR_ADR) out.push(['warn','Repite la adrenalina 1 mg (cada 4 min): la última fue hace '+pcrFmt(since)+'.']);
+            else out.push(['info','Próxima adrenalina en '+pcrFmt(PCR_ADR-since)+' (cada 4 min).']); }
   if(!pcr.iv) out.push(['info','Canaliza un acceso IV (o IO si no es posible).']);
   if(!pcr.airway && pcr.cycle >= 2) out.push(['info','Considera vía aérea avanzada con capnografía.']);
   out.push(['info','Busca y trata las causas reversibles ('+(pcrAlgo()==='ERC' ? '4H y 4T' : '5H y 5T')+').']);
@@ -7545,11 +7562,11 @@ function pcrRender(keepTest){
   } else if(pcr.phase==='check'){
     const left = PCR_CHECK - (pcrNow()-pcr.checkStart);
     h = '<div class="pcr-k">Comprobación de ritmo</div><div class="pcr-big '+(left<0 ? 'late' : '')+'">'+(left>=0 ? Math.ceil(left/1000)+' s' : '+'+Math.ceil(-left/1000)+' s')+'</div>'
-      + '<div class="pcr-rh">'+Object.keys(PCR_RHYTHMS).map(k=>'<button type="button" class="pcr-rb'+(pcr.rhythm===k?' on':'')+(PCR_RHYTHMS[k].shock?' sh':'')+(k==='rosc'?' ok':'')+'" onclick="pcrSetRhythm(\''+k+'\')" title="'+PCR_RHYTHMS[k].long+'">'+PCR_RHYTHMS[k].name+'</button>').join('')+'</div>'
+      + '<div class="pcr-rh">'+Object.keys(PCR_RHYTHMS).map(k=>'<button type="button" class="pcr-rb'+(pcr.rhythm===k?' on':'')+'" onclick="pcrSetRhythm(\''+k+'\')" title="'+PCR_RHYTHMS[k].long+'">'+PCR_RHYTHMS[k].name+'</button>').join('')+'</div>'
       + '<div class="pcr-row">'
-      + (pcrIsShock() ? '<button type="button" class="pcr-cta sh'+(pcr.shockedThisCheck?' done':'')+'" onclick="pcrShock()">⚡ Descarga'+(pcr.shockedThisCheck?' dada':'')+'</button>' : '')
-      + (pcr.rhythm==='rosc' ? '<button type="button" class="pcr-cta ok" onclick="pcrRosc()">Confirmar RCE</button>' : '')
+      + (pcr.rhythm ? '<button type="button" class="pcr-cta sh'+(pcr.shockedThisCheck?' done':'')+'" onclick="pcrShock()">⚡ Descarga'+(pcr.shockedThisCheck?' dada':'')+'</button>' : '')
       + (pcr.rhythm ? '<button type="button" class="pcr-cta" onclick="pcrResume()">'+IC('play')+' Reanudar RCP</button>' : '')
+      + (pcr.rhythm ? '<button type="button" class="pcr-cta ok" onclick="pcrRosc()">Confirmar RCE</button>' : '')
       + '</div>';
   } else if(pcr.phase==='cpr'){
     const left = PCR_CYCLE - (pcrNow()-pcr.cycleStart);
@@ -7566,7 +7583,7 @@ function pcrRender(keepTest){
   const adrN = on ? pcr.adr.length : 0, since = adrN ? pcrNow()-pcr.adr[adrN-1] : 0;
   document.getElementById('pcrActs').innerHTML = !on ? '' :
       '<button type="button" class="pcr-act sh" onclick="pcrShock()"'+(pcr.phase==='rosc'?' disabled':'')+'><b>⚡ Descarga</b><span>'+pcr.shocks+' dadas</span></button>'
-    + '<button type="button" class="pcr-act'+(adrN && since>=180000 ? ' due' : '')+'" onclick="pcrDrug(\'adr\')"><b>Adrenalina 1 mg</b><span>'+adrN+(adrN ? ' · hace '+pcrFmt(since) : '')+'</span></button>'
+    + '<button type="button" class="pcr-act'+(adrN && since>=PCR_ADR ? ' due' : '')+'" onclick="pcrDrug(\'adr\')"><b>Adrenalina 1 mg</b><span>'+adrN+(adrN ? ' · hace '+pcrFmt(since) : '')+'</span></button>'
     + '<button type="button" class="pcr-act" onclick="pcrDrug(\'amio\')"'+(pcr.amio.length>=2?' disabled':'')+'><b>Amiodarona '+(pcr.amio.length ? '150' : '300')+' mg</b><span>'+(pcr.amio.length ? pcr.amio.join(' + ')+' mg' : 'no administrada')+'</span></button>'
     + '<button type="button" class="pcr-act" onclick="pcrDrug(\'lido\')"'+(pcr.lido.length>=2?' disabled':'')+'><b>Lidocaína '+(pcr.lido.length ? T.lido2 : T.lido1)+'</b><span>'+(pcr.lido.length ? pcr.lido.join(' + ') : 'no administrada')+'</span></button>'
     + '<button type="button" class="pcr-act tg'+(pcr.iv?' on':'')+'" onclick="pcrToggle(\'iv\')"><b>Acceso IV/IO</b><span>'+(pcr.iv?'conseguido':'pendiente')+'</span></button>'
@@ -7575,7 +7592,7 @@ function pcrRender(keepTest){
   // recomendaciones
   document.getElementById('pcrAdv').innerHTML = pcrAdvice().map(([k,t])=>'<li class="'+k+'">'+escapeHtml(t)+'</li>').join('');
   // preguntas
-  const Q = pcrQuestions(), ctxs = pcrContexts(), LBL = { check:'Comprobación de ritmo', shock:'Ritmo desfibrilable', noshock:'Ritmo no desfibrilable', general:'Generales', post:'Tras la RCE' };
+  const Q = pcrQuestions(), ctxs = pcrContexts(), LBL = { check:'Comprobación de ritmo', shock:'Manejo del ritmo actual', noshock:'Manejo del ritmo actual', general:'Generales', post:'Tras la RCE' };
   let i = 0;
   document.getElementById('pcrQs').innerHTML = ctxs.map(c=>'<h4>'+LBL[c]+'</h4>'+(Q[c]||[]).map(x=>{ const n = i++;
     return '<details class="pcr-q"><summary>'+escapeHtml(x.q)+'</summary><p>'+escapeHtml(x.a)+'</p><div class="pcr-qb">'
@@ -7626,12 +7643,10 @@ function pcrRenderStudent(){
   card.innerHTML = '<div class="pc-head"><span class="pc-k">PCR en curso · '+escapeHtml(p.algo==='AHA'?'AHA 2025':'ERC 2025')+'</span><span class="pc-total">'+pcrFmt(el)+'</span></div>'
     + '<div class="pc-phase '+p.phase+'">'+phase+(p.phase==='cpr' ? '<b>'+pcrFmt(cyc)+'</b>' : '')+'</div>'
     + '<div class="pc-grid">'
-    + '<div><span>Ciclos</span><b>'+p.cycle+'</b></div>'
     + '<div><span>Descargas</span><b>'+p.shocks+'</b></div>'
     + '<div><span>Adrenalina</span><b>'+p.adr+'</b>'+(adrAgo!=null ? '<small>última hace '+pcrFmt(adrAgo)+'</small>' : '')+'</div>'
     + '<div><span>Amiodarona</span><b class="sm">'+amio+'</b></div>'
     + '<div><span>Lidocaína</span><b class="sm">'+escapeHtml(lido)+'</b></div>'
-    + '<div><span>IV/IO · vía aérea</span><b class="sm">'+(p.iv?'✓':'—')+' · '+(p.airway?'✓':'—')+'</b></div>'
     + '</div>';
   hud.classList.add('on');
   hud.textContent = 'PCR '+pcrFmt(el)+' · '+(p.phase==='cpr' ? 'C'+p.cycle+' '+pcrFmt(cyc) : p.phase==='check' ? 'Ritmo' : 'RCE')+' · ⚡'+p.shocks+' · Adr '+p.adr+(p.amio.length ? ' · Amio '+p.amio.reduce((a,b)=>a+b,0) : '')+(p.lido.length ? ' · Lido '+p.lido.length : '');
