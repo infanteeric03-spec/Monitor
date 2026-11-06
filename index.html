@@ -1243,6 +1243,20 @@
   .ic-spin{ animation:icSpin .9s linear infinite; }
   @keyframes icSpin{ to{ transform:rotate(360deg); } }
   .mi-ic .ic{ width:18px; height:18px; vertical-align:0; }
+  /* ---------- Novedades ---------- */
+  #changesOverlay{ position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:16px; }
+  #changesOverlay.open{ display:flex; }
+  #changesPanel{ width:min(520px,100%); max-height:min(640px,100%); background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:14px;
+    display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .chg-body{ flex:1; overflow-y:auto; padding:4px 18px 10px; font-size:13.5px; line-height:1.5; }
+  .chg-ver{ padding:12px 0 6px; border-bottom:1px solid var(--line); }
+  .chg-ver:last-child{ border-bottom:none; }
+  .chg-ver h3{ margin:0 0 4px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); display:flex; gap:8px; align-items:center; }
+  .chg-new{ font-size:9.5px; font-weight:800; color:#04140b; background:var(--ecg); border-radius:4px; padding:1px 6px; letter-spacing:.04em; }
+  .chg-ver ul{ margin:0; padding-left:18px; } .chg-ver li{ margin:3px 0; }
+  .chg-foot{ display:flex; justify-content:flex-end; gap:8px; padding:10px 16px; border-top:1px solid var(--line); }
+  .chg-foot:empty{ display:none; }
+  .chg-foot .chg-upd{ background:var(--ecg); color:#04140b; border-color:var(--ecg); font-weight:700; }
   /* ---------- Manual de uso ---------- */
   #manualOverlay{ position:fixed; inset:0; z-index:99; background:rgba(0,0,0,.55); display:none; overscroll-behavior:contain; }
   #manualOverlay.open{ display:flex; align-items:center; justify-content:center; }
@@ -1389,6 +1403,8 @@
     font-size:13px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
   #updateBar.open{ opacity:1; transform:translate(-50%,0); pointer-events:auto; }
   #updateBar .ub-go{ background:#35ff6b; color:#04140b; border:none; border-radius:6px; padding:7px 12px; font-weight:700; font-family:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  #updateBar .ub-see{ background:transparent; color:#35ff6b; border:1px solid rgba(53,255,107,.5); border-radius:6px; padding:6px 10px; font-weight:700; font-family:inherit; font-size:12.5px; cursor:pointer; white-space:nowrap; }
+  #updateBar .ub-see[hidden]{ display:none; }
   #updateBar .ub-x{ background:transparent; border:none; color:#8a979b; font-size:18px; cursor:pointer; padding:0 4px; }
 
   /* iPad con la app instalada (iPadOS 26, ventanas): el sistema superpone arriba una barra de título
@@ -1708,6 +1724,18 @@
   .ecg12-calbar[data-pos="left"]{ left:8px; } .ecg12-calbar[data-pos="right"]{ left:auto; right:8px; }
   .ecg12-calbar[data-pos="left"] .cb-btns, .ecg12-calbar[data-pos="right"] .cb-btns{ flex-direction:column; }
   .ecg12-calbar[data-pos="left"] .cb-read, .ecg12-calbar[data-pos="right"] .cb-read{ display:none; }
+  .ecg12-calbar .cb-info i{ font:italic 700 13px/1 Georgia, serif; }
+  .ecg12-calbar .cb-info[aria-expanded="true"]{ background:#2b2f33; color:#fff; border-color:#2b2f33; }
+  .ecg12-calhelp{ top:50%; bottom:auto; transform:translate(-50%,-50%); width:min(380px, calc(100% - 24px)); max-height:calc(100% - 24px); overflow:auto;
+    padding:10px 12px 12px; font-size:12.5px; line-height:1.4; z-index:6; background:rgba(255,255,255,.97); }
+  .ch-head{ display:flex; align-items:center; justify-content:space-between; font-size:14px; margin-bottom:4px; }
+  .ch-head .ecg12-b{ height:26px; min-width:26px; padding:0 6px; }
+  .ch-lead, .ch-foot{ margin:4px 0 8px; color:#555; } .ch-foot{ margin:8px 0 0; font-size:11.5px; }
+  .ecg12-calhelp ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .ecg12-calhelp li{ display:flex; gap:10px; align-items:flex-start; }
+  .ch-k{ flex:0 0 44px; height:26px; border:1px solid #ddd; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:600; background:#fff; }
+  .ch-k svg{ width:15px; height:15px; }
+
   @media (max-width:760px) and (orientation:portrait), (max-height:520px){ .ecg12-calbar .cb-read{ display:none; } .ecg12-calbar{ padding:3px 4px; } }
   .cb-btns, .cbb-btns{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
   .ecg12-calbar .ecg12-b[aria-pressed="true"]{ background:#2b2f33; color:#fff; border-color:#2b2f33; }
@@ -2320,8 +2348,10 @@
   </div>
 </div>
 
+<script type="application/json" id="appChangelog">[{"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
+  <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
   <button type="button" class="ub-go" onclick="reloadApp()">Actualizar</button>
   <button type="button" class="ub-x" onclick="document.getElementById('updateBar').classList.remove('open')" aria-label="Ahora no">×</button>
 </div>
@@ -2346,6 +2376,13 @@
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="joinNote" role="status" aria-live="polite"></div>
+<div id="changesOverlay" onclick="if(event.target===this) closeChanges()">
+  <div id="changesPanel" role="dialog" aria-modal="true" aria-labelledby="chTitle">
+    <div class="mn-head"><h2 id="chTitle">Novedades</h2><button type="button" class="st-x" onclick="closeChanges()" aria-label="Cerrar novedades">✕</button></div>
+    <div class="chg-body" id="chgBody"></div>
+    <div class="chg-foot" id="chgFoot"></div>
+  </div>
+</div>
 <div id="manualOverlay" onclick="if(event.target===this) closeManual()">
   <div id="manualPanel" role="dialog" aria-modal="true" aria-labelledby="mnTitle">
     <div class="mn-head"><span class="mn-ic"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><h2 id="mnTitle">Manual de uso</h2><button type="button" class="mn-guide st-go" onclick="closeManual(); closeSettings(); startGuide();">Guía rápida</button><button type="button" class="st-x mn-x" onclick="closeManual()" aria-label="Cerrar manual">✕</button></div>
@@ -2370,6 +2407,7 @@
         <div class="st-row"><span class="st-l">Tema <button type="button" class="st-i" aria-expanded="false" aria-label="Más información">i</button><small class="st-tip">«Auto» sigue el modo claro u oscuro del dispositivo.</small></span><div class="st-seg" data-set="theme" role="group" aria-label="Tema"><button type="button" data-v="auto">Auto</button><button type="button" data-v="dark">Oscuro</button><button type="button" data-v="light">Claro</button></div></div>
         <div class="st-row"><span>Guía rápida<small>Recorrido por la pantalla, paso a paso</small></span><button type="button" class="st-go" onclick="closeSettings(); startGuide();">Ver guía</button></div>
         <div class="st-row"><span>Manual de uso<small>Todos los apartados de la app, explicados</small></span><button type="button" class="st-go" onclick="openManual()">Abrir</button></div>
+        <div class="st-row"><span>Novedades<small>Cambios de las últimas versiones</small></span><button type="button" class="st-go" onclick="openChanges()">Ver</button></div>
         <div class="st-row"><span>Actualizar la app<small id="stUpdate">Recarga la última versión sin salir de la sala</small></span><button type="button" class="st-go" onclick="reloadApp()">Recargar</button></div>
       </section>
       <section class="st-sec"><h3>Sonido</h3>
@@ -2521,6 +2559,19 @@
       <button type="button" class="ecg12-b" onclick="undoInk()" title="Deshacer" aria-label="Deshacer"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5 3.5 9l4 4"/><path d="M3.8 9H12a4.5 4.5 0 0 1 0 9h-2"/></svg></button>
       <button type="button" class="ecg12-b" onclick="clearInk()" title="Borrar todo" aria-label="Borrar todas las anotaciones"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.8h4v1.7M5.2 5.5l.8 11h8l.8-11M8.5 8.5v5M11.5 8.5v5"/></svg><span class="lbl"> Borrar</span></button>
     </div>
+    <div class="ecg12-float ecg12-calhelp instructor-only" id="ecg12CalHelp" role="dialog" aria-label="Ayuda del compás" hidden>
+      <div class="ch-head"><b>Compás</b><button type="button" class="ecg12-b" onclick="toggleCalHelp(false)" aria-label="Cerrar ayuda">✕</button></div>
+      <p class="ch-lead">Arrastra las líneas o sus círculos para medir. La medida aparece en la etiqueta azul.</p>
+      <ul>
+        <li><span class="ch-k">↕ mV</span><span>Cambia a medir <b>voltaje</b> (líneas horizontales: mV y mm). «↔ ms» vuelve a medir <b>tiempo</b> (ms, mm y lpm).</span></li>
+        <li><span class="ch-k"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5l5 5-5 5M10 5l5 5-5 5"/></svg></span><span><b>Repetir:</b> desplaza la medida un intervalo a la derecha para comprobar si el ritmo es regular.</span></li>
+        <li><span class="ch-k"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="1"/><path d="M3 7.7h14M3 12.3h14M7.7 3v14M12.3 3v14"/></svg></span><span><b>Cuadrícula:</b> superpone cuadros de 5 mm para comprobar que la escala coincide con el papel.</span></li>
+        <li><span class="ch-k"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 2.5l5 5-3 1-3.5 3.5.5 4-2 1-3-3-4 4M5.5 8.5l6 6M8.5 5.5l-3 3"/></svg></span><span><b>Fijar:</b> deja la medida dibujada como anotación. «Deshacer» la quita y vuelve a abrir el compás.</span></li>
+        <li><span class="ch-k"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5v15M2.5 10h15M10 2.5 8 4.5M10 2.5l2 2M10 17.5l-2-2M10 17.5l2-2M2.5 10l2-2M2.5 10l2 2M17.5 10l-2-2M17.5 10l-2 2"/></svg></span><span><b>Mover la barra:</b> abajo, a la izquierda o a la derecha. Se recuerda.</span></li>
+        <li><span class="ch-k">✕</span><span>Cierra el compás sin guardar la medida.</span></li>
+      </ul>
+      <p class="ch-foot">Si el alumno está viendo el ECG en directo, también ve el compás.</p>
+    </div>
     <div class="ecg12-float ecg12-calbar instructor-only" id="ecg12CalBar" data-pos="bottom" hidden>
       <div class="cb-read" id="cbRead" aria-live="polite">—</div>
       <div class="cb-btns">
@@ -2529,6 +2580,7 @@
         <button type="button" class="ecg12-b" id="cbGrid" onclick="toggleCalibGrid()" aria-pressed="false" title="Cuadrícula de comprobación de 5 mm" aria-label="Cuadrícula de 5 mm"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="1"/><path d="M3 7.7h14M3 12.3h14M7.7 3v14M12.3 3v14"/></svg></button>
         <button type="button" class="ecg12-b" onclick="caliperFix()" title="Fijar: dejar la medida dibujada" aria-label="Fijar la medida"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 2.5l5 5-3 1-3.5 3.5.5 4-2 1-3-3-4 4M5.5 8.5l6 6M8.5 5.5l-3 3"/></svg></button>
         <button type="button" class="ecg12-b cb-move" onclick="cycleCalBarPos()" title="Mover la barra: abajo, izquierda o derecha" aria-label="Mover la barra del compás"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5v15M2.5 10h15M10 2.5 8 4.5M10 2.5l2 2M10 17.5l-2-2M10 17.5l2-2M2.5 10l2-2M2.5 10l2 2M17.5 10l-2-2M17.5 10l-2 2"/></svg></button>
+        <button type="button" class="ecg12-b cb-info" id="cbInfoBtn" onclick="toggleCalHelp()" aria-expanded="false" aria-controls="ecg12CalHelp" title="Qué hace cada botón" aria-label="Ayuda del compás"><i>i</i></button>
         <button type="button" class="ecg12-b" onclick="toggleCaliper(false)" aria-label="Cerrar compás" title="Cerrar compás">✕</button>
       </div>
     </div>
@@ -5426,6 +5478,7 @@ window.addEventListener('resize', ()=>{
 document.addEventListener('keydown', e=>{
   if(e.key!=='Escape' || e.target.classList.contains('ecg12-txt') || document.getElementById('appDialog').classList.contains('open')) return;
   if(!document.getElementById('ecg12More').hidden) closeEcg12More(true);
+  else if(!document.getElementById('ecg12CalHelp').hidden) toggleCalHelp(false);
   else if(ecg12Rhythm) closeEcg12();
   else if(document.getElementById('ecgEditorOverlay').classList.contains('open')) closeEcgEditor();
   else if(document.getElementById('ecgBankOverlay').classList.contains('open')) closeEcgBank();
@@ -5883,9 +5936,11 @@ async function checkForUpdate(){
   try{
     const r = await fetch(location.href.split('#')[0], { cache:'no-store' });
     if(!r.ok) return;
-    const h = textHash(await r.text());
+    const txt = await r.text(), h = textHash(txt);
     if(appVersionHash===null){ appVersionHash = h; return; }
     if(h!==appVersionHash){
+      remoteChanges = newChangesFrom(txt);
+      document.getElementById('ubSee').hidden = !remoteChanges.length;
       document.getElementById('updateBar').classList.add('open');
       const st = document.getElementById('stUpdate'); if(st) st.textContent = 'Hay una versión nueva disponible';
     }
@@ -6487,6 +6542,7 @@ function toggleCaliper(force){
     e12Cal = { axis:'h', a:cx-half, b:cx+half, o:cy };
   } else e12Cal = null;
   document.getElementById('ecg12CalBar').hidden = !e12Cal;
+  if(!e12Cal) toggleCalHelp(false);
   document.getElementById('ecg12CalBtn').setAttribute('aria-pressed', e12Cal ? 'true':'false');
   document.getElementById('ecg12Paper').classList.toggle('measuring', !!e12Cal);
   caliperRead(); drawInk(); e12SendCal(true);
@@ -6833,7 +6889,7 @@ const MANUAL = [
   <h4>Instalar como app</h4>
   <p>En el navegador, usa «Añadir a pantalla de inicio» (iPhone/iPad: botón Compartir; Android: menú ⋮). Se abre a pantalla completa como una app.</p>
   <h4>Actualizar</h4>
-  <p>Cuando hay una versión nueva aparece una barra para actualizar. También puedes hacerlo en ☰ › General › <b>Actualizar la app</b>; vuelves a entrar en la misma sala.</p>
+  <p>Cuando hay una versión nueva aparece una barra con <b>Ver cambios</b> (las novedades) y <b>Actualizar</b>. También puedes actualizar en ☰ › General › <b>Actualizar la app</b>; vuelves a entrar en la misma sala. En ☰ › General › <b>Novedades</b> tienes el historial de cambios.</p>
   <p class="mn-note">Herramienta formativa: las ondas son aproximaciones y no sirven para diagnóstico.</p>` },
 
  { id:'monitor', shots:[['monitor', 'Consola del instructor: monitor, constantes y pestañas']], who:'all', t:'El monitor', h:`
@@ -6877,7 +6933,7 @@ const MANUAL = [
   <p>Proyecta el ECG en el monitor del alumno con tu mismo encuadre, zoom y anotaciones. La casilla junto al nombre decide si el alumno ve el nombre del ritmo (desmarcada al principio).</p>
   <h4>⋯ Más</h4>
   <ul>
-   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ mV», <b>mV y mm</b> (y «↔ ms» para volver). En su barra: <b>»</b> repite la medida un intervalo a la derecha para comprobar la regularidad, la cuadrícula superpone cuadros de 5 mm, el <b>alfiler</b> fija la medida como anotación (justo después aparece «Medida fijada · Deshacer», que la quita y vuelve a abrir el compás donde estaba), la <b>cruz de flechas</b> mueve la barra abajo, a la izquierda o a la derecha (se recuerda) y ✕ cierra el compás.</li>
+   <li><b>Compás:</b> dos líneas que arrastras sobre el trazado. En horizontal mide <b>ms, mm y lpm</b>; con «↕ mV», <b>mV y mm</b> (y «↔ ms» para volver). En su barra: <b>»</b> repite la medida un intervalo a la derecha para comprobar la regularidad, la cuadrícula superpone cuadros de 5 mm, el <b>alfiler</b> fija la medida como anotación (justo después aparece «Medida fijada · Deshacer», que la quita y vuelve a abrir el compás donde estaba), la <b>cruz de flechas</b> mueve la barra abajo, a la izquierda o a la derecha (se recuerda), la <b>i</b> explica cada botón y ✕ cierra el compás.</li>
    <li><b>Interpretación</b> {i:notes} (ECG del banco): el comentario del autor, visible solo para el instructor.</li>
    <li><b>Calibrar escala</b> {i:ruler} (administrador, ECG del banco): ver <a href="#mn-banco">Banco de ECG</a>.</li>
   </ul>` },
@@ -7012,6 +7068,44 @@ function cycleCalBarPos(){
 }
 (function(){ let p = 'bottom'; try{ p = localStorage.getItem('monitor-calbar-pos') || 'bottom'; }catch(e){}
   const bar = document.getElementById('ecg12CalBar'); if(bar) bar.dataset.pos = ['bottom','left','right'].includes(p) ? p : 'bottom'; })();
+
+/* ---------- Novedades (registro de cambios) ----------
+   El registro viaja dentro del propio index.html (#appChangelog). Al detectar una versión nueva
+   se lee el de esa versión y se muestran las entradas que esta todavía no tiene. */
+var remoteChanges = [];
+function localChangelog(){ try{ return JSON.parse(document.getElementById('appChangelog').textContent) || []; }catch(e){ return []; } }
+function newChangesFrom(html){
+  try{
+    const m = html.match(/<script type="application\/json" id="appChangelog">([\s\S]*?)<\/script>/); if(!m) return [];
+    const have = new Set(localChangelog().map(x=>x.v));
+    return (JSON.parse(m[1])||[]).filter(x=>x && !have.has(x.v));
+  }catch(e){ return []; }
+}
+function changesHtml(list, markNew){
+  return list.map(x=>'<div class="chg-ver"><h3>'+escapeHtml(x.d||'')+(markNew ? '<span class="chg-new">NUEVO</span>' : '')+'</h3><ul>'
+    + (x.items||[]).map(t=>'<li>'+escapeHtml(t)+'</li>').join('')+'</ul></div>').join('');
+}
+function openChanges(mode){
+  const isNew = mode==='new' && remoteChanges.length;
+  const list = isNew ? remoteChanges : localChangelog();
+  document.getElementById('chTitle').textContent = isNew ? 'Novedades de la versión nueva' : 'Novedades';
+  document.getElementById('chgBody').innerHTML = list.length ? changesHtml(list, isNew) : '<p>No hay novedades registradas.</p>';
+  document.getElementById('chgFoot').innerHTML = isNew ? '<button type="button" class="st-go" onclick="closeChanges()">Más tarde</button><button type="button" class="st-go chg-upd" onclick="reloadApp()">Actualizar ahora</button>' : '';
+  document.getElementById('changesOverlay').classList.add('open');
+  openChanges._opener = document.activeElement;
+  document.querySelector('#changesPanel .st-x').focus({ preventScroll:true });
+}
+function closeChanges(){
+  document.getElementById('changesOverlay').classList.remove('open');
+  const o = openChanges._opener; if(o && o.focus && document.body.contains(o)) o.focus({ preventScroll:true });
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('changesOverlay').classList.contains('open')){ e.stopImmediatePropagation(); closeChanges(); } }, true);
+// ayuda de la barra del compás
+function toggleCalHelp(force){
+  const h = document.getElementById('ecg12CalHelp'), b = document.getElementById('cbInfoBtn'); if(!h) return;
+  const open = force===undefined ? h.hidden : force;
+  h.hidden = !open; if(b) b.setAttribute('aria-expanded', open ? 'true':'false');
+}
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
