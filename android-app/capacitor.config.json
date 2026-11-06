@@ -1,0 +1,7 @@
+{
+  "appId": "io.github.infanteeric03.simulador",
+  "appName": "Simulador Urgencias",
+  "webDir": "www",
+  "android": { "allowMixedContent": false, "backgroundColor": "#05080a" },
+  "server": { "androidScheme": "https" }
+}

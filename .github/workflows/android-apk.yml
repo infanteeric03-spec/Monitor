@@ -1,0 +1,98 @@
+# APK de Android (Capacitor) con la web empaquetada dentro.
+# Se compila cada noche a las 00:00 (hora de Madrid) si ha habido cambios desde la última APK,
+# y se publica como «release» de GitHub; la app avisa al iniciarse de que hay versión nueva.
+name: APK Android
+
+on:
+  schedule:
+    - cron: '0 22 * * *'   # 00:00 en Madrid en horario de verano (UTC+2)
+    - cron: '0 23 * * *'   # 00:00 en Madrid en horario de invierno (UTC+1)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Compilar aunque no haya cambios'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ¿Toca compilar?
+        id: gate
+        run: |
+          h=$(TZ=Europe/Madrid date +%H)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$h" != "00" ]; then
+            echo "No es medianoche en Madrid ($h h): se omite."; echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          body=$(gh release view --json body -q .body 2>/dev/null || true)
+          lastsha=$(printf '%s' "$body" | sed -n 's/.*<!--SHA:\([0-9a-f]*\)-->.*/\1/p' | head -1)
+          lastweb=$(printf '%s' "$body" | sed -n 's/.*<!--WEBV:\([^-][^>]*\)-->.*/\1/p' | head -1)
+          echo "lastweb=$lastweb" >> "$GITHUB_OUTPUT"
+          if [ "${{ inputs.force }}" = "true" ] || [ -z "$lastsha" ] || ! git cat-file -e "$lastsha" 2>/dev/null; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --quiet "$lastsha" HEAD -- index.html manual manifest.json icon-512.png android-app .github/workflows/android-apk.yml; then
+            echo "Sin cambios desde la última APK: se omite."; echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Versión
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          echo "APK_CODE=$(( $(date -u +%s) / 60 ))" >> "$GITHUB_ENV"
+          echo "APK_NAME=$(TZ=Europe/Madrid date +%Y.%m.%d-%H%M)" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-java@v4
+        if: steps.gate.outputs.go == 'true'
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.go == 'true'
+        with:
+          node-version: '20'
+
+      - name: Web y proyecto Android
+        if: steps.gate.outputs.go == 'true'
+        working-directory: android-app
+        run: |
+          npm ci --no-audit --no-fund
+          node scripts/build-www.mjs
+          npx cap sync android
+
+      - name: Compilar y firmar
+        if: steps.gate.outputs.go == 'true'
+        working-directory: android-app/android
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+        run: |
+          if [ -z "$KEYSTORE_PASS" ]; then
+            echo "::error::Falta el secreto ANDROID_KEYSTORE_PASS (Settings › Secrets and variables › Actions)."; exit 1
+          fi
+          export KEYSTORE_FILE="$GITHUB_WORKSPACE/android-app/keystore/simulador-release.jks" KEY_ALIAS=simulador
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/dist/SimuladorUrgencias-$APK_NAME.apk"
+
+      - name: Publicar
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          node android-app/scripts/notes.mjs "${{ steps.gate.outputs.lastweb }}" > notes.md
+          gh release create "apk-$APK_CODE" dist/*.apk --title "App Android $APK_NAME" --notes-file notes.md --latest
