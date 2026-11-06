@@ -1269,6 +1269,22 @@
   .mn-body dl{ margin:6px 0; } .mn-body dt{ font-weight:700; margin-top:10px; } .mn-body dd{ margin:2px 0 0; color:var(--text-dim); }
   .mn-note{ font-size:12.5px; color:var(--text-dim); border-left:3px solid var(--line); padding-left:10px; }
   .mn-body.is-student .mn-who-i{ display:none; }
+  #manualPanel{ position:relative; }
+  .mn-shots{ display:flex; gap:12px; flex-wrap:wrap; margin:4px 0 10px; }
+  .mn-shot{ width:210px; padding:0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:#05080a; cursor:zoom-in;
+    display:flex; flex-direction:column; text-align:left; font:inherit; color:var(--text-dim); transition:border-color .15s, transform .15s; }
+  .mn-shot:hover, .mn-shot:focus-visible{ border-color:var(--ecg); transform:translateY(-1px); }
+  .mn-shot img{ width:100%; height:128px; object-fit:cover; object-position:top center; display:block; }
+  .mn-shot span{ font-size:11.5px; line-height:1.35; padding:6px 8px; background:var(--panel); border-top:1px solid var(--line); }
+  .mn-seelinks{ display:none; }
+  .mn-see{ display:flex; align-items:center; gap:6px; width:100%; margin:2px 0; padding:6px 0; background:none; border:none; color:var(--ecg);
+    font:inherit; font-size:13px; font-weight:600; text-align:left; cursor:pointer; }
+  .mn-light{ position:absolute; inset:0; z-index:5; background:rgba(3,6,8,.96); display:flex; align-items:center; justify-content:center; padding:20px; }
+  .mn-light[hidden]{ display:none; }
+  .mn-light figure{ margin:0; max-width:100%; max-height:100%; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .mn-light img{ max-width:100%; max-height:calc(100% - 40px); object-fit:contain; border-radius:8px; border:1px solid #2a3438; }
+  .mn-light figcaption{ color:#c9d3d6; font-size:13px; text-align:center; }
+  .mn-light .st-x{ position:absolute; top:12px; right:12px; background:#0b1113; color:#e6f2ee; border-color:#2a3438; }
   @media (max-width:760px){
     #manualPanel{ width:100vw; height:100dvh; border-radius:0; border:none; }
     .mn-wrap{ flex-direction:column; }
@@ -1276,6 +1292,9 @@
     .mn-nav a{ white-space:nowrap; padding:6px 10px; font-size:12.5px; border:1px solid var(--line); }
     .mn-body{ padding:0 16px 50vh; }
     .mn-guide{ display:none; }
+    .mn-shots{ display:none; }
+    .mn-seelinks{ display:block; margin:0 0 6px; }
+    .mn-light{ padding:56px 8px 16px; }
   }
   /* ---------- Menú de configuración (instructor) ---------- */
   .settings-btn svg{ width:17px; height:17px; }
@@ -1729,6 +1748,7 @@
 <symbol id="i-next" viewBox="0 0 20 20"><g fill="currentColor"><path d="M5 4.5v11L12.5 10z"/><rect x="13.5" y="4.5" width="2" height="11" rx=".6"/></g></symbol>
 <symbol id="i-restart" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10a6.5 6.5 0 1 0 2-4.7"/><path d="M3.5 3v3.5H7"/></g></symbol>
 <symbol id="i-rotate" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 10a6.5 6.5 0 1 1-2-4.7"/><path d="M16.5 3v3.5H13"/></g></symbol>
+<symbol id="i-image" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="15" height="13" rx="1.5"/><circle cx="7" cy="8" r="1.5"/><path d="M17.5 13l-4-4-7.5 7.5"/></g></symbol>
 <symbol id="i-book" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.5C8.5 4 6 3.5 3 3.8v11.4c3-.3 5.5.2 7 1.7 1.5-1.5 4-2 7-1.7V3.8c-3-.3-5.5.2-7 1.7zM10 5.5v11.4"/></g></symbol>
 </defs></svg>
 <script>
@@ -2319,6 +2339,10 @@
   <div id="manualPanel" role="dialog" aria-modal="true" aria-labelledby="mnTitle">
     <div class="mn-head"><span class="mn-ic"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><h2 id="mnTitle">Manual de uso</h2><button type="button" class="mn-guide st-go" onclick="closeManual(); closeSettings(); startGuide();">Guía rápida</button><button type="button" class="st-x mn-x" onclick="closeManual()" aria-label="Cerrar manual">✕</button></div>
     <div class="mn-wrap"><nav class="mn-nav" id="mnNav" aria-label="Apartados del manual"></nav><div class="mn-body" id="mnBody"></div></div>
+    <div class="mn-light" id="mnLight" hidden onclick="if(event.target===this) closeManualShot()">
+      <figure><img id="mnLightImg" alt=""><figcaption id="mnLightCap"></figcaption></figure>
+      <button type="button" class="st-x" id="mnLightX" onclick="closeManualShot()" aria-label="Cerrar captura">✕</button>
+    </div>
   </div>
 </div>
 <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()">
@@ -6777,7 +6801,7 @@ updateSoundUI();
    Contenido por apartados. «who»: 'i' solo instructor, 'm' solo alumno, 'all' ambos.
    {i:nombre} inserta un icono del sprite. */
 const MANUAL = [
- { id:'inicio', who:'all', t:'Primeros pasos', h:`
+ { id:'inicio', shots:[['inicio', 'Pantalla de inicio: elige Instructor o Alumno']], who:'all', t:'Primeros pasos', h:`
   <p>El simulador conecta dos tipos de dispositivo en una <b>sala</b>: el del <b>instructor</b>, que controla al paciente, y el del <b>alumno</b>, que muestra el monitor como en un box de urgencias.</p>
   <ol>
    <li>El instructor elige <b>Instructor</b> y crea una sala: aparece un código de 4 cifras arriba («Sala 1234»).</li>
@@ -6790,7 +6814,7 @@ const MANUAL = [
   <p>Cuando hay una versión nueva aparece una barra para actualizar. También puedes hacerlo en ☰ › General › <b>Actualizar la app</b>; vuelves a entrar en la misma sala.</p>
   <p class="mn-note">Herramienta formativa: las ondas son aproximaciones y no sirven para diagnóstico.</p>` },
 
- { id:'monitor', who:'all', t:'El monitor', h:`
+ { id:'monitor', shots:[['monitor', 'Consola del instructor: monitor, constantes y pestañas']], who:'all', t:'El monitor', h:`
   <p>Tres ondas, de arriba abajo: <b>ECG</b> (verde), <b>pletismografía de la SpO₂</b> (azul) y <b>respiración</b> (amarilla). Arriba a la derecha, la hora.</p>
   <ul>
    <li><b>Derivación:</b> toca «ECG · II ▾» para cambiarla; cambia en todos los dispositivos de la sala.</li>
@@ -6804,14 +6828,14 @@ const MANUAL = [
    <li>{i:cast} amplía o reduce <b>el monitor del alumno</b> sin tocar el tuyo; queda encendido mientras el alumno lo tiene ampliado.</li>
   </ul></div>` },
 
- { id:'sinc', who:'i', t:'Sincronización y envío', h:`
+ { id:'sinc', shots:[['sinc', 'Sinc desactivado: el punto rojo en «Enviar» indica cambios pendientes']], who:'i', t:'Sincronización y envío', h:`
   <ul>
    <li><b>Sinc</b> en verde: cada cambio llega al alumno al instante.</li>
    <li><b>Sinc</b> en gris: preparas los cambios sin que el alumno los vea. Un punto avisa de que hay cambios pendientes; pulsa {i:send} <b>Enviar</b> para mandarlos todos juntos.</li>
   </ul>
   <p>Útil para preparar un cambio brusco (por ejemplo, pasar a FV) y lanzarlo en el momento justo.</p>` },
 
- { id:'ritmo', who:'i', t:'Pestaña Ritmo', h:`
+ { id:'ritmo', shots:[['ritmo', 'Pestaña Ritmo con la ficha desplegada y su ECG en miniatura']], who:'i', t:'Pestaña Ritmo', h:`
   <ul>
    <li><b>Ritmo cardiaco:</b> elige el ritmo del desplegable; el ECG, el pulso y la pletismografía se adaptan.</li>
    <li>{i:send} <b>Enviar</b> muestra al alumno el nombre del ritmo con su ficha y ECG. Vuelve a pulsarlo (✕ Retirar) para quitarlo; también se retira solo al cambiar de ritmo.</li>
@@ -6821,7 +6845,7 @@ const MANUAL = [
   </ul>
   <p>En ☰ › Clase › <b>Ficha del ritmo</b> eliges si se muestra oculta, solo el ECG, contraída o desplegada.</p>` },
 
- { id:'visor', who:'i', t:'Visor de ECG', h:`
+ { id:'visor', shots:[['visor', 'Visor de ECG con el compás midiendo un intervalo'], ['visor_mas', 'Menú ⋯ Más: compás y zoom']], who:'i', t:'Visor de ECG', h:`
   <p>Se abre al tocar la miniatura del ECG o un ECG del banco. En el móvil en vertical se gira para verse en horizontal.</p>
   <h4>Zoom</h4>
   <p>Pellizca con dos dedos, haz doble toque (o doble clic) donde quieras ampliar, o usa ⋯ <b>Más</b> › Zoom (−, +, {i:restart} ver completo). Arrastra para moverte.</p>
@@ -6837,7 +6861,7 @@ const MANUAL = [
    <li><b>Cuadrícula</b> (en la barra del compás): superpone cuadros de 5 mm para comprobar la calibración.</li>
   </ul>` },
 
- { id:'banco', who:'i', t:'Banco de ECG', h:`
+ { id:'banco', shots:[['banco', 'Banco de ECG con búsqueda y categorías'], ['banco_editor', 'Editor para subir un ECG (administrador)']], who:'i', t:'Banco de ECG', h:`
   <p>ECG reales <b>anonimizados</b>, ordenados por categorías (ritmos y bloqueos, taquiarritmias, SCA/isquemia, alteraciones iónicas y otros). Se abre con el icono de la <b>onda verde</b> al final de las pestañas.</p>
   <ul>
    <li>Busca por título o interpretación, o filtra por categoría.</li>
@@ -6854,7 +6878,7 @@ const MANUAL = [
   </ol>
   <p class="mn-note">Sube solo ECG propios y sin ningún dato que identifique al paciente.</p>` },
 
- { id:'casos', who:'i', t:'Casos clínicos', h:`
+ { id:'casos', shots:[['casos', 'Caso clínico en curso'], ['alumno_caso', 'Lo que ve el alumno durante el caso']], who:'i', t:'Casos clínicos', h:`
   <ul>
    <li>Elige un caso en el desplegable. La casilla de al lado decide si el alumno ve su nombre (ⓘ lo explica).</li>
    <li>Controles: {i:prev} fase anterior, {i:play} iniciar / {i:pause} pausar, {i:next} fase siguiente, {i:restart} reiniciar y ✕ salir del caso.</li>
@@ -6867,7 +6891,7 @@ const MANUAL = [
   <p>☰ › Clase › Herramientas › <b>Editor de casos</b>: título y fases, cada una con su tiempo, ritmo, constantes, pulso y narrativa. Puedes reordenar ↑ ↓ y eliminar {i:trash} fases. Los casos propios se pueden {i:pen} editar o {i:trash} eliminar.</p>
   <p>La velocidad (x0,5 a x4) se elige en ☰ › Clase.</p>` },
 
- { id:'preguntas', who:'i', t:'Preguntas', h:`
+ { id:'preguntas', shots:[['preguntas', 'Pregunta enviada, esperando respuesta'], ['alumno_pregunta', 'La pregunta en el monitor del alumno']], who:'i', t:'Preguntas', h:`
   <ol>
    <li>Elige una <b>categoría</b> (o todas las del banco) y una <b>pregunta</b>.</li>
    <li>{i:send} <b>Enviar al monitor</b>: el alumno la ve sobre su pantalla, aunque tenga el monitor ampliado.</li>
@@ -6878,7 +6902,7 @@ const MANUAL = [
    <li><b>Gestionar preguntas</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, {i:trash} eliminar o {i:restart} volver a la versión original de una predefinida. ★ marca las propias.</li>
   </ul>` },
 
- { id:'sonido', who:'all', t:'Sonido y alarmas', h:`
+ { id:'sonido', shots:[['sonido', '☰ › General › Sonido'], ['alarmas', 'Alarma de prioridad alta (FV) en la campana del monitor']], who:'all', t:'Sonido y alarmas', h:`
   <p>Se activan en ☰ › General › <b>Sonido</b>, en cada dispositivo por separado (vienen apagados).</p>
   <ul>
    <li><b>Beep con cada latido:</b> su tono baja cuando baja la SpO₂. No suena sin pulso (AESP, FV, TV sin pulso) ni en asistolia.</li>
@@ -6890,7 +6914,7 @@ const MANUAL = [
   <h4>Volumen</h4>
   <p>El control de la app es relativo al <b>volumen multimedia</b> del dispositivo: súbelo también con sus botones. Los navegadores solo dejan sonar después de tocar la pantalla una vez. En iPhone/iPad, si no suena, revisa el modo silencio.</p>` },
 
- { id:'alumno', who:'all', t:'Pantalla del alumno', h:`
+ { id:'alumno', shots:[['alumno', 'Alumno con la ficha del ritmo recibida'], ['alumno_pregunta', 'Pregunta sobre el monitor del alumno']], who:'all', t:'Pantalla del alumno', h:`
   <p>Muestra el monitor del paciente y lo que el instructor le envía:</p>
   <ul>
    <li><b>Nombre y ficha del ritmo</b> con su ECG, debajo de las constantes.</li>
@@ -6901,7 +6925,7 @@ const MANUAL = [
   </ul>
   <p>El alumno puede ampliar su monitor ⤢, cambiar la derivación y, en ☰, el tema, el sonido, la guía y actualizar la app.</p>` },
 
- { id:'config', who:'i', t:'Menú ☰ Configuración', h:`
+ { id:'config', shots:[['config', '☰ Configuración, pestaña Clase']], who:'i', t:'Menú ☰ Configuración', h:`
   <ul>
    <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla encendida al ampliar.</li>
    <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (preguntas, editor de casos, administrador del banco).</li>
@@ -6923,7 +6947,10 @@ function openManual(sec){
   const isI = role==='instructor';
   const list = MANUAL.filter(x=>x.who==='all' || (x.who==='i')===isI);
   document.getElementById('mnNav').innerHTML = list.map(x=>'<a href="#mn-'+x.id+'" data-id="'+x.id+'">'+escapeHtml(x.t)+'</a>').join('');
-  document.getElementById('mnBody').innerHTML = list.map((x,i)=>'<section id="mn-'+x.id+'"><h3><span class="mn-n">'+(i+1)+'</span>'+escapeHtml(x.t)+'</h3>'+manualHtml(x.h)+'</section>').join('');
+  const shotsHtml = x=>!x.shots ? '' : '<div class="mn-shots">'+x.shots.map(([f,c])=>
+      '<button type="button" class="mn-shot" data-src="manual/'+f+'.jpg" data-cap="'+escapeHtml(c)+'"><img src="manual/'+f+'.jpg" alt="" loading="lazy"><span>'+escapeHtml(c)+'</span></button>').join('')+'</div>'
+    + '<div class="mn-seelinks">'+x.shots.map(([f,c])=>'<button type="button" class="mn-see" data-src="manual/'+f+'.jpg" data-cap="'+escapeHtml(c)+'">'+IC('image')+' Ver: '+escapeHtml(c)+' ›</button>').join('')+'</div>';
+  document.getElementById('mnBody').innerHTML = list.map((x,i)=>'<section id="mn-'+x.id+'"><h3><span class="mn-n">'+(i+1)+'</span>'+escapeHtml(x.t)+'</h3>'+shotsHtml(x)+manualHtml(x.h)+'</section>').join('');
   document.getElementById('mnBody').classList.toggle('is-student', !isI);
   const ov = document.getElementById('manualOverlay'); ov.classList.add('open');
   openManual._opener = document.activeElement;
@@ -6943,11 +6970,18 @@ function manualSpy(){
     if(on && a.dataset.on!=='1'){ a.scrollIntoView({ block:'nearest', inline:'nearest' }); } a.dataset.on = on?'1':''; });
 }
 document.getElementById('mnBody').addEventListener('scroll', manualSpy, { passive:true });
+function openManualShot(src, cap){
+  const lb = document.getElementById('mnLight');
+  document.getElementById('mnLightImg').src = src; document.getElementById('mnLightCap').textContent = cap;
+  lb.hidden = false; document.getElementById('mnLightX').focus({ preventScroll:true });
+}
+function closeManualShot(){ const lb = document.getElementById('mnLight'); if(lb.hidden) return false; lb.hidden = true; return true; }
 document.getElementById('manualPanel').addEventListener('click', e=>{
+  const sh = e.target.closest('.mn-shot, .mn-see'); if(sh){ openManualShot(sh.dataset.src, sh.dataset.cap); return; }
   const a = e.target.closest('a[href^="#mn-"]'); if(!a) return;
   e.preventDefault(); const t = document.getElementById(a.getAttribute('href').slice(1)); if(t) t.scrollIntoView({ behavior:'smooth' });
 });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('manualOverlay').classList.contains('open')){ e.stopImmediatePropagation(); closeManual(); } }, true);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('manualOverlay').classList.contains('open')){ e.stopImmediatePropagation(); if(!closeManualShot()) closeManual(); } }, true);
 
 // Registro del service worker: requisito de Chrome/Samsung Internet para poder "instalar" la web
 if('serviceWorker' in navigator){
