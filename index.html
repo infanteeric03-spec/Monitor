@@ -1597,9 +1597,9 @@
   .chg-foot:empty{ display:none; }
   .chg-foot .chg-upd{ background:var(--ecg); color:#04140b; border-color:var(--ecg); font-weight:700; }
   /* ---------- Manual de uso ---------- */
-  #manualOverlay{ position:fixed; inset:0; z-index:99; background:rgba(0,0,0,.55); display:none; overscroll-behavior:contain; }
-  #manualOverlay.open{ display:flex; align-items:center; justify-content:center; }
-  #manualPanel{ width:min(980px,100vw); height:min(760px,100dvh); background:var(--panel); color:var(--text); border:1px solid var(--line);
+  #manualOverlay, #ceOverlay{ position:fixed; inset:0; z-index:99; background:rgba(0,0,0,.55); display:none; overscroll-behavior:contain; }
+  #manualOverlay.open, #ceOverlay.open{ display:flex; align-items:center; justify-content:center; }
+  #manualPanel, #cePanel{ width:min(980px,100vw); height:min(760px,100dvh); background:var(--panel); color:var(--text); border:1px solid var(--line);
     border-radius:14px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); }
   .mn-head{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); padding-top:max(12px, env(safe-area-inset-top)); }
   .mn-head h2{ margin:0; font-size:16px; font-weight:800; flex:1; }
@@ -1639,7 +1639,7 @@
   .mn-light figcaption{ color:#c9d3d6; font-size:13px; text-align:center; }
   .mn-light .st-x{ position:absolute; top:12px; right:12px; background:#0b1113; color:#e6f2ee; border-color:#2a3438; }
   @media (max-width:760px){
-    #manualPanel{ width:100vw; height:100dvh; border-radius:0; border:none; }
+    #manualPanel, #cePanel{ width:100vw; height:100dvh; border-radius:0; border:none; }
     .mn-wrap{ flex-direction:column; }
     .mn-nav{ width:auto; flex-direction:row; border-right:none; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; padding:8px 10px; gap:4px; scrollbar-width:none; }
     .mn-nav a{ white-space:nowrap; padding:6px 10px; font-size:12.5px; border:1px solid var(--line); }
@@ -1649,6 +1649,42 @@
     .mn-seelinks{ display:block; margin:0 0 6px; }
     .mn-light{ padding:56px 8px 16px; }
   }
+  /* ---------- Editor de preguntas y casos (mismo marco que el manual) ---------- */
+  .ce-body{ padding-bottom:40px; }
+  .ce-top{ display:flex; align-items:center; gap:10px; padding-top:18px; }
+  .ce-top h3{ flex:1; margin:0; }
+  .ce-top .st-go{ border-color:var(--ecg); color:var(--ecg); font-weight:700; }
+  .ce-tools{ display:flex; gap:8px; margin:10px 0 4px; flex-wrap:wrap; }
+  .ce-tools input{ flex:1; min-width:160px; background:var(--field); color:var(--text); border:1px solid var(--line); border-radius:7px; padding:8px 10px; font:inherit; font-size:13px; }
+  .ce-tools .st-seg button{ font-size:12px; }
+  .ce-g{ margin:16px 0 6px; font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--text-dim); }
+  .ce-list{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:9px; overflow:hidden; }
+  .ce-item{ display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; background:var(--panel); border:none; border-top:1px solid var(--line);
+    color:var(--text); font:inherit; font-size:13.5px; line-height:1.4; text-align:left; cursor:pointer; }
+  .ce-item:first-child{ border-top:none; }
+  .ce-item:hover{ background:var(--field); }
+  .ce-item[hidden]{ display:none; }
+  .ce-item.is-hidden{ color:var(--text-dim); cursor:default; }
+  .ce-item .ce-t{ flex:1; min-width:0; }
+  .ce-item .ce-t small{ display:block; color:var(--text-dim); font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ce-item .st-chev{ color:var(--text-dim); flex-shrink:0; }
+  .ce-b{ flex-shrink:0; font-size:10px; font-weight:800; letter-spacing:.05em; padding:2px 6px; border-radius:4px; border:1px solid var(--line); color:var(--text-dim); white-space:nowrap; }
+  .ce-b.own{ color:var(--ecg); border-color:color-mix(in srgb, var(--ecg) 45%, transparent); }
+  .ce-b.mod{ color:#f5c542; border-color:color-mix(in srgb, #f5c542 45%, transparent); }
+  .ce-empty{ padding:14px 12px; color:var(--text-dim); font-size:13px; }
+  .ce-back{ background:none; border:none; color:var(--ecg); font:inherit; font-size:13px; font-weight:700; padding:16px 0 4px; cursor:pointer; }
+  .ce-form h3{ margin:4px 0 12px !important; }
+  .ce-form .qe-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .ce-form .kf-field label{ font-size:10.5px; }
+  .ce-form textarea.kf-narrative{ font-size:14px; min-height:64px; margin-bottom:10px; }
+  .ce-form .kf-actions{ margin-top:12px; }
+  .ce-form .kf-actions.n2{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .ce-form .kf-actions.n4{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+  .ce-form .kf-status{ font-size:12.5px; }
+  .ce-form .kf-scroll{ max-height:none; overflow:visible; }
+  .ce-form #caseBuilder{ display:block !important; }
+  .ce-del{ color:var(--alarm) !important; }
+  @media (max-width:520px){ .ce-form .kf-actions.n4{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
   /* ---------- Menú de configuración (instructor) ---------- */
   .settings-btn svg{ width:17px; height:17px; }
   header .helpBtn, header .themeToggle{ display:none !important; }
@@ -1760,8 +1796,8 @@
   html.ipad-app .gate-bar{ top:max(16px, env(safe-area-inset-top, 0px), 48px); }
   html.ipad-app #gate .gate-theme{ top:max(9px, env(safe-area-inset-top, 0px), 41px); }
   html.ipad-app .st-head{ padding-top:calc(max(14px, env(safe-area-inset-top, 0px), 48px) + 0.5cm); }
-  html.ipad-app #manualOverlay.open, html.ipad-app #changesOverlay.open{ padding-top:calc(max(env(safe-area-inset-top, 0px), 24px) + 0.5cm + 10px); align-items:flex-start; }
-  html.ipad-app #manualPanel{ height:min(760px, calc(100dvh - max(env(safe-area-inset-top, 0px), 24px) - 0.5cm - 30px)); }
+  html.ipad-app #manualOverlay.open, html.ipad-app #ceOverlay.open, html.ipad-app #changesOverlay.open{ padding-top:calc(max(env(safe-area-inset-top, 0px), 24px) + 0.5cm + 10px); align-items:flex-start; }
+  html.ipad-app #manualPanel, html.ipad-app #cePanel{ height:min(760px, calc(100dvh - max(env(safe-area-inset-top, 0px), 24px) - 0.5cm - 30px)); }
 
   /* Franja bajo la barra de estado del sistema (hora, wifi, batería): iOS/iPadOS 26 difumina lo que
      queda debajo de ella. Con un color liso en esa franja (sin cuadrícula ni contenido) no se ve borroso. */
@@ -2886,7 +2922,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-07.9", "d": "7 nov 2026", "items": ["Alumno: al silenciar las alarmas, la cuenta atrás de 2 minutos se ve completa junto a la campana."]}, {"v": "2026-11-07.8", "d": "7 nov 2026", "items": ["Alumno en tablet y ordenador (2 columnas): pantalla completa a lo ancho; el monitor ocupa los 2/3 superiores de la parte izquierda y la columna derecha (1/3) todo el alto."]}, {"v": "2026-11-07.7", "d": "7 nov 2026", "items": ["Alumno: opción «Distribución» en ☰ › General: 1 columna (monitor a todo el ancho y tarjetas debajo) o 2 columnas (por defecto; en tablet y ordenador, monitor en 2/3 y tarjetas en 1/3). Durante una parada siempre se usan 2 columnas."]}, {"v": "2026-11-07.6", "d": "7 nov 2026", "items": ["Alumno: vuelve la opción de salir de la sala en el menú (Sala actual › Cambiar / Salir).", "Alumno en tablet, ordenador y monitor ampliado: nombres de las constantes más grandes y más cerca de su valor."]}, {"v": "2026-11-07.5", "d": "7 nov 2026", "items": ["Móvil en horizontal (alumno): la ficha del ritmo, el caso clínico y la tarjeta de la PCR ocupan siempre el área reservada a la derecha, del mismo alto que el monitor."]}, {"v": "2026-11-07.4", "d": "7 nov 2026", "items": ["Monitor del alumno: FC, SpO₂, FR y TA al doble de tamaño en tablet, ordenador y con el monitor ampliado.", "Móvil en horizontal (alumno): monitor siempre a la izquierda y la columna derecha reservada para la ficha del ritmo, el caso clínico y la PCR, con su propio desplazamiento."]}, {"v": "2026-11-07.3", "d": "7 nov 2026", "items": ["Monitor del alumno al estilo IntelliVue: cada número arriba a la derecha de su curva (FC, SpO₂, FR), TA y Tª en la franja inferior y banda superior con la alarma, la hora, la campana y ampliar. En vertical las curvas llegan al borde y el monitor es más bajo."]}, {"v": "2026-11-07.2", "d": "7 nov 2026", "items": ["Configuración: «Guías» con los botones Rápida y Manual; «Sala actual» con Cambiar y Salir; al final, «Actualizaciones»: recargar (en el navegador) e instalar la app Android, o buscar actualización desde la app."]}, {"v": "2026-11-07.1", "d": "7 nov 2026", "items": ["App Android: se compila cada noche a las 00:00 si hay cambios; al iniciarse avisa de que hay una versión nueva con sus novedades, y se puede buscar a mano en ☰ › General › App Android."]}, {"v": "2026-11-06.45", "d": "6 nov 2026", "items": ["Circuito de PCR detenido: el monitor sigue mostrando el ritmo del momento, sin artefacto de compresiones ni el aviso de comprobación encima."]}, {"v": "2026-11-06.44", "d": "6 nov 2026", "items": ["Circuito de PCR: el pulso lo decide el instructor con el ritmo que elige (TVSP, TV con pulso, AESP, RCE); la respuesta del alumno se valora con ✓/✗ sin cambiar el algoritmo.", "Ritmo programado: al acabar los 10 s la RCP se reanuda sola solo con «Sin validación del instructor»; si no, se pregunta."]}, {"v": "2026-11-06.43", "d": "6 nov 2026", "items": ["Circuito de PCR: «Ritmo programado» (desplegable) en lugar de «RCE…»: aparece a los 2 s de la próxima comprobación y la RCP se reanuda al acabar los 10 s; si es una RCE se elige el ritmo de salida.", "Botón «Detener» para parar el circuito sin terminarlo (se congelan los tiempos también en el alumno) y «Continuar»."]}, {"v": "2026-11-06.42", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal con un caso clínico: monitor y constantes a la izquierda (como en la PCR) y el caso con sus botones a la derecha, con desplazamiento propio."]}, {"v": "2026-11-06.41", "d": "6 nov 2026", "items": ["PCR del alumno: las opciones de descarga y dosis se abren hacia arriba si caben y, si no, hacia abajo; siempre dentro de la pantalla."]}, {"v": "2026-11-06.40", "d": "6 nov 2026", "items": ["Circuito de PCR: opción «Sin validación del instructor»: las respuestas del alumno se aplican directamente y, al elegir el ritmo, la RCP se reanuda sola a los 2 s.", "Ordenador: los botones del circuito ya responden al primer clic."]}, {"v": "2026-11-06.39", "d": "6 nov 2026", "items": ["Alumno en la PCR: la guía (ERC/AHA 2025) aparece arriba junto a «Alumno» y la tarjeta ya no repite la sala.", "Monitor ampliado del alumno en la RCE: siguen visibles la descarga y la adrenalina con su conteo (desactivadas)."]}, {"v": "2026-11-06.38", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal durante la PCR: monitor el doble de alto y constantes en una fila compacta con todo su contenido visible (incluida la TAM).", "La tensión pasa a llamarse «TA» (sin NIBP)."]}, {"v": "2026-11-06.37", "d": "6 nov 2026", "items": ["Instructor en el móvil en horizontal: constantes redistribuidas; la temperatura ya no queda cortada."]}, {"v": "2026-11-06.36", "d": "6 nov 2026", "items": ["Flutter: selector de conducción sin el rótulo, a todo el ancho."]}, {"v": "2026-11-06.35", "d": "6 nov 2026", "items": ["Flutter auricular: ondas F en dientes de sierra en el monitor y selector de conducción 2:1 (150 lpm) o 3:1 (100 lpm), también en el ECG de 12 derivaciones y en el monitor del alumno."]}, {"v": "2026-11-06.34", "d": "6 nov 2026", "items": ["Circuito de PCR en el móvil: cabecera más compacta, sin el rótulo «Velocidad», tiempo a la derecha y botón de monitor con icono."]}, {"v": "2026-11-06.33", "d": "6 nov 2026", "items": ["Lista de ritmos: «Extrasístoles ventriculares» y «Taquicardia ventricular monomorfa».", "«Sinc» pasa a llamarse «Sincro».", "Guía rápida: el aviso del manual queda solo en el primer paso; en el iPad, la parte de arriba de la guía medio centímetro más abajo."]}, {"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-07.10", "d": "7 nov 2026", "items": ["Nuevo «Editor de preguntas y casos» en ☰ › Clase › Herramientas, con el mismo formato que el manual: banco de preguntas, preguntas de RCP que se envían al alumno, preguntas orales de la parada para el instructor y casos clínicos. Crear, editar, ocultar o volver al original, con búsqueda y filtro por algoritmo."]}, {"v": "2026-11-07.9", "d": "7 nov 2026", "items": ["Alumno: al silenciar las alarmas, la cuenta atrás de 2 minutos se ve completa junto a la campana."]}, {"v": "2026-11-07.8", "d": "7 nov 2026", "items": ["Alumno en tablet y ordenador (2 columnas): pantalla completa a lo ancho; el monitor ocupa los 2/3 superiores de la parte izquierda y la columna derecha (1/3) todo el alto."]}, {"v": "2026-11-07.7", "d": "7 nov 2026", "items": ["Alumno: opción «Distribución» en ☰ › General: 1 columna (monitor a todo el ancho y tarjetas debajo) o 2 columnas (por defecto; en tablet y ordenador, monitor en 2/3 y tarjetas en 1/3). Durante una parada siempre se usan 2 columnas."]}, {"v": "2026-11-07.6", "d": "7 nov 2026", "items": ["Alumno: vuelve la opción de salir de la sala en el menú (Sala actual › Cambiar / Salir).", "Alumno en tablet, ordenador y monitor ampliado: nombres de las constantes más grandes y más cerca de su valor."]}, {"v": "2026-11-07.5", "d": "7 nov 2026", "items": ["Móvil en horizontal (alumno): la ficha del ritmo, el caso clínico y la tarjeta de la PCR ocupan siempre el área reservada a la derecha, del mismo alto que el monitor."]}, {"v": "2026-11-07.4", "d": "7 nov 2026", "items": ["Monitor del alumno: FC, SpO₂, FR y TA al doble de tamaño en tablet, ordenador y con el monitor ampliado.", "Móvil en horizontal (alumno): monitor siempre a la izquierda y la columna derecha reservada para la ficha del ritmo, el caso clínico y la PCR, con su propio desplazamiento."]}, {"v": "2026-11-07.3", "d": "7 nov 2026", "items": ["Monitor del alumno al estilo IntelliVue: cada número arriba a la derecha de su curva (FC, SpO₂, FR), TA y Tª en la franja inferior y banda superior con la alarma, la hora, la campana y ampliar. En vertical las curvas llegan al borde y el monitor es más bajo."]}, {"v": "2026-11-07.2", "d": "7 nov 2026", "items": ["Configuración: «Guías» con los botones Rápida y Manual; «Sala actual» con Cambiar y Salir; al final, «Actualizaciones»: recargar (en el navegador) e instalar la app Android, o buscar actualización desde la app."]}, {"v": "2026-11-07.1", "d": "7 nov 2026", "items": ["App Android: se compila cada noche a las 00:00 si hay cambios; al iniciarse avisa de que hay una versión nueva con sus novedades, y se puede buscar a mano en ☰ › General › App Android."]}, {"v": "2026-11-06.45", "d": "6 nov 2026", "items": ["Circuito de PCR detenido: el monitor sigue mostrando el ritmo del momento, sin artefacto de compresiones ni el aviso de comprobación encima."]}, {"v": "2026-11-06.44", "d": "6 nov 2026", "items": ["Circuito de PCR: el pulso lo decide el instructor con el ritmo que elige (TVSP, TV con pulso, AESP, RCE); la respuesta del alumno se valora con ✓/✗ sin cambiar el algoritmo.", "Ritmo programado: al acabar los 10 s la RCP se reanuda sola solo con «Sin validación del instructor»; si no, se pregunta."]}, {"v": "2026-11-06.43", "d": "6 nov 2026", "items": ["Circuito de PCR: «Ritmo programado» (desplegable) en lugar de «RCE…»: aparece a los 2 s de la próxima comprobación y la RCP se reanuda al acabar los 10 s; si es una RCE se elige el ritmo de salida.", "Botón «Detener» para parar el circuito sin terminarlo (se congelan los tiempos también en el alumno) y «Continuar»."]}, {"v": "2026-11-06.42", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal con un caso clínico: monitor y constantes a la izquierda (como en la PCR) y el caso con sus botones a la derecha, con desplazamiento propio."]}, {"v": "2026-11-06.41", "d": "6 nov 2026", "items": ["PCR del alumno: las opciones de descarga y dosis se abren hacia arriba si caben y, si no, hacia abajo; siempre dentro de la pantalla."]}, {"v": "2026-11-06.40", "d": "6 nov 2026", "items": ["Circuito de PCR: opción «Sin validación del instructor»: las respuestas del alumno se aplican directamente y, al elegir el ritmo, la RCP se reanuda sola a los 2 s.", "Ordenador: los botones del circuito ya responden al primer clic."]}, {"v": "2026-11-06.39", "d": "6 nov 2026", "items": ["Alumno en la PCR: la guía (ERC/AHA 2025) aparece arriba junto a «Alumno» y la tarjeta ya no repite la sala.", "Monitor ampliado del alumno en la RCE: siguen visibles la descarga y la adrenalina con su conteo (desactivadas)."]}, {"v": "2026-11-06.38", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal durante la PCR: monitor el doble de alto y constantes en una fila compacta con todo su contenido visible (incluida la TAM).", "La tensión pasa a llamarse «TA» (sin NIBP)."]}, {"v": "2026-11-06.37", "d": "6 nov 2026", "items": ["Instructor en el móvil en horizontal: constantes redistribuidas; la temperatura ya no queda cortada."]}, {"v": "2026-11-06.36", "d": "6 nov 2026", "items": ["Flutter: selector de conducción sin el rótulo, a todo el ancho."]}, {"v": "2026-11-06.35", "d": "6 nov 2026", "items": ["Flutter auricular: ondas F en dientes de sierra en el monitor y selector de conducción 2:1 (150 lpm) o 3:1 (100 lpm), también en el ECG de 12 derivaciones y en el monitor del alumno."]}, {"v": "2026-11-06.34", "d": "6 nov 2026", "items": ["Circuito de PCR en el móvil: cabecera más compacta, sin el rótulo «Velocidad», tiempo a la derecha y botón de monitor con icono."]}, {"v": "2026-11-06.33", "d": "6 nov 2026", "items": ["Lista de ritmos: «Extrasístoles ventriculares» y «Taquicardia ventricular monomorfa».", "«Sinc» pasa a llamarse «Sincro».", "Guía rápida: el aviso del manual queda solo en el primer paso; en el iPad, la parte de arriba de la guía medio centímetro más abajo."]}, {"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -2986,6 +3022,12 @@
     <div class="chg-foot" id="chgFoot"></div>
   </div>
 </div>
+<div id="ceOverlay" onclick="if(event.target===this) closeEditor()">
+  <div id="cePanel" role="dialog" aria-modal="true" aria-labelledby="ceTitle">
+    <div class="mn-head"><span class="mn-ic"><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg></span><h2 id="ceTitle">Editor de preguntas y casos</h2><button type="button" class="st-x mn-x" onclick="closeEditor()" aria-label="Cerrar el editor">✕</button></div>
+    <div class="mn-wrap"><nav class="mn-nav" id="ceNav" aria-label="Apartados del editor"></nav><div class="mn-body ce-body" id="ceBody"></div></div>
+  </div>
+</div>
 <div id="manualOverlay" onclick="if(event.target===this) closeManual()">
   <div id="manualPanel" role="dialog" aria-modal="true" aria-labelledby="mnTitle">
     <div class="mn-head"><span class="mn-ic"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><h2 id="mnTitle">Manual de uso</h2><button type="button" class="mn-guide st-go" onclick="closeManual(); closeSettings(); startGuide();">Guía rápida</button><button type="button" class="st-x mn-x" onclick="closeManual()" aria-label="Cerrar manual">✕</button></div>
@@ -3042,8 +3084,7 @@
         <div class="st-row"><span>Velocidad del caso</span><div class="st-seg" data-set="speed" role="group" aria-label="Velocidad por defecto"><button type="button" data-v="0.5">x0,5</button><button type="button" data-v="1">x1</button><button type="button" data-v="2">x2</button><button type="button" data-v="4">x4</button></div></div>
       </section>
       <section class="st-sec"><h3>Herramientas</h3>
-        <button type="button" class="st-row st-link" onclick="closeSettings(); manageQuestions();"><span class="st-l"><span class="st-ic" aria-hidden="true">?</span>Gestionar preguntas</span><span class="st-chev" aria-hidden="true">›</span></button>
-        <button type="button" class="st-row st-link" onclick="closeSettings(); switchTab('case'); openCaseBuilder();"><span class="st-l"><span class="st-ic" aria-hidden="true">▤</span>Editor de casos</span><span class="st-chev" aria-hidden="true">›</span></button>
+        <button type="button" class="st-row st-link" onclick="openEditor()"><span class="st-l" style="flex-wrap:nowrap"><span class="st-ic" aria-hidden="true">✎</span><span>Editor de preguntas y casos<small>Banco de preguntas, preguntas de la parada y casos clínicos</small></span></span><span class="st-chev" aria-hidden="true">›</span></button>
         <div class="st-row"><span class="st-l" style="flex-wrap:nowrap"><span class="st-ic" aria-hidden="true">∿</span><span>Banco de ECG · administrador<small id="stAdmin">Desbloquea con el PIN para subir, editar y calibrar</small></span></span><button type="button" class="st-go" id="stAdminBtn" onclick="adminToggle()">Desbloquear</button></div>
         <button type="button" class="st-row st-link admin-only" onclick="openPcr()"><span class="st-l"><span class="st-ic" aria-hidden="true">♥</span>Circuito de PCR <span class="st-beta">BETA</span></span><span class="st-chev" aria-hidden="true">›</span></button>
         <div class="st-row admin-only"><span class="st-l"><span class="st-ic" aria-hidden="true"></span>PIN de administrador</span><button type="button" class="st-go" onclick="adminChangePin()">Cambiar PIN</button></div>
@@ -3376,6 +3417,7 @@ function connectRoom(){
         sendStudentPrefs();
         loadCustomCases();
         loadCustomQuestions();
+        loadOralQuestions();
       }
     } else if(status==='CHANNEL_ERROR' || status==='TIMED_OUT'){
       document.getElementById('gateStatus').textContent = 'No se pudo conectar. Revisa la conexión e inténtalo de nuevo.';
@@ -3834,6 +3876,7 @@ function rebuildQuestionBanks(){
   ALL_QUESTIONS = QUESTION_BANK.concat(CPR_BANK);
   rebuildRestoreLink();
   populateQuizSelect();
+  ceRefresh();
   updateCprPanel(true);
   // refresca la vista previa por si la pregunta mostrada ha cambiado
   ['quiz','cpr'].forEach(k=>{
@@ -4183,7 +4226,7 @@ async function loadCustomCases(){
   try{
     const { data, error } = await supa.from('clinical_cases').select('id,title,keyframes').order('created_at', { ascending:true });
     if(error){ console.error('No se pudieron cargar los casos guardados:', error); return; }
-    customCases = {};
+    customCases = {}; ceRefresh();
     const select = document.getElementById('caseSelect');
     // elimina optgroup previo si lo hubiera (recarga)
     const prevGroup = document.getElementById('customCasesGroup');
@@ -4201,6 +4244,7 @@ async function loadCustomCases(){
     });
     select.appendChild(group);
     updateCaseActionButtons();
+    ceRefresh();
   }catch(e){
     console.error('Error al cargar casos guardados:', e);
   }
@@ -4252,6 +4296,7 @@ function editSelectedCase(){
 }
 
 function cancelCaseBuilder(){
+  if(ceCaseHosted){ ceCaseBack(); return; }
   document.getElementById('caseBuilder').style.display = 'none';
   document.getElementById('caseNormalView').style.display = 'block';
 }
@@ -4430,6 +4475,7 @@ async function saveCaseBuilder(){
     statusEl.className = 'kf-status ok';
     await loadCustomCases();
     setTimeout(()=>{
+      if(ceCaseHosted){ ceCaseBack(); showToast('Caso guardado.'); return; }
       document.getElementById('caseBuilder').style.display = 'none';
       document.getElementById('caseNormalView').style.display = 'block';
     }, 500);
@@ -7636,6 +7682,286 @@ function updateSoundUI(){
 }
 updateSoundUI();
 
+/* ---------- Editor de preguntas y casos (☰ › Clase › Herramientas) ----------
+   Un solo entorno, con el marco del manual, para:
+   · Banco de preguntas tipo test (ritmos y bloqueos) → tabla quiz_questions, bank 'general'
+   · Preguntas de RCP que se envían al alumno (tipo test) → quiz_questions, bank 'rcp'
+   · Preguntas orales de la parada que ve el instructor (pregunta + respuesta) → pcr_oral_questions
+   · Casos clínicos → clinical_cases (se reutiliza el constructor de fases)
+   Las predefinidas se pueden modificar (con vuelta al original) u ocultar; las nuevas, editar o eliminar. */
+var ceSec = 'general', ceForm = null, ceCaseHosted = false, ceQuery = '', ceAlgoF = 'all';
+const CE_SECS = [
+  { id:'general', t:'Banco de preguntas', nav:'Banco de preguntas',
+    d:'Preguntas tipo test de ritmos y bloqueos. Se envían al alumno desde la pestaña «Preguntas».' },
+  { id:'rcp', t:'Preguntas de RCP para el alumno', nav:'RCP · alumno',
+    d:'Preguntas tipo test que llegan a la pantalla del alumno durante la parada (circuito de PCR y casos con parada) y desde la pestaña «Preguntas». Cada una tiene su fase y su algoritmo.' },
+  { id:'oral', t:'Preguntas de la parada · instructor', nav:'Parada · instructor',
+    d:'Preguntas orales con su respuesta que ve el instructor en el circuito de PCR, según la fase, para hacérselas al alumno y valorar ✓/✗.' },
+  { id:'cases', t:'Casos clínicos', nav:'Casos clínicos',
+    d:'Casos con fases: tiempo, ritmo, constantes, pulso y narrativa. Los predefinidos se pueden duplicar para crear una versión propia.' }
+];
+const CE_CTX = { general:'Generales', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', post:'Tras la RCE' };
+const CE_OCTX = { check:'Comprobación de ritmo', shock:'Ritmo desfibrilable (FV/TVSP)', noshock:'Ritmo no desfibrilable (asistolia/AESP)', general:'Generales', post:'Tras la RCE' };
+const CE_DYN = { o1:'ritmo', o2:'ritmo', o3:'ritmo', o5:'algoritmo', o7:'algoritmo', o8:'algoritmo', o9:'algoritmo', o13:'algoritmo', o18:'algoritmo', o19:'algoritmo', o20:'algoritmo' };
+
+function openEditor(sec){
+  if(role!=='instructor') return;
+  closeSettings();
+  if(sec) ceSec = sec;
+  ceForm = null; ceQuery = '';
+  document.getElementById('ceOverlay').classList.add('open');
+  openEditor._opener = document.activeElement;
+  ceRender();
+  if(supa){ loadCustomQuestions(); loadOralQuestions(); loadCustomCases(); }
+  document.querySelector('#cePanel .mn-x').focus({ preventScroll:true });
+}
+async function closeEditor(){
+  if(ceForm && ceForm.dirty && !(await appConfirm('¿Salir sin guardar los cambios?', { ok:'Salir', danger:true }))) return;
+  ceCaseBack(true);
+  ceForm = null;
+  document.getElementById('ceOverlay').classList.remove('open');
+  const o = openEditor._opener; if(o && o.focus && document.body.contains(o)) o.focus({ preventScroll:true });
+}
+function ceOpen(){ return document.getElementById('ceOverlay').classList.contains('open'); }
+// se llama al recargar preguntas o casos: solo repinta la lista (nunca un formulario a medio escribir)
+function ceRefresh(){ if(ceOpen() && !ceForm) ceRender(); }
+async function ceGo(sec){
+  if(ceForm && ceForm.dirty && !(await appConfirm('¿Salir sin guardar los cambios?', { ok:'Salir', danger:true }))) return;
+  ceCaseBack(true);
+  ceSec = sec; ceForm = null; ceQuery = ''; ceRender();
+  document.getElementById('ceBody').scrollTop = 0;
+}
+
+/* ---- datos de cada apartado ---- */
+function ceHiddenBase(bank){
+  const base = bank==='rcp' ? BASE_CPR_BANK : BASE_QUESTION_BANK;
+  return questionRows.filter(r=>r.base_id && r.deleted).map(r=>{ const b = base.find(x=>x.id===r.base_id); return b ? { ...b, bank, origin:'hidden', rowId:r.id } : null; }).filter(Boolean);
+}
+function ceItems(){
+  if(ceSec==='general') return [{ label:'Ritmos y bloqueos', items:QUESTION_BANK }, { label:'Predefinidas ocultas', items:ceHiddenBase('general'), hidden:true }];
+  if(ceSec==='rcp'){
+    const okA = x=>ceAlgoF==='all' || x.algo==='both' || x.algo===ceAlgoF;
+    return Object.keys(CE_CTX).map(c=>({ label:CE_CTX[c], items:CPR_BANK.filter(x=>x.ctx===c && okA(x)) }))
+      .concat([{ label:'Predefinidas ocultas', items:ceHiddenBase('rcp').filter(okA), hidden:true }]);
+  }
+  if(ceSec==='oral'){
+    const Q = pcrQuestions(true), okA = x=>ceAlgoF==='all' || x.algo==='both' || x.algo===ceAlgoF;
+    const groups = Object.keys(CE_OCTX).map(c=>({ label:CE_OCTX[c], items:(Q[c]||[]).filter(x=>x.origin!=='hidden' && okA(x)) }));
+    return groups.concat([{ label:'Predefinidas ocultas', items:Object.values(Q).flat().filter(x=>x.origin==='hidden'), hidden:true }]);
+  }
+  return [
+    { label:'Casos guardados', items:Object.keys(customCases).map(k=>({ id:k, q:customCases[k].title, kfs:customCases[k].keyframes, origin:'custom' })) },
+    { label:'Predefinidos', items:Object.keys(CASES).map(k=>({ id:k, q:CASES[k].title, kfs:CASES[k].keyframes, origin:'base' })) }
+  ];
+}
+function ceFind(id){ return ceItems().flatMap(g=>g.items).find(x=>x.id===id); }
+function ceAlgoBadge(a){ return a && a!=='both' ? '<span class="ce-b">'+a+'</span>' : ''; }
+function ceOriginBadge(o){ return o==='custom' ? '<span class="ce-b own">PROPIA</span>' : o==='edited' ? '<span class="ce-b mod">MODIFICADA</span>' : ''; }
+
+/* ---- lista ---- */
+function ceRender(){
+  document.getElementById('ceNav').innerHTML = CE_SECS.map(x=>'<a href="#" class="'+(x.id===ceSec?'on':'')+'" onclick="event.preventDefault(); ceGo(\''+x.id+'\')">'+escapeHtml(x.nav)+'</a>').join('');
+  if(ceForm) return;
+  const S = CE_SECS.find(x=>x.id===ceSec), idx = CE_SECS.indexOf(S)+1, isCase = ceSec==='cases';
+  const groups = ceItems();
+  const total = groups.filter(g=>!g.hidden).reduce((n,g)=>n+g.items.length, 0);
+  let h = '<section><div class="ce-top"><h3><span class="mn-n">'+idx+'</span>'+escapeHtml(S.t)+'</h3>'
+    + '<button type="button" class="st-go" onclick="'+(isCase ? 'ceCaseEdit()' : 'ceQEdit()')+'">+ '+(isCase ? 'Nuevo caso' : 'Nueva pregunta')+'</button></div>'
+    + '<p class="mn-note">'+escapeHtml(S.d)+'</p>'
+    + '<div class="ce-tools"><input type="search" id="ceSearch" placeholder="Buscar en '+total+' '+(isCase ? 'casos' : 'preguntas')+'…" aria-label="Buscar" value="'+escapeHtml(ceQuery)+'" oninput="ceFilter(this.value)">'
+    + ((ceSec==='rcp' || ceSec==='oral') ? '<div class="st-seg" role="group" aria-label="Algoritmo">'+[['all','Todas'],['ERC','ERC'],['AHA','AHA']].map(([v,l])=>'<button type="button" class="'+(ceAlgoF===v?'on':'')+'" onclick="ceAlgoF=\''+v+'\'; ceRender();">'+l+'</button>').join('')+'</div>' : '')
+    + '</div>';
+  groups.forEach(g=>{
+    if(g.hidden && !g.items.length) return;
+    h += '<div class="ce-g">'+escapeHtml(g.label)+' · '+g.items.length+'</div><div class="ce-list">';
+    if(!g.items.length) h += '<div class="ce-empty">'+(isCase ? 'Todavía no hay casos guardados. Pulsa «+ Nuevo caso» o duplica uno predefinido.' : 'No hay preguntas en este grupo.')+'</div>';
+    g.items.forEach(x=>{
+      const txt = escapeHtml((x.q+' '+(x.a||'')+' '+(x.options||[]).join(' ')).toLowerCase());
+      if(g.hidden){
+        h += '<div class="ce-item is-hidden" data-s="'+txt+'"><span class="ce-t">'+escapeHtml(x.q)+'</span><button type="button" class="st-go" onclick="ceRestore(\''+x.id+'\')">Mostrar</button></div>';
+        return;
+      }
+      let sub = '';
+      if(isCase){ const k = x.kfs||[]; sub = k.length+' fases · '+formatTime(k.length ? k[k.length-1].t : 0); }
+      else if(ceSec==='oral') sub = (x.origin==='base' && CE_DYN[x.id]==='ritmo') ? 'Respuesta automática según el ritmo elegido' : (x.a || '');
+      else sub = '✓ '+(x.options||[])[x.correct];
+      h += '<button type="button" class="ce-item" data-s="'+txt+'" onclick="'+(isCase ? 'ceCaseEdit(\''+x.id+'\')' : 'ceQEdit(\''+x.id+'\')')+'"><span class="ce-t">'+escapeHtml(x.q)+'<small>'+escapeHtml(sub)+'</small></span>'
+        + (isCase && x.origin==='base' ? '<span class="ce-b">PREDEFINIDO</span>' : '')+ceAlgoBadge(x.algo)+ceOriginBadge(x.origin)+'<span class="st-chev" aria-hidden="true">›</span></button>';
+    });
+    h += '</div>';
+  });
+  h += '</section>';
+  document.getElementById('ceBody').innerHTML = h;
+  if(ceQuery) ceFilter(ceQuery);
+}
+function ceFilter(v){
+  ceQuery = v; const t = v.trim().toLowerCase();
+  document.querySelectorAll('#ceBody .ce-item').forEach(el=>{ el.hidden = !!t && !el.dataset.s.includes(t); });
+}
+
+/* ---- formulario de pregunta ---- */
+function ceQEdit(id){
+  const it = id ? ceFind(id) : null;
+  const oral = ceSec==='oral', rcp = ceSec==='rcp';
+  ceForm = { kind:'q', item:it, dirty:false };
+  const ctxs = oral ? CE_OCTX : CE_CTX;
+  const algo = it ? (it.algo||'both') : 'both', ctx = it ? (it.ctx||'general') : (oral ? 'check' : 'general');
+  const isBase = it && it.origin!=='custom';
+  let h = '<button type="button" class="ce-back" onclick="ceBack()">‹ Volver a la lista</button><section class="ce-form">'
+    + '<h3>'+(it ? (isBase ? 'Editar pregunta predefinida' : 'Editar pregunta') : 'Nueva pregunta')+'</h3>'
+    + '<p class="mn-note">'+escapeHtml(CE_SECS.find(x=>x.id===ceSec).t)+'</p>';
+  if(oral || rcp){
+    h += '<div class="qe-grid">'
+      + '<div class="kf-field"><label>Algoritmo</label><select id="ceAlgo"'+(isBase && oral ? ' disabled' : '')+'>'+[['both','ERC y AHA'],['ERC','Solo ERC'],['AHA','Solo AHA']].map(([v,l])=>'<option value="'+v+'"'+(v===algo?' selected':'')+'>'+l+'</option>').join('')+'</select></div>'
+      + '<div class="kf-field"><label>Fase</label><select id="ceCtx"'+(isBase && oral ? ' disabled' : '')+'>'+Object.keys(ctxs).map(c=>'<option value="'+c+'"'+(c===ctx?' selected':'')+'>'+ctxs[c]+'</option>').join('')+'</select></div></div>';
+  }
+  h += '<div class="kf-field"><label>Pregunta</label><textarea id="ceText" class="kf-narrative" rows="2" placeholder="Escribe el enunciado…">'+escapeHtml(it ? it.q : '')+'</textarea></div>';
+  if(oral){
+    h += '<div class="kf-field"><label>Respuesta (la ve solo el instructor)</label><textarea id="ceAns" class="kf-narrative" rows="4" placeholder="'+(it && it.origin==='base' && CE_DYN[it.id]==='ritmo' ? 'Ahora se completa sola según el ritmo elegido. Escribe aquí una respuesta fija si quieres sustituirla…' : 'Respuesta esperada…')+'">'+escapeHtml(it && !(it.origin==='base' && CE_DYN[it.id]==='ritmo') ? it.a : '')+'</textarea></div>';
+    if(it && CE_DYN[it.id] && it.origin==='base') h += '<p class="mn-note">Esta respuesta se adapta al '+CE_DYN[it.id]+' elegido. Si la modificas quedará fija; con «Original» vuelve a adaptarse.</p>';
+  } else {
+    const L = ['A','B','C','D'], op = it ? it.options : ['','','',''], cor = it ? it.correct : -1;
+    h += '<div class="qe-opts-label">Respuestas <span>· marca la correcta</span></div><div id="ceOpts">'
+      + L.map((l,i)=>'<label class="qe-opt'+(i===cor?' is-correct':'')+'"><input type="radio" name="ceCorrect" value="'+i+'"'+(i===cor?' checked':'')+'><span class="quiz-opt-letter">'+l+'</span><input type="text" id="ceOpt'+i+'" value="'+escapeHtml(op[i]||'')+'" placeholder="Respuesta '+l+'" aria-label="Respuesta '+l+'" autocomplete="off"></label>').join('')
+      + '</div>';
+  }
+  const btns = ['<button class="casebtn primary" onclick="ceQSave()"><svg class="ic" aria-hidden="true"><use href="#i-save"/></svg> Guardar</button>',
+                '<button class="casebtn" onclick="ceBack()"><span aria-hidden="true">✕</span> Cancelar</button>'];
+  if(it && it.origin==='edited') btns.push('<button class="casebtn" onclick="ceQRevert()"><svg class="ic" aria-hidden="true"><use href="#i-restart"/></svg> Original</button>');
+  if(it) btns.push('<button class="casebtn ce-del" onclick="ceQDelete()"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> '+(isBase ? 'Ocultar' : 'Eliminar')+'</button>');
+  h += '<div class="kf-actions n'+btns.length+'">'+btns.join('')+'</div><div class="kf-status" id="ceStatus" role="status" aria-live="polite"></div></section>';
+  const body = document.getElementById('ceBody'); body.innerHTML = h; body.scrollTop = 0;
+  body.querySelector('.ce-form').addEventListener('input', ()=>{ if(ceForm) ceForm.dirty = true; });
+  body.querySelectorAll('#ceOpts input[type=radio]').forEach(r=>r.addEventListener('change', ()=>{
+    body.querySelectorAll('#ceOpts .qe-opt').forEach((el,j)=>el.classList.toggle('is-correct', j===+r.value)); if(ceForm) ceForm.dirty = true; }));
+  ceRender();
+  if(!it) document.getElementById('ceText').focus();
+}
+function ceErr(m){ const st = document.getElementById('ceStatus'); st.textContent = m; st.className = 'kf-status err'; }
+async function ceBack(){
+  if(ceForm && ceForm.dirty && !(await appConfirm('¿Descartar los cambios?', { ok:'Descartar', danger:true }))) return;
+  ceCaseBack(true); ceForm = null; ceRender();
+}
+async function ceQSave(){
+  const it = ceForm && ceForm.item, oral = ceSec==='oral', rcp = ceSec==='rcp';
+  const q = document.getElementById('ceText').value.trim();
+  if(!q) return ceErr('Escribe el enunciado de la pregunta.');
+  if(!supa) return ceErr('No hay conexión con la base de datos: entra en una sala.');
+  const now = new Date().toISOString();
+  let row, table;
+  if(oral){
+    const a = document.getElementById('ceAns').value.trim();
+    if(!a) return ceErr('Escribe la respuesta.');
+    table = 'pcr_oral_questions';
+    row = { q, a, algo:document.getElementById('ceAlgo').value, ctx:document.getElementById('ceCtx').value, deleted:false, updated_at:now };
+    if(it && it.origin!=='custom'){ row.algo = 'both'; row.ctx = it.ctx; }
+  } else {
+    const options = [0,1,2,3].map(i=>document.getElementById('ceOpt'+i).value.trim());
+    const ch = document.querySelector('#ceOpts input[name=ceCorrect]:checked');
+    if(options.some(o=>!o)) return ceErr('Rellena las cuatro respuestas.');
+    if(!ch) return ceErr('Marca cuál es la respuesta correcta.');
+    table = 'quiz_questions';
+    row = { q, options, correct:+ch.value, bank:rcp ? 'rcp' : 'general',
+      algo: rcp ? document.getElementById('ceAlgo').value : 'both', ctx: rcp ? document.getElementById('ceCtx').value : 'general', deleted:false, updated_at:now };
+  }
+  const st = document.getElementById('ceStatus'); st.textContent = 'Guardando…'; st.className = 'kf-status';
+  try{
+    let res;
+    if(it && it.origin==='custom') res = await supa.from(table).update(row).eq('id', it.rowId);
+    else if(it) res = await supa.from(table).upsert({ ...row, base_id:it.id }, { onConflict:'base_id' });
+    else res = await supa.from(table).insert(row);
+    if(res.error) return ceErr('Error al guardar: '+res.error.message);
+    ceForm = null;
+    await (oral ? loadOralQuestions() : loadCustomQuestions());
+    ceRender(); showToast(it ? 'Pregunta guardada.' : 'Pregunta añadida.');
+  }catch(e){ ceErr('Error al guardar: '+e.message); }
+}
+async function ceQRevert(){
+  const it = ceForm && ceForm.item; if(!it || !supa) return;
+  if(!(await appConfirm('¿Descartar los cambios y volver a la versión original de esta pregunta?', { ok:'Restaurar', danger:true }))) return;
+  const oral = ceSec==='oral';
+  const { error } = await supa.from(oral ? 'pcr_oral_questions' : 'quiz_questions').delete().eq('base_id', it.id);
+  if(error) return ceErr('No se pudo restaurar: '+error.message);
+  ceForm = null; await (oral ? loadOralQuestions() : loadCustomQuestions()); ceRender(); showToast('Pregunta original restaurada.');
+}
+async function ceQDelete(){
+  const it = ceForm && ceForm.item; if(!it || !supa) return;
+  const oral = ceSec==='oral', base = it.origin!=='custom', table = oral ? 'pcr_oral_questions' : 'quiz_questions';
+  if(!(await appConfirm((base ? '¿Ocultar esta pregunta predefinida?\n\n«'+it.q+'»\nPodrás volver a mostrarla desde «Predefinidas ocultas».'
+      : '¿Eliminar esta pregunta?\n\n«'+it.q+'»\nSe borrará para todos los instructores y no se podrá recuperar.'), { ok: base ? 'Ocultar' : 'Eliminar', danger:true }))) return;
+  let error;
+  if(!base) ({ error } = await supa.from(table).delete().eq('id', it.rowId));
+  else if(oral){
+    const b = Object.values(pcrQuestionsBase(true)).flat().find(x=>x.id===it.id) || it;
+    ({ error } = await supa.from(table).upsert({ base_id:it.id, q:b.q, a:b.a||'', ctx:it.ctx, algo:'both', deleted:true, updated_at:new Date().toISOString() }, { onConflict:'base_id' }));
+  } else {
+    const b = BASE_QUESTION_BANK.concat(BASE_CPR_BANK).find(x=>x.id===it.id) || it;
+    ({ error } = await supa.from(table).upsert({ base_id:it.id, bank:it.bank, algo:b.algo||'both', ctx:b.ctx||'general', q:b.q, options:b.options, correct:b.correct, deleted:true, updated_at:new Date().toISOString() }, { onConflict:'base_id' }));
+  }
+  if(error) return ceErr('No se pudo '+(base ? 'ocultar' : 'eliminar')+': '+error.message);
+  ceForm = null; await (oral ? loadOralQuestions() : loadCustomQuestions()); ceRender(); showToast(base ? 'Pregunta oculta.' : 'Pregunta eliminada.');
+}
+async function ceRestore(id){
+  if(!supa) return;
+  const oral = ceSec==='oral';
+  const { error } = await supa.from(oral ? 'pcr_oral_questions' : 'quiz_questions').delete().eq('base_id', id);
+  if(error){ showToast('No se pudo restaurar: '+error.message); return; }
+  await (oral ? loadOralQuestions() : loadCustomQuestions()); ceRender(); showToast('La pregunta vuelve a mostrarse.');
+}
+
+/* ---- casos: se usa el mismo constructor de fases, movido dentro del editor ---- */
+function ceCaseEdit(id){
+  const own = id && customCases[id], src = own || (id && CASES[id]) || null;
+  ceForm = { kind:'case', id, dirty:false };
+  builderEditingId = own ? id : null;
+  builderKfs = src ? src.keyframes.map(k=>({ ...k })) : [
+    { t:0, rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' },
+    { t:30, rhythm:'nsr', hr:80, sys:120, dia:75, spo2:97, rr:16, temp:36.5, noPulse:false, label:'' }];
+  builderOpen = new Set([builderKfs[0]]);
+  const body = document.getElementById('ceBody');
+  body.innerHTML = '<button type="button" class="ce-back" onclick="ceBack()">‹ Volver a la lista</button><section class="ce-form">'
+    + '<h3>'+(own ? 'Editar caso' : src ? 'Duplicar caso predefinido' : 'Nuevo caso')+'</h3>'
+    + (src && !own ? '<p class="mn-note">Los casos predefinidos no se modifican: al guardar se crea una copia propia que podrás editar.</p>' : '')
+    + (own ? '<div class="kf-actions n2" style="margin:0 0 12px"><button class="casebtn" onclick="ceCaseEdit(null); ceCaseDup(\''+id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Duplicar</button><button class="casebtn ce-del" onclick="ceCaseDelete(\''+id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Eliminar caso</button></div>' : '')
+    + '<div id="ceCaseHost"></div></section>';
+  body.scrollTop = 0;
+  const cb = document.getElementById('caseBuilder');
+  if(!ceCaseHosted){ ceCaseBack._home = [cb.parentNode, cb.nextSibling]; ceCaseHosted = true; }
+  document.getElementById('ceCaseHost').appendChild(cb);
+  document.getElementById('kfTitle').value = src ? (own ? src.title : 'Copia de '+src.title) : '';
+  document.getElementById('kfStatus').textContent = ''; document.getElementById('kfStatus').className = 'kf-status';
+  renderBuilderRows();
+  body.querySelector('.ce-form').addEventListener('input', ()=>{ if(ceForm) ceForm.dirty = true; });
+  body.querySelector('.ce-form').addEventListener('change', ()=>{ if(ceForm) ceForm.dirty = true; });
+  ceRender();
+}
+function ceCaseDup(id){
+  const c = customCases[id]; if(!c) return;
+  builderEditingId = null; builderKfs = c.keyframes.map(k=>({ ...k })); builderOpen = new Set([builderKfs[0]]);
+  document.getElementById('kfTitle').value = 'Copia de '+c.title;
+  document.querySelector('#ceBody .ce-form h3').textContent = 'Duplicar caso';
+  renderBuilderRows(); ceForm.dirty = true;
+}
+async function ceCaseDelete(id){
+  const c = customCases[id]; if(!c || !supa) return;
+  if(!(await appConfirm('¿Eliminar el caso «'+c.title+'»?\n\nSe borrará para todos los instructores y no se podrá recuperar.', { ok:'Eliminar', danger:true }))) return;
+  if(scenario.active && scenario.key===id) stopScenario();
+  const { error } = await supa.from('clinical_cases').delete().eq('id', id);
+  if(error){ showToast('No se pudo eliminar: '+error.message); return; }
+  ceCaseBack(true); ceForm = null; await loadCustomCases(); ceRender(); showToast('Caso eliminado.');
+}
+// devuelve el constructor a la pestaña de casos; sin «silent», vuelve además a la lista del editor
+function ceCaseBack(silent){
+  if(!ceCaseHosted) return;
+  const cb = document.getElementById('caseBuilder'), [par, next] = ceCaseBack._home || [];
+  if(par) par.insertBefore(cb, next && next.parentNode===par ? next : null);
+  cb.style.display = 'none';
+  document.getElementById('caseNormalView').style.display = 'block';
+  ceCaseHosted = false;
+  if(!silent){ ceForm = null; ceRender(); }
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ceOpen() && !document.querySelector('#appDialog.open')){ e.stopImmediatePropagation(); closeEditor(); } }, true);
+
 /* ---------- Manual de uso (menú ☰ › General) ----------
    Contenido por apartados. «who»: 'i' solo instructor, 'm' solo alumno, 'all' ambos.
    {i:nombre} inserta un icono del sprite. */
@@ -7727,7 +8053,7 @@ const MANUAL = [
    <li><b>Q. RCP:</b> en los casos con parada aparece una barra para enviar preguntas de la fase en curso (FV/TVSP, asistolia/AESP, tras la RCE) según ERC o AHA.</li>
   </ul>
   <h4>Editor de casos</h4>
-  <p>☰ › Clase › Herramientas › <b>Editor de casos</b>: título y fases, cada una con su tiempo, ritmo, constantes, pulso y narrativa. Puedes reordenar ↑ ↓ y eliminar {i:trash} fases. Los casos propios se pueden {i:pen} editar o {i:trash} eliminar.</p>
+  <p>☰ › Clase › Herramientas › <b>Editor de preguntas y casos</b> › Casos clínicos: título y fases, cada una con su tiempo, ritmo, constantes, pulso y narrativa. Puedes reordenar ↑ ↓ y eliminar {i:trash} fases. Los casos propios se pueden {i:pen} editar o {i:trash} eliminar.</p>
   <p>La velocidad (x0,5 a x4) se elige en ☰ › Clase.</p>` },
 
  { id:'preguntas', shots:[['preguntas', 'Pregunta enviada, esperando respuesta'], ['alumno_pregunta', 'La pregunta en el monitor del alumno']], who:'i', t:'Preguntas', h:`
@@ -7738,7 +8064,7 @@ const MANUAL = [
   </ol>
   <ul>
    <li>Las preguntas de RCP siguen el algoritmo <b>ERC</b> por defecto; cámbialo a AHA en ☰ › Clase.</li>
-   <li><b>Gestionar preguntas</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, {i:trash} eliminar o {i:restart} volver a la versión original de una predefinida. ★ marca las propias.</li>
+   <li><b>Editor de preguntas y casos</b> (☰ › Clase › Herramientas): crear, {i:pen} editar, ocultar o {i:restart} volver a la versión original de una predefinida, en el banco de preguntas, en las de RCP para el alumno y en las preguntas orales de la parada. ★ marca las propias.</li>
   </ul>` },
 
  { id:'pcr', who:'i', t:'Circuito de PCR (beta)', h:`
@@ -7785,7 +8111,7 @@ const MANUAL = [
  { id:'config', shots:[['config', '☰ Configuración, pestaña Clase']], who:'i', t:'Menú ☰ Configuración', h:`
   <ul>
    <li><b>General:</b> tema (auto, oscuro, claro), sonido y alarmas, guía, este manual, actualizar la app, sala (cambiar, aviso al conectarse alumnos, salir) y pantalla siempre encendida en clase.</li>
-   <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (preguntas, editor de casos, administrador del banco).</li>
+   <li><b>Clase:</b> ficha del ritmo, algoritmo de RCP, cierre de preguntas, pausa en la parada, velocidad del caso y herramientas (editor de preguntas y casos, administrador del banco).</li>
    <li><b>Alumno:</b> lo que ve el alumno (caso, sus controles, nombre del ritmo en el ECG, temperatura), si las alarmas muestran el parámetro alterado y el parpadeo rojo al perder el pulso.</li>
   </ul>
   <p>Toca ⓘ junto a una opción para ver su explicación. El menú recuerda la última pestaña.</p>` },
@@ -7984,42 +8310,70 @@ function pcrTxt(){
   };
 }
 // preguntas orales para el instructor, por contexto
-function pcrQuestions(){
+function pcrQuestionsBase(all){
   const T = pcrTxt(), r = pcr && pcr.rhythm && PCR_RHYTHMS[pcr.rhythm];
   return {
     check:[
-      { q:'¿Qué ritmo ves?', a: r ? r.long+'.' : 'Elige primero el ritmo que verá el alumno.' },
-      { q:'¿Es desfibrilable? ¿Qué harías ahora?', a: r ? (r.shock ? 'Sí: descarga y reanudar las compresiones de inmediato 2 minutos.' : (pcr.rhythm==='rosc' ? 'No: ritmo organizado; comprobar pulso y signos de vida. Si los hay, RCE y cuidados posteriores.' : pcr.rhythm==='vt' ? 'No: hay pulso, no es una parada (RCE). Tratar la taquicardia: cardioversión sincronizada si es inestable.' : 'No: reanudar RCP 2 minutos y adrenalina 1 mg lo antes posible si aún no se ha puesto.')) : 'Elige primero el ritmo que verá el alumno.' },
-      ...((pcr && (pcrIsOrg(pcr.rhythm) || pcr.rhythm==='pvt')) ? [{ q:'Ritmo organizado: ¿has comprobado el pulso?', a: pcr.rhythm==='pea' ? 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → AESP. RCP 2 minutos y adrenalina 1 mg lo antes posible.' : pcr.rhythm==='rosc' ? 'Sí, debe comprobarlo (máx. 10 s): hay pulso y signos de vida → RCE.' : pcr.rhythm==='vt' ? 'Sí, debe comprobarlo (máx. 10 s): hay pulso → no es una parada; RCE con TV.' : 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → TVSP, desfibrilable.' }] : []),
-      { q:'¿Cuánto puede durar la pausa para comprobar el ritmo?', a:'Menos de 10 segundos, y reanudar las compresiones cuanto antes.' }
+      { id:'o1', q:'¿Qué ritmo ves?', a: r ? r.long+'.' : 'Elige primero el ritmo que verá el alumno.' },
+      { id:'o2', q:'¿Es desfibrilable? ¿Qué harías ahora?', a: r ? (r.shock ? 'Sí: descarga y reanudar las compresiones de inmediato 2 minutos.' : (pcr.rhythm==='rosc' ? 'No: ritmo organizado; comprobar pulso y signos de vida. Si los hay, RCE y cuidados posteriores.' : pcr.rhythm==='vt' ? 'No: hay pulso, no es una parada (RCE). Tratar la taquicardia: cardioversión sincronizada si es inestable.' : 'No: reanudar RCP 2 minutos y adrenalina 1 mg lo antes posible si aún no se ha puesto.')) : 'Elige primero el ritmo que verá el alumno.' },
+      ...((all || (pcr && (pcrIsOrg(pcr.rhythm) || pcr.rhythm==='pvt'))) ? [{ id:'o3', q:'Ritmo organizado: ¿has comprobado el pulso?', a: !(pcr && pcr.rhythm) ? 'Sí, debe comprobarlo (máx. 10 s); la respuesta depende del ritmo elegido.' : pcr.rhythm==='pea' ? 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → AESP. RCP 2 minutos y adrenalina 1 mg lo antes posible.' : pcr.rhythm==='rosc' ? 'Sí, debe comprobarlo (máx. 10 s): hay pulso y signos de vida → RCE.' : pcr.rhythm==='vt' ? 'Sí, debe comprobarlo (máx. 10 s): hay pulso → no es una parada; RCE con TV.' : 'Sí, debe comprobarlo (máx. 10 s): no hay pulso → TVSP, desfibrilable.' }] : []),
+      { id:'o4', q:'¿Cuánto puede durar la pausa para comprobar el ritmo?', a:'Menos de 10 segundos, y reanudar las compresiones cuanto antes.' }
     ],
     shock:[
-      { q:'¿Qué energía usas en la descarga?', a:T.energy+'.' },
-      { q:'¿Qué haces justo después de la descarga?', a:'Reanudar las compresiones de inmediato durante 2 minutos, sin comprobar pulso ni ritmo.' },
-      { q:'¿Cuándo pones la adrenalina en un ritmo desfibrilable y a qué dosis?', a:T.adrShock+'.' },
-      { q:'¿Qué antiarrítmico usas, cuándo y a qué dosis?', a:T.antiarr+'.' },
-      { q:'FV refractaria: ¿qué puedes considerar?', a:T.refract }
+      { id:'o5', q:'¿Qué energía usas en la descarga?', a:T.energy+'.' },
+      { id:'o6', q:'¿Qué haces justo después de la descarga?', a:'Reanudar las compresiones de inmediato durante 2 minutos, sin comprobar pulso ni ritmo.' },
+      { id:'o7', q:'¿Cuándo pones la adrenalina en un ritmo desfibrilable y a qué dosis?', a:T.adrShock+'.' },
+      { id:'o8', q:'¿Qué antiarrítmico usas, cuándo y a qué dosis?', a:T.antiarr+'.' },
+      { id:'o9', q:'FV refractaria: ¿qué puedes considerar?', a:T.refract }
     ],
     noshock:[
-      { q:'¿Cuándo pones la adrenalina en asistolia o AESP?', a:'Lo antes posible: 1 mg IV/IO, y repetir cada 4 minutos (las guías indican cada 3–5 min).' },
-      { q:'¿Está indicada la descarga?', a:'No. RCP durante 2 minutos y volver a comprobar el ritmo.' },
-      { q:'En una AESP, ¿qué tienes que buscar?', a:'Causas reversibles (H y T), sin interrumpir la RCP.' }
+      { id:'o10', q:'¿Cuándo pones la adrenalina en asistolia o AESP?', a:'Lo antes posible: 1 mg IV/IO, y repetir cada 4 minutos (las guías indican cada 3–5 min).' },
+      { id:'o11', q:'¿Está indicada la descarga?', a:'No. RCP durante 2 minutos y volver a comprobar el ritmo.' },
+      { id:'o12', q:'En una AESP, ¿qué tienes que buscar?', a:'Causas reversibles (H y T), sin interrumpir la RCP.' }
     ],
     general:[
-      { q:T.causesQ, a:T.causes },
-      { q:'¿Cómo son unas compresiones de calidad?', a:'100–120 por minuto, 5–6 cm de profundidad, reexpansión completa, mínimas interrupciones y cambio de reanimador cada 2 minutos.' },
-      { q:'¿Relación compresiones/ventilaciones?', a:'30:2. Con vía aérea avanzada: compresiones continuas y 10 ventilaciones por minuto.' },
-      { q:'¿Para qué sirve la capnografía durante la RCP?', a:'Confirmar la posición del tubo, valorar la calidad de la RCP y detectar la RCE (subida brusca del ETCO₂).' },
-      { q:'¿Qué vía usas para los fármacos?', a:'Intravenosa de primera elección; intraósea si no se consigue la IV.' }
+      { id:'o13', q:T.causesQ, a:T.causes },
+      { id:'o14', q:'¿Cómo son unas compresiones de calidad?', a:'100–120 por minuto, 5–6 cm de profundidad, reexpansión completa, mínimas interrupciones y cambio de reanimador cada 2 minutos.' },
+      { id:'o15', q:'¿Relación compresiones/ventilaciones?', a:'30:2. Con vía aérea avanzada: compresiones continuas y 10 ventilaciones por minuto.' },
+      { id:'o16', q:'¿Para qué sirve la capnografía durante la RCP?', a:'Confirmar la posición del tubo, valorar la calidad de la RCP y detectar la RCE (subida brusca del ETCO₂).' },
+      { id:'o17', q:'¿Qué vía usas para los fármacos?', a:'Intravenosa de primera elección; intraósea si no se consigue la IV.' }
     ],
     post:[
-      { q:'Objetivos de oxigenación y ventilación tras la RCE', a:T.o2+'.' },
-      { q:'Objetivo de presión arterial tras la RCE', a:T.bp+'.' },
-      { q:'¿Qué haces con la temperatura?', a:T.temp+'.' },
-      { q:'¿Qué pruebas haces de entrada?', a:'ECG de 12 derivaciones (coronariografía urgente si hay elevación persistente del ST), analítica y gasometría, ecocardiografía y búsqueda de la causa de la parada.' },
-      { q:'¿Cuándo se valora el pronóstico neurológico?', a:'A partir de las 72 h tras la RCE, sin efecto de la sedación y con un enfoque multimodal.' }
+      { id:'o18', q:'Objetivos de oxigenación y ventilación tras la RCE', a:T.o2+'.' },
+      { id:'o19', q:'Objetivo de presión arterial tras la RCE', a:T.bp+'.' },
+      { id:'o20', q:'¿Qué haces con la temperatura?', a:T.temp+'.' },
+      { id:'o21', q:'¿Qué pruebas haces de entrada?', a:'ECG de 12 derivaciones (coronariografía urgente si hay elevación persistente del ST), analítica y gasometría, ecocardiografía y búsqueda de la causa de la parada.' },
+      { id:'o22', q:'¿Cuándo se valora el pronóstico neurológico?', a:'A partir de las 72 h tras la RCE, sin efecto de la sedación y con un enfoque multimodal.' }
     ]
   };
+}
+/* Preguntas orales = predefinidas (con los cambios guardados) + nuevas (tabla pcr_oral_questions).
+   all=true (editor): incluye las ocultas, la condicional del ritmo organizado y las nuevas de los dos algoritmos. */
+let oralRows = [];
+function pcrQuestions(all){
+  const B = pcrQuestionsBase(all), by = {}, A = pcrAlgo();
+  oralRows.forEach(r=>{ if(r.base_id) by[r.base_id] = r; });
+  const out = {};
+  Object.keys(B).forEach(c=>{
+    out[c] = B[c].map(x=>{ const r = by[x.id];
+      if(!r) return { ...x, ctx:c, algo:'both', origin:'base' };
+      if(r.deleted) return all ? { ...x, ctx:c, algo:'both', origin:'hidden', rowId:r.id } : null;
+      return { ...x, q:r.q, a:r.a, ctx:c, algo:'both', origin:'edited', rowId:r.id };
+    }).filter(Boolean).concat(oralRows.filter(r=>!r.base_id && !r.deleted && r.ctx===c && (all || r.algo==='both' || r.algo===A))
+      .map(r=>({ id:'uo_'+r.id, rowId:r.id, q:r.q, a:r.a, ctx:c, algo:r.algo, origin:'custom' })));
+  });
+  return out;
+}
+async function loadOralQuestions(){
+  if(!supa) return;
+  try{
+    const { data, error } = await supa.from('pcr_oral_questions').select('*').order('created_at', { ascending:true });
+    if(error){ console.error('No se pudieron cargar las preguntas orales:', error); return; }
+    oralRows = data || [];
+    pcrRenderTick._ctx = null;
+    if(typeof pcrRender==='function' && pcr && document.getElementById('pcrOverlay').classList.contains('open')) pcrRender();
+    ceRefresh();
+  }catch(e){ console.error('Error al cargar preguntas orales:', e); }
 }
 function pcrIsShock(){ return !!(pcr && pcr.rhythm && PCR_RHYTHMS[pcr.rhythm].shock); }
 function pcrContexts(){
