@@ -5,8 +5,9 @@ name: APK Android
 
 on:
   schedule:
-    - cron: '0 22 * * *'   # 00:00 en Madrid en horario de verano (UTC+2)
-    - cron: '0 23 * * *'   # 00:00 en Madrid en horario de invierno (UTC+1)
+    # 00:07 en Madrid (fuera de la hora en punto, que GitHub retrasa o descarta con frecuencia)
+    - cron: '7 22 * * *'   # horario de verano (UTC+2)
+    - cron: '7 23 * * *'   # horario de invierno (UTC+1)
   workflow_dispatch:
     inputs:
       force:
@@ -35,8 +36,9 @@ jobs:
         id: gate
         run: |
           h=$(TZ=Europe/Madrid date +%H)
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$h" != "00" ]; then
-            echo "No es medianoche en Madrid ($h h): se omite."; echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
+          # GitHub puede retrasar la ejecución programada: vale cualquier hora entre las 00:00 y las 02:59 en Madrid
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$h" != "00" ] && [ "$h" != "01" ] && [ "$h" != "02" ]; then
+            echo "Fuera de la franja de medianoche en Madrid ($h h): se omite."; echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
           body=$(gh release view --json body -q .body 2>/dev/null || true)
           lastsha=$(printf '%s' "$body" | sed -n 's/.*<!--SHA:\([0-9a-f]*\)-->.*/\1/p' | head -1)
