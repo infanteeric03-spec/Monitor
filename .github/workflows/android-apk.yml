@@ -65,6 +65,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # caché de Gradle: evita volver a descargarlo en cada compilación (la descarga de GitHub a veces falla)
+      - uses: actions/cache@v4
+        if: steps.gate.outputs.go == 'true'
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+          key: gradle-${{ hashFiles('android-app/android/gradle/wrapper/gradle-wrapper.properties', 'android-app/android/**/*.gradle') }}
+          restore-keys: gradle-
+
       - uses: actions/setup-node@v4
         if: steps.gate.outputs.go == 'true'
         with:
