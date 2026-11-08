@@ -1699,16 +1699,43 @@
     font-size:11px; font-weight:800; line-height:1; letter-spacing:.1em; white-space:nowrap; }
   .live-pill[hidden]{ display:none; }
   .live-pill i{ width:8px; height:8px; border-radius:50%; background:#ff4d5e; box-shadow:0 0 8px #ff4d5e; animation:auBlink 1.4s ease-in-out infinite; }
-  .live-pill b{ font-weight:600; letter-spacing:0; color:var(--text); }
+  button.live-pill{ cursor:pointer; font-family:inherit; }
+  .lv-n{ display:inline-flex; align-items:center; gap:2px; margin-left:2px; padding-left:6px; border-left:1px solid rgba(255,77,94,.5); letter-spacing:0; font-weight:800; }
+  .lv-n:empty{ display:none; }
+  .lv-n svg{ width:12px; height:12px; }
+  body.au-on:not(.au-live) .live-pill i, body.au-on:not(.au-live) .lv-band > i{ animation:none; opacity:.45; box-shadow:none; }
+  /* franja bajo la cabecera (móvil en vertical, tablet y ordenador) */
+  .lv-band{ display:flex; align-items:center; gap:8px; margin:0 0 8px; padding:5px 6px 5px 10px; border-radius:8px; border:1px solid rgba(255,77,94,.55);
+    background:rgba(255,77,94,.1); color:#ff4d5e; font-size:12px; font-weight:800; letter-spacing:.06em; cursor:pointer; min-width:0; flex:none; }
+  .lv-band[hidden]{ display:none; }
+  .lv-band > i{ width:9px; height:9px; border-radius:50%; background:#ff4d5e; box-shadow:0 0 8px #ff4d5e; flex-shrink:0; animation:auBlink 1.4s ease-in-out infinite; }
+  .lv-band .lv-l{ white-space:nowrap; }
+  .lv-band .lv-t{ color:var(--text); font-weight:600; letter-spacing:0; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .lv-band .lv-t:not(:empty)::before{ content:'· '; color:var(--text-dim); }
+  .lv-band .lv-cut{ margin-left:auto; flex-shrink:0; background:transparent; border:1px solid #ff4d5e; color:#ff4d5e; border-radius:6px; padding:4px 10px; font:inherit; font-size:11.5px; letter-spacing:.02em; cursor:pointer; }
+  /* móvil en horizontal: solo la etiqueta en la cabecera; el título se oculta para dejarle sitio */
+  @media (orientation:landscape) and (max-height:560px){ body.au-on header .title-main, body.au-on header .title-sep{ display:none; } }
+  /* desplegable al tocar «EN DIRECTO» */
+  .lv-pop{ position:fixed; z-index:140; width:min(300px, calc(100vw - 16px)); display:none; background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:0 14px 40px rgba(0,0,0,.6); padding:6px; }
+  .lv-pop.open{ display:block; }
+  .lv-pop h4{ margin:6px 8px 2px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#ff4d5e; display:flex; align-items:center; gap:6px; }
+  .lv-pop .lv-st{ margin:0 8px 8px; font-size:12.5px; color:var(--text-dim); }
+  .lv-pop button{ display:flex; align-items:center; gap:10px; width:100%; padding:11px 10px; background:transparent; border:none; border-radius:8px; color:var(--text); font:inherit; font-size:14px; text-align:left; cursor:pointer; }
+  .lv-pop button:hover{ background:var(--field); }
+  .lv-pop button.danger{ color:var(--alarm); }
+  .lv-pop .ic{ width:16px; height:16px; flex-shrink:0; }
+  .lv-pop hr{ border:none; border-top:1px solid var(--line); margin:4px 6px; }
+  .au-vol{ display:flex; align-items:center; gap:10px; padding:8px 10px 10px; color:var(--text-dim); font-size:12.5px; }
+  .au-vol input{ flex:1; min-width:80px; accent-color:var(--ecg); }
+  .au-vol .au-vp{ width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+  .au-volrow{ border-bottom:none !important; padding-bottom:0 !important; }
+  #auBody .au-vol{ padding:2px 0 10px; border-bottom:1px solid var(--line); }
+  .mtr{ display:inline-flex; gap:2px; align-items:flex-end; height:14px; margin-left:auto; vertical-align:middle; }
+  .au-volrow .mtr{ margin-left:4px; }
+  .mtr b{ width:4px; border-radius:1px; background:var(--line); }
+  .mtr b.on{ background:var(--ecg); }
   @keyframes auBlink{ 50%{ opacity:.25; } }
   @media (prefers-reduced-motion:reduce){ .live-pill i{ animation:none; } }
-  /* móvil (vertical u horizontal): no cabe la etiqueta; el indicador es la propia etiqueta de la sala
-     (borde rojo y punto rojo parpadeante en lugar del verde de conexión) */
-  @media (max-width:760px), (max-height:560px){
-    .live-pill{ display:none !important; }
-    body.au-live #roomBadge{ border-color:#ff4d5e; box-shadow:0 0 0 1px rgba(255,77,94,.35); }
-    body.au-live #roomDot{ background:#ff4d5e !important; box-shadow:0 0 8px #ff4d5e; animation:auBlink 1.4s ease-in-out infinite; }
-  }
   .au-sec{ border:1px solid color-mix(in srgb, #ff4d5e 35%, transparent); border-radius:10px; padding:0 12px; margin:10px 0; background:rgba(255,77,94,.03); }
   .au-sec > summary{ list-style:none; cursor:pointer; padding:12px 0; }
   .au-sec > summary::-webkit-details-marker{ display:none; }
@@ -1740,6 +1767,11 @@
   .au-stu.talk{ border-color:#ff4d5e; }
   .au-stu .dot{ width:10px; height:10px; border-radius:50%; background:#ff4d5e; box-shadow:0 0 10px #ff4d5e; animation:auBlink 1.4s ease-in-out infinite; flex-shrink:0; }
   .au-stu .casebtn{ white-space:nowrap; }
+  .au-stu{ flex-direction:column; align-items:stretch; gap:4px; }
+  .au-stu .r1{ display:flex; align-items:center; gap:10px; }
+  .au-stu .r1 .casebtn{ margin-left:auto; }
+  .au-stu .au-vol{ padding:4px 0 0; }
+  @media (max-width:520px){ .au-stu{ left:12px; right:12px; } }
   /* ---------- Búsqueda (lupa) en el menú y en el manual ---------- */
   .st-head .st-find{ margin-left:auto; margin-right:8px; display:inline-flex; align-items:center; justify-content:center; }
   .st-find[aria-expanded="true"], .mn-find[aria-expanded="true"]{ color:var(--ecg); border-color:var(--ecg); }
@@ -2408,7 +2440,7 @@
     body.role-monitor.cols-2 .side-col:not(.has){ align-items:center; justify-content:center; border:1px dashed var(--line); border-radius:8px; }
     body.role-monitor.cols-2 .side-col:not(.has)::before{ content:'Aquí aparecerán la ficha del ritmo, el caso clínico o la PCR'; color:var(--text-dim); font-size:12.5px; text-align:center; padding:0 18px; line-height:1.5; }
     body.role-monitor.cols-2 .side-col .pcr-card, body.role-monitor.cols-2 .side-col .case-share, body.role-monitor.cols-2 .side-col .rhythm-share{ margin-top:0; }
-    body.role-monitor.cols-2 .monitor{ height:calc(100vh - var(--header-h, 0px) - 44px); height:calc(100dvh - var(--header-h, 0px) - 44px); }
+    body.role-monitor.cols-2 .monitor{ height:calc(100vh - var(--header-h, 0px) - var(--au-band, 0px) - 44px); height:calc(100dvh - var(--header-h, 0px) - var(--au-band, 0px) - 44px); }
     /* tablet y ordenador: todo el ancho de la ventana; el monitor ocupa los 2/3 superiores de su columna (2/3 izquierdos)
        y la columna de la derecha (1/3) todo el alto */
     body.role-monitor.cols-2 .wrap{ max-width:none !important; }
@@ -2646,7 +2678,7 @@
     <div class="header-row">
       <h1><span class="title-main">Simulador</span><span class="title-role" id="titleRole"></span><span class="title-algo" id="titleAlgo" hidden></span></h1>
       <div class="header-right">
-        <span class="live-pill" id="auLiveTag" hidden role="status" aria-label="En directo" title="En directo"><i aria-hidden="true"></i>EN DIRECTO<b></b></span>
+        <button type="button" class="live-pill" id="auLiveTag" hidden aria-haspopup="dialog" aria-expanded="false" onclick="auPopToggle(this)"><i aria-hidden="true"></i>EN DIRECTO<span class="lv-n" id="auLiveN"></span></button>
         <span class="room-badge" id="roomBadge"><span class="dot" id="roomDot"></span><span id="roomBadgeText" role="status" aria-live="polite">sin conectar</span></span>
         <button type="button" class="theme-btn helpBtn" onclick="startGuide()" title="Guía de uso" aria-label="Guía de uso">?</button>
         <button type="button" class="theme-btn themeToggle" onclick="toggleTheme()" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">☀</button>
@@ -2663,6 +2695,7 @@
       </div>
     </div>
   </header>
+  <div class="lv-band" id="auBand" hidden role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" onclick="if(!event.target.closest('.lv-cut')) auPopToggle(this)" onkeydown="if((event.key==='Enter'||event.key===' ') && event.target===this){ event.preventDefault(); auPopToggle(this); }"><i aria-hidden="true"></i><span class="lv-l">EN DIRECTO</span><span class="lv-t" id="auBandT"></span><span class="lv-n" id="auBandN"></span><button type="button" class="lv-cut" id="auBandCut" onclick="auCut()"></button></div>
 
   <div class="monitor">
     <div class="monitor-left">
@@ -3069,7 +3102,7 @@
   </div>
 </div>
 
-<script type="application/json" id="appChangelog">[{"v": "2026-11-08.5", "d": "8 nov 2026", "items": ["Audio en directo: en el móvil el indicador EN DIRECTO pasa a la etiqueta de la sala (borde y punto rojos parpadeantes) para no desbordar la cabecera."]}, {"v": "2026-11-08.4", "d": "8 nov 2026", "items": ["Audio en directo (de momento solo para el administrador): ☰ › Clase › Audio en directo. Invitas a los alumnos conectados, ellos aceptan, y pueden pedir la palabra (solo uno a la vez). Indicador EN DIRECTO; se cierra al terminar el caso o la PCR, o al salir de la sala."]}, {"v": "2026-11-08.3", "d": "8 nov 2026", "items": ["Lupa en el menú de configuración y en el manual de uso para buscar opciones y textos (sin distinguir tildes ni mayúsculas), con las coincidencias resaltadas.", "Alumno: la opción Distribución (1 o 2 columnas) se ve también con el móvil en vertical, y se vuelve una vez a las 2 columnas por defecto."]}, {"v": "2026-11-08.2", "d": "8 nov 2026", "items": ["Alumno: números de las constantes en negrita, con el mismo tamaño y grosor que antes del cambio de tipografía.", "Instructor, monitor ampliado: la TA aparece la primera.", "El menú de configuración se abre siempre en «General»."]}, {"v": "2026-11-08.1", "d": "8 nov 2026", "items": ["Tipografía estrecha tipo IntelliVue en todos los números de constantes: monitor del alumno, tarjetas del instructor y monitor ampliado."]}, {"v": "2026-11-07.18", "d": "7 nov 2026", "items": ["Instructor en tablet horizontal y ordenador: números de las constantes casi al doble, en una sola línea y con tipografía estrecha como la del monitor IntelliVue."]}, {"v": "2026-11-07.17", "d": "7 nov 2026", "items": ["Botón «atrás»: funciona también con varias ventanas abiertas una sobre otra (por ejemplo, menú y manual), pulsación tras pulsación."]}, {"v": "2026-11-07.16", "d": "7 nov 2026", "items": ["Botón «atrás» del móvil: cierra lo que esté abierto (diálogos, menú, manual, editor, banco de ECG, monitor ampliado…) y minimiza el circuito de PCR. Solo con la pantalla principal sale de la app."]}, {"v": "2026-11-07.15", "d": "7 nov 2026", "items": ["Menú de configuración en el móvil en vertical: las pestañas General, Clase y Alumno tienen la misma altura."]}, {"v": "2026-11-07.14", "d": "7 nov 2026", "items": ["Caso clínico en el móvil: el valor de la velocidad (x0,5, x1, x2, x4) se ve completo en su botón."]}, {"v": "2026-11-07.13", "d": "7 nov 2026", "items": ["Banco de ECG en el móvil en horizontal: 2 columnas, con el título, la búsqueda y las categorías a la izquierda y la lista de ECG a la derecha; las tarjetas ya no se ven cortadas."]}, {"v": "2026-11-07.12", "d": "7 nov 2026", "items": ["Instructor en tablet y ordenador: pantalla completa en 2 columnas. A la izquierda el monitor y debajo las constantes con sus controles (con un espacio libre debajo); a la derecha Ritmo, Caso clínico y Preguntas a todo el alto. En la tablet en vertical, todo en una columna.", "Opción ☰ › General › Distribución para volver a la vista clásica."]}, {"v": "2026-11-07.11", "d": "7 nov 2026", "items": ["Menú ☰ › Clase: «Herramientas» con el Banco de ECG para todos; «Iniciar sesión» de administrador con el PIN y, con la sesión iniciada, el bloque «Administración» (editor de preguntas y casos, circuito de PCR, cambiar PIN y cerrar sesión)."]}, {"v": "2026-11-07.10", "d": "7 nov 2026", "items": ["Nuevo «Editor de preguntas y casos» en ☰ › Clase › Herramientas, con el mismo formato que el manual: banco de preguntas, preguntas de RCP que se envían al alumno, preguntas orales de la parada para el instructor y casos clínicos. Crear, editar, ocultar o volver al original, con búsqueda y filtro por algoritmo."]}, {"v": "2026-11-07.9", "d": "7 nov 2026", "items": ["Alumno: al silenciar las alarmas, la cuenta atrás de 2 minutos se ve completa junto a la campana."]}, {"v": "2026-11-07.8", "d": "7 nov 2026", "items": ["Alumno en tablet y ordenador (2 columnas): pantalla completa a lo ancho; el monitor ocupa los 2/3 superiores de la parte izquierda y la columna derecha (1/3) todo el alto."]}, {"v": "2026-11-07.7", "d": "7 nov 2026", "items": ["Alumno: opción «Distribución» en ☰ › General: 1 columna (monitor a todo el ancho y tarjetas debajo) o 2 columnas (por defecto; en tablet y ordenador, monitor en 2/3 y tarjetas en 1/3). Durante una parada siempre se usan 2 columnas."]}, {"v": "2026-11-07.6", "d": "7 nov 2026", "items": ["Alumno: vuelve la opción de salir de la sala en el menú (Sala actual › Cambiar / Salir).", "Alumno en tablet, ordenador y monitor ampliado: nombres de las constantes más grandes y más cerca de su valor."]}, {"v": "2026-11-07.5", "d": "7 nov 2026", "items": ["Móvil en horizontal (alumno): la ficha del ritmo, el caso clínico y la tarjeta de la PCR ocupan siempre el área reservada a la derecha, del mismo alto que el monitor."]}, {"v": "2026-11-07.4", "d": "7 nov 2026", "items": ["Monitor del alumno: FC, SpO₂, FR y TA al doble de tamaño en tablet, ordenador y con el monitor ampliado.", "Móvil en horizontal (alumno): monitor siempre a la izquierda y la columna derecha reservada para la ficha del ritmo, el caso clínico y la PCR, con su propio desplazamiento."]}, {"v": "2026-11-07.3", "d": "7 nov 2026", "items": ["Monitor del alumno al estilo IntelliVue: cada número arriba a la derecha de su curva (FC, SpO₂, FR), TA y Tª en la franja inferior y banda superior con la alarma, la hora, la campana y ampliar. En vertical las curvas llegan al borde y el monitor es más bajo."]}, {"v": "2026-11-07.2", "d": "7 nov 2026", "items": ["Configuración: «Guías» con los botones Rápida y Manual; «Sala actual» con Cambiar y Salir; al final, «Actualizaciones»: recargar (en el navegador) e instalar la app Android, o buscar actualización desde la app."]}, {"v": "2026-11-07.1", "d": "7 nov 2026", "items": ["App Android: se compila cada noche a las 00:00 si hay cambios; al iniciarse avisa de que hay una versión nueva con sus novedades, y se puede buscar a mano en ☰ › General › App Android."]}, {"v": "2026-11-06.45", "d": "6 nov 2026", "items": ["Circuito de PCR detenido: el monitor sigue mostrando el ritmo del momento, sin artefacto de compresiones ni el aviso de comprobación encima."]}, {"v": "2026-11-06.44", "d": "6 nov 2026", "items": ["Circuito de PCR: el pulso lo decide el instructor con el ritmo que elige (TVSP, TV con pulso, AESP, RCE); la respuesta del alumno se valora con ✓/✗ sin cambiar el algoritmo.", "Ritmo programado: al acabar los 10 s la RCP se reanuda sola solo con «Sin validación del instructor»; si no, se pregunta."]}, {"v": "2026-11-06.43", "d": "6 nov 2026", "items": ["Circuito de PCR: «Ritmo programado» (desplegable) en lugar de «RCE…»: aparece a los 2 s de la próxima comprobación y la RCP se reanuda al acabar los 10 s; si es una RCE se elige el ritmo de salida.", "Botón «Detener» para parar el circuito sin terminarlo (se congelan los tiempos también en el alumno) y «Continuar»."]}, {"v": "2026-11-06.42", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal con un caso clínico: monitor y constantes a la izquierda (como en la PCR) y el caso con sus botones a la derecha, con desplazamiento propio."]}, {"v": "2026-11-06.41", "d": "6 nov 2026", "items": ["PCR del alumno: las opciones de descarga y dosis se abren hacia arriba si caben y, si no, hacia abajo; siempre dentro de la pantalla."]}, {"v": "2026-11-06.40", "d": "6 nov 2026", "items": ["Circuito de PCR: opción «Sin validación del instructor»: las respuestas del alumno se aplican directamente y, al elegir el ritmo, la RCP se reanuda sola a los 2 s.", "Ordenador: los botones del circuito ya responden al primer clic."]}, {"v": "2026-11-06.39", "d": "6 nov 2026", "items": ["Alumno en la PCR: la guía (ERC/AHA 2025) aparece arriba junto a «Alumno» y la tarjeta ya no repite la sala.", "Monitor ampliado del alumno en la RCE: siguen visibles la descarga y la adrenalina con su conteo (desactivadas)."]}, {"v": "2026-11-06.38", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal durante la PCR: monitor el doble de alto y constantes en una fila compacta con todo su contenido visible (incluida la TAM).", "La tensión pasa a llamarse «TA» (sin NIBP)."]}, {"v": "2026-11-06.37", "d": "6 nov 2026", "items": ["Instructor en el móvil en horizontal: constantes redistribuidas; la temperatura ya no queda cortada."]}, {"v": "2026-11-06.36", "d": "6 nov 2026", "items": ["Flutter: selector de conducción sin el rótulo, a todo el ancho."]}, {"v": "2026-11-06.35", "d": "6 nov 2026", "items": ["Flutter auricular: ondas F en dientes de sierra en el monitor y selector de conducción 2:1 (150 lpm) o 3:1 (100 lpm), también en el ECG de 12 derivaciones y en el monitor del alumno."]}, {"v": "2026-11-06.34", "d": "6 nov 2026", "items": ["Circuito de PCR en el móvil: cabecera más compacta, sin el rótulo «Velocidad», tiempo a la derecha y botón de monitor con icono."]}, {"v": "2026-11-06.33", "d": "6 nov 2026", "items": ["Lista de ritmos: «Extrasístoles ventriculares» y «Taquicardia ventricular monomorfa».", "«Sinc» pasa a llamarse «Sincro».", "Guía rápida: el aviso del manual queda solo en el primer paso; en el iPad, la parte de arriba de la guía medio centímetro más abajo."]}, {"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
+<script type="application/json" id="appChangelog">[{"v": "2026-11-08.6", "d": "8 nov 2026", "items": ["Audio en directo: franja roja «EN DIRECTO» bajo la cabecera (en el móvil en horizontal, solo la etiqueta en la cabecera, con el número de alumnos en el audio). Al tocarla, desplegable para silenciar el micro, ajustar el volumen, pedir la palabra, cortar la transmisión o salir.", "Control de volumen del audio en directo en cada dispositivo (hasta 150 %) y medidor del nivel del micrófono del instructor."]}, {"v": "2026-11-08.4", "d": "8 nov 2026", "items": ["Audio en directo (de momento solo para el administrador): ☰ › Clase › Audio en directo. Invitas a los alumnos conectados, ellos aceptan, y pueden pedir la palabra (solo uno a la vez). Indicador EN DIRECTO; se cierra al terminar el caso o la PCR, o al salir de la sala."]}, {"v": "2026-11-08.3", "d": "8 nov 2026", "items": ["Lupa en el menú de configuración y en el manual de uso para buscar opciones y textos (sin distinguir tildes ni mayúsculas), con las coincidencias resaltadas.", "Alumno: la opción Distribución (1 o 2 columnas) se ve también con el móvil en vertical, y se vuelve una vez a las 2 columnas por defecto."]}, {"v": "2026-11-08.2", "d": "8 nov 2026", "items": ["Alumno: números de las constantes en negrita, con el mismo tamaño y grosor que antes del cambio de tipografía.", "Instructor, monitor ampliado: la TA aparece la primera.", "El menú de configuración se abre siempre en «General»."]}, {"v": "2026-11-08.1", "d": "8 nov 2026", "items": ["Tipografía estrecha tipo IntelliVue en todos los números de constantes: monitor del alumno, tarjetas del instructor y monitor ampliado."]}, {"v": "2026-11-07.18", "d": "7 nov 2026", "items": ["Instructor en tablet horizontal y ordenador: números de las constantes casi al doble, en una sola línea y con tipografía estrecha como la del monitor IntelliVue."]}, {"v": "2026-11-07.17", "d": "7 nov 2026", "items": ["Botón «atrás»: funciona también con varias ventanas abiertas una sobre otra (por ejemplo, menú y manual), pulsación tras pulsación."]}, {"v": "2026-11-07.16", "d": "7 nov 2026", "items": ["Botón «atrás» del móvil: cierra lo que esté abierto (diálogos, menú, manual, editor, banco de ECG, monitor ampliado…) y minimiza el circuito de PCR. Solo con la pantalla principal sale de la app."]}, {"v": "2026-11-07.15", "d": "7 nov 2026", "items": ["Menú de configuración en el móvil en vertical: las pestañas General, Clase y Alumno tienen la misma altura."]}, {"v": "2026-11-07.14", "d": "7 nov 2026", "items": ["Caso clínico en el móvil: el valor de la velocidad (x0,5, x1, x2, x4) se ve completo en su botón."]}, {"v": "2026-11-07.13", "d": "7 nov 2026", "items": ["Banco de ECG en el móvil en horizontal: 2 columnas, con el título, la búsqueda y las categorías a la izquierda y la lista de ECG a la derecha; las tarjetas ya no se ven cortadas."]}, {"v": "2026-11-07.12", "d": "7 nov 2026", "items": ["Instructor en tablet y ordenador: pantalla completa en 2 columnas. A la izquierda el monitor y debajo las constantes con sus controles (con un espacio libre debajo); a la derecha Ritmo, Caso clínico y Preguntas a todo el alto. En la tablet en vertical, todo en una columna.", "Opción ☰ › General › Distribución para volver a la vista clásica."]}, {"v": "2026-11-07.11", "d": "7 nov 2026", "items": ["Menú ☰ › Clase: «Herramientas» con el Banco de ECG para todos; «Iniciar sesión» de administrador con el PIN y, con la sesión iniciada, el bloque «Administración» (editor de preguntas y casos, circuito de PCR, cambiar PIN y cerrar sesión)."]}, {"v": "2026-11-07.10", "d": "7 nov 2026", "items": ["Nuevo «Editor de preguntas y casos» en ☰ › Clase › Herramientas, con el mismo formato que el manual: banco de preguntas, preguntas de RCP que se envían al alumno, preguntas orales de la parada para el instructor y casos clínicos. Crear, editar, ocultar o volver al original, con búsqueda y filtro por algoritmo."]}, {"v": "2026-11-07.9", "d": "7 nov 2026", "items": ["Alumno: al silenciar las alarmas, la cuenta atrás de 2 minutos se ve completa junto a la campana."]}, {"v": "2026-11-07.8", "d": "7 nov 2026", "items": ["Alumno en tablet y ordenador (2 columnas): pantalla completa a lo ancho; el monitor ocupa los 2/3 superiores de la parte izquierda y la columna derecha (1/3) todo el alto."]}, {"v": "2026-11-07.7", "d": "7 nov 2026", "items": ["Alumno: opción «Distribución» en ☰ › General: 1 columna (monitor a todo el ancho y tarjetas debajo) o 2 columnas (por defecto; en tablet y ordenador, monitor en 2/3 y tarjetas en 1/3). Durante una parada siempre se usan 2 columnas."]}, {"v": "2026-11-07.6", "d": "7 nov 2026", "items": ["Alumno: vuelve la opción de salir de la sala en el menú (Sala actual › Cambiar / Salir).", "Alumno en tablet, ordenador y monitor ampliado: nombres de las constantes más grandes y más cerca de su valor."]}, {"v": "2026-11-07.5", "d": "7 nov 2026", "items": ["Móvil en horizontal (alumno): la ficha del ritmo, el caso clínico y la tarjeta de la PCR ocupan siempre el área reservada a la derecha, del mismo alto que el monitor."]}, {"v": "2026-11-07.4", "d": "7 nov 2026", "items": ["Monitor del alumno: FC, SpO₂, FR y TA al doble de tamaño en tablet, ordenador y con el monitor ampliado.", "Móvil en horizontal (alumno): monitor siempre a la izquierda y la columna derecha reservada para la ficha del ritmo, el caso clínico y la PCR, con su propio desplazamiento."]}, {"v": "2026-11-07.3", "d": "7 nov 2026", "items": ["Monitor del alumno al estilo IntelliVue: cada número arriba a la derecha de su curva (FC, SpO₂, FR), TA y Tª en la franja inferior y banda superior con la alarma, la hora, la campana y ampliar. En vertical las curvas llegan al borde y el monitor es más bajo."]}, {"v": "2026-11-07.2", "d": "7 nov 2026", "items": ["Configuración: «Guías» con los botones Rápida y Manual; «Sala actual» con Cambiar y Salir; al final, «Actualizaciones»: recargar (en el navegador) e instalar la app Android, o buscar actualización desde la app."]}, {"v": "2026-11-07.1", "d": "7 nov 2026", "items": ["App Android: se compila cada noche a las 00:00 si hay cambios; al iniciarse avisa de que hay una versión nueva con sus novedades, y se puede buscar a mano en ☰ › General › App Android."]}, {"v": "2026-11-06.45", "d": "6 nov 2026", "items": ["Circuito de PCR detenido: el monitor sigue mostrando el ritmo del momento, sin artefacto de compresiones ni el aviso de comprobación encima."]}, {"v": "2026-11-06.44", "d": "6 nov 2026", "items": ["Circuito de PCR: el pulso lo decide el instructor con el ritmo que elige (TVSP, TV con pulso, AESP, RCE); la respuesta del alumno se valora con ✓/✗ sin cambiar el algoritmo.", "Ritmo programado: al acabar los 10 s la RCP se reanuda sola solo con «Sin validación del instructor»; si no, se pregunta."]}, {"v": "2026-11-06.43", "d": "6 nov 2026", "items": ["Circuito de PCR: «Ritmo programado» (desplegable) en lugar de «RCE…»: aparece a los 2 s de la próxima comprobación y la RCP se reanuda al acabar los 10 s; si es una RCE se elige el ritmo de salida.", "Botón «Detener» para parar el circuito sin terminarlo (se congelan los tiempos también en el alumno) y «Continuar»."]}, {"v": "2026-11-06.42", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal con un caso clínico: monitor y constantes a la izquierda (como en la PCR) y el caso con sus botones a la derecha, con desplazamiento propio."]}, {"v": "2026-11-06.41", "d": "6 nov 2026", "items": ["PCR del alumno: las opciones de descarga y dosis se abren hacia arriba si caben y, si no, hacia abajo; siempre dentro de la pantalla."]}, {"v": "2026-11-06.40", "d": "6 nov 2026", "items": ["Circuito de PCR: opción «Sin validación del instructor»: las respuestas del alumno se aplican directamente y, al elegir el ritmo, la RCP se reanuda sola a los 2 s.", "Ordenador: los botones del circuito ya responden al primer clic."]}, {"v": "2026-11-06.39", "d": "6 nov 2026", "items": ["Alumno en la PCR: la guía (ERC/AHA 2025) aparece arriba junto a «Alumno» y la tarjeta ya no repite la sala.", "Monitor ampliado del alumno en la RCE: siguen visibles la descarga y la adrenalina con su conteo (desactivadas)."]}, {"v": "2026-11-06.38", "d": "6 nov 2026", "items": ["Alumno en el móvil en horizontal durante la PCR: monitor el doble de alto y constantes en una fila compacta con todo su contenido visible (incluida la TAM).", "La tensión pasa a llamarse «TA» (sin NIBP)."]}, {"v": "2026-11-06.37", "d": "6 nov 2026", "items": ["Instructor en el móvil en horizontal: constantes redistribuidas; la temperatura ya no queda cortada."]}, {"v": "2026-11-06.36", "d": "6 nov 2026", "items": ["Flutter: selector de conducción sin el rótulo, a todo el ancho."]}, {"v": "2026-11-06.35", "d": "6 nov 2026", "items": ["Flutter auricular: ondas F en dientes de sierra en el monitor y selector de conducción 2:1 (150 lpm) o 3:1 (100 lpm), también en el ECG de 12 derivaciones y en el monitor del alumno."]}, {"v": "2026-11-06.34", "d": "6 nov 2026", "items": ["Circuito de PCR en el móvil: cabecera más compacta, sin el rótulo «Velocidad», tiempo a la derecha y botón de monitor con icono."]}, {"v": "2026-11-06.33", "d": "6 nov 2026", "items": ["Lista de ritmos: «Extrasístoles ventriculares» y «Taquicardia ventricular monomorfa».", "«Sinc» pasa a llamarse «Sincro».", "Guía rápida: el aviso del manual queda solo en el primer paso; en el iPad, la parte de arriba de la guía medio centímetro más abajo."]}, {"v": "2026-11-06.32", "d": "6 nov 2026", "items": ["Guía rápida: indica que existe el Manual de uso, con un botón para abrirlo en el primer y en el último paso."]}, {"v": "2026-11-06.31", "d": "6 nov 2026", "items": ["Al introducir el código de sala, Intro/Enter entra en la sala.", "Alumno en el móvil en horizontal durante la PCR: constantes en una fila debajo del monitor y la tarjeta de la PCR en toda la columna derecha, sin desplazarse."]}, {"v": "2026-11-06.30", "d": "6 nov 2026", "items": ["Circuito de PCR: la RCE se puede elegir en cualquier momento; queda programada con su ritmo de salida para la próxima comprobación, donde el alumno comprueba el pulso (sí → recuperación; no → AESP, tras confirmarlo el instructor).", "Tablet y ordenador: preguntas y registro a la izquierda; casilla «Ver monitor» que muestra encima de las preguntas el monitor del alumno con sus constantes."]}, {"v": "2026-11-06.29", "d": "6 nov 2026", "items": ["Circuito de PCR: la TV es un ritmo organizado; el alumno comprueba el pulso: con pulso es una RCE con TV de salida y sin pulso una TVSP.", "En la recuperación el alumno puede volver a comprobar el pulso; si no lo tiene, nueva parada como AESP.", "Alumno: en tablet y ordenador los contadores también son pulsables y las opciones se despliegan hacia arriba; con el monitor ampliado, botones en fila encima de las constantes (más pequeñas) y contador de descargas.", "Instructor en el móvil: ya no se superpone el texto del circuito de PCR."]}, {"v": "2026-11-06.28", "d": "6 nov 2026", "items": ["Circuito de PCR: la pantalla se mantiene encendida durante toda la parada, en el instructor y en el alumno."]}, {"v": "2026-11-06.27", "d": "6 nov 2026", "items": ["PCR: las dosis de los contadores pulsables se despliegan hacia arriba; número de sala en la cabecera del circuito; en el instructor solo se desplazan las preguntas y el registro."]}, {"v": "2026-11-06.26", "d": "6 nov 2026", "items": ["PCR del alumno: en el móvil en horizontal los contadores son pulsables; se recuerda la energía de la primera descarga (pulsación larga para cambiarla); con el monitor ampliado, junto a la adrenalina, dosis puestas y tiempo desde la última."]}, {"v": "2026-11-06.25", "d": "6 nov 2026", "items": ["Móvil en horizontal: la tarjeta de la PCR del alumno va debajo de las constantes.", "Al terminar el instructor la PCR, también se cierra siempre en el alumno."]}, {"v": "2026-11-06.24", "d": "6 nov 2026", "items": ["Monitor ampliado: el tiempo de la PCR va a la derecha de la FR y la campana encima del botón de ampliar.", "iPad: el circuito de PCR medio centímetro más abajo."]}, {"v": "2026-11-06.23", "d": "6 nov 2026", "items": ["Móvil: al cerrar el monitor ampliado la pantalla ya no queda desajustada."]}, {"v": "2026-11-06.22", "d": "6 nov 2026", "items": ["Circuito de PCR: velocidad del escenario (x1–x8); al elegir el ritmo se pregunta si se reanuda la RCP; en ritmos organizados el alumno responde en grande si tiene pulso; sin avisos rojos de «sin pulso» durante el circuito; caja de tiempo grande y movible, también en el monitor ampliado."]}, {"v": "2026-11-06.21", "d": "6 nov 2026", "items": ["Informe de la PCR: cabecera con iconos (imprimir/PDF, descargar, compartir, copiar) en una sola línea."]}, {"v": "2026-11-06.20", "d": "6 nov 2026", "items": ["Circuito de PCR: al terminar se genera un informe exportable (imprimir/PDF, descargar, compartir o copiar)."]}, {"v": "2026-11-06.19", "d": "6 nov 2026", "items": ["Circuito de PCR: sin pulso, la TA del alumno queda en blanco y sin la etiqueta «sin pulso»."]}, {"v": "2026-11-06.18", "d": "6 nov 2026", "items": ["Circuito de PCR: aviso «Comprobación del ritmo finalizada» al alumno; en ritmos organizados se recuerda preguntar por el pulso y el alumno puede marcar «Sin pulso»."]}, {"v": "2026-11-06.17", "d": "6 nov 2026", "items": ["Circuito de PCR: alarma sonora al iniciar la parada; al confirmar la RCE se elige el ritmo de salida (incluido SCACEST con elevación del ST); «Terminar» devuelve los monitores a ritmo sinusal con constantes normales."]}, {"v": "2026-11-06.16", "d": "6 nov 2026", "items": ["Circuito de PCR: botones del alumno también con el monitor ampliado; la adrenalina a 1 mg no se vuelve a preguntar; tras amiodarona no se ofrece lidocaína (y al revés)."]}, {"v": "2026-11-06.15", "d": "6 nov 2026", "items": ["Circuito de PCR: el alumno administra las descargas (eligiendo energía) y los fármacos (eligiendo dosis) desde su pantalla; el instructor ve cada actuación valorada según la guía."]}, {"v": "2026-11-06.14", "d": "6 nov 2026", "items": ["Circuito de PCR: adrenalina cada 4 minutos; los botones de ritmo ya no indican si es desfibrilable (pasa a pregunta oral); el alumno solo ve descargas y fármacos.", "Manual: nuevo apartado de Fuentes."]}, {"v": "2026-11-06.13", "d": "6 nov 2026", "items": ["Circuito de PCR (beta, solo administrador): temporizador de parada y ciclos de 2 min, comprobación de ritmo, descargas y fármacos según ERC 2025 o AHA 2025, preguntas para el alumno y contador en su pantalla."]}, {"v": "2026-11-06.12", "d": "6 nov 2026", "items": ["Alarmas: por defecto el monitor solo muestra la campana. El parámetro alterado y su tendencia se activan en ☰ › Alumno › «Mostrar el parámetro alterado»."]}, {"v": "2026-11-06.11", "d": "6 nov 2026", "items": ["Alarmas de constantes: aviso amarillo arriba en el monitor con el parámetro alterado y su tendencia (p. ej. «FC ↑ · SpO₂ ↓»).", "iPad: menú y manual medio centímetro más abajo.", "Manual: ejemplos del banco de ECG acordes con su título."]}, {"v": "2026-11-06.10", "d": "6 nov 2026", "items": ["Botones dentro del monitor más pequeños y con fondo opaco.", "La pantalla no se apaga mientras hay un caso clínico en marcha.", "La campana de alarma ya no muestra el diagnóstico del ritmo (FV, TV, asistolia…)."]}, {"v": "2026-11-06.9", "d": "6 nov 2026", "items": ["Barra del compás con botón «i» que explica cada opción.", "Aviso de versión nueva con «Ver cambios» y apartado «Novedades» en el menú ☰."]}, {"v": "2026-11-06.8", "d": "6 nov 2026", "items": ["Compás: al deshacer una medida fijada, vuelve a abrirse donde estaba.", "Barra del compás más pequeña, con iconos, y colocable abajo, a la izquierda o a la derecha."]}, {"v": "2026-11-06.6", "d": "6 nov 2026", "items": ["Manual de uso completo en ☰ › General, con capturas ampliables.", "Iconos de línea en lugar de emoji en toda la app."]}, {"v": "2026-11-06.5", "d": "6 nov 2026", "items": ["Sonido del monitor: beep con cada latido (tono según la SpO₂).", "Alarmas de prioridad alta y media, con botón de campana que las silencia 2 minutos (también en el alumno)."]}, {"v": "2026-11-06.4", "d": "6 nov 2026", "items": ["Configuración organizada en pestañas: General, Clase y Alumno, con ayudas ⓘ.", "Ficha del ritmo en una sola opción: oculta, solo ECG, contraída o desplegada.", "Banco de ECG como icono de onda al final de las pestañas."]}, {"v": "2026-11-06.1", "d": "6 nov 2026", "items": ["Visor de ECG: compás, interpretación, calibrar y zoom dentro del menú ⋯ Más.", "Banco de ECG con subida por administrador (PIN), calibración y compás."]}]</script>
 <div id="updateBar" role="status" aria-live="polite">
   <span>Hay una versión nueva de la app.</span>
   <button type="button" class="ub-see" id="ubSee" onclick="openChanges('new')" hidden>Ver cambios</button>
@@ -3077,6 +3110,7 @@
   <button type="button" class="ub-x" onclick="document.getElementById('updateBar').classList.remove('open')" aria-label="Ahora no">×</button>
 </div>
 <div class="au-stu" id="auStu" hidden role="status" aria-live="polite"></div>
+<div class="lv-pop" id="auPop" role="dialog" aria-label="Audio en directo"></div>
 <div id="appDialog" role="alertdialog" aria-modal="true" aria-labelledby="adTitle" aria-describedby="adText">
   <div class="ad-card">
     <div class="ad-icon" id="adIcon" aria-hidden="true"></div>
@@ -8174,6 +8208,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ceOpen() && !do
   const isOpen = id=>{ const e = $(id); return !!(e && e.classList.contains('open')); };
   const L = [   // de más arriba a más abajo: [¿está abierto?, cerrar]
     [()=>isOpen('appDialog'), ()=>$('adCancel').click()],
+    [()=>isOpen('auPop'), ()=>auPopClose()],
     [()=>{ const p = $('csel-pop'); return !!(p && p.classList.contains('open')); }, ()=>window.dispatchEvent(new Event('resize'))],
     [()=>{ const l = $('mnLight'); return !!(l && !l.hidden); }, ()=>closeManualShot()],
     [()=>isOpen('guide'), ()=>closeGuide()],
@@ -8304,6 +8339,8 @@ var myId = (function(){ try{ let v = sessionStorage.getItem('monitor-cid'); if(!
 const AU_ICE = { iceServers:[{ urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302'] }] };
 const AU_MIC = { audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true } };
 const AU = { on:false, micOn:true, hands:true, stream:null, peers:{}, roster:{}, order:[], talk:null, iceQ:{} };   // instructor
+var auVolume = 1; try{ const v = parseFloat(localStorage.getItem('monitor-au-vol')); if(v>=0 && v<=1.5) auVolume = v; }catch(e){}
+var auCtx = null; const auGains = {};
 const AUS = { inst:null, pc:null, st:'none', mic:null, live:false, hands:true, iceQ:[], name:'' };                 // alumno
 function auSend(to, t, data){ if(!channel) return; try{ channel.send({ type:'broadcast', event:'au', payload:Object.assign({ t, to, from:myId }, data||{}) }); }catch(e){} }
 function auAudio(key){
@@ -8312,6 +8349,122 @@ function auAudio(key){
   return a;
 }
 function auPlay(a){ const p = a.play(); if(p && p.catch) p.catch(()=>{ if(role==='monitor'){ AUS.blocked = true; auStuUi(); } }); }
+/* La voz pasa por WebAudio (ganancia = volumen de este dispositivo, hasta 150 %); así funciona también en
+   iPhone/iPad, donde el volumen de <audio> no se puede cambiar. El <audio> queda silenciado pero sonando
+   (Chrome lo necesita para que llegue el audio de WebRTC). Si WebAudio no está disponible, suena por el <audio>. */
+function auCtxGet(){ if(!auCtx){ const C = window.AudioContext || window.webkitAudioContext; if(C) auCtx = new C(); } return auCtx; }
+function auAttach(key, track){
+  const a = auAudio(key); a.srcObject = new MediaStream([track]);
+  if(auGains[key]){ try{ auGains[key].disconnect(); }catch(e){} delete auGains[key]; }
+  try{
+    const ctx = auCtxGet(); const src = ctx.createMediaStreamSource(a.srcObject), g = ctx.createGain();
+    g.gain.value = auVolume; src.connect(g); g.connect(ctx.destination); auGains[key] = g; a.muted = true;
+    if(ctx.state!=='running') ctx.resume().catch(()=>{});
+    setTimeout(()=>{ if(role==='monitor' && ctx.state!=='running' && AUS.st!=='none'){ AUS.blocked = true; auStuUi(); } }, 900);
+  }catch(e){ a.muted = false; a.volume = Math.min(1, auVolume); }
+  auPlay(a);
+}
+function auDetach(key){ const a = document.getElementById('auA-'+key); if(a){ a.srcObject = null; a.remove(); } if(auGains[key]){ try{ auGains[key].disconnect(); }catch(e){} delete auGains[key]; } }
+function auSetVol(v){
+  auVolume = Math.max(0, Math.min(1.5, v)); try{ localStorage.setItem('monitor-au-vol', String(auVolume)); }catch(e){}
+  Object.values(auGains).forEach(g=>{ g.gain.value = auVolume; });
+  document.querySelectorAll('audio[id^="auA-"]').forEach(a=>{ if(!a.muted) a.volume = Math.min(1, auVolume); });
+  document.querySelectorAll('.au-vp').forEach(e=>{ e.textContent = Math.round(auVolume*100)+'%'; });
+  document.querySelectorAll('.au-vol input').forEach(i=>{ if(document.activeElement!==i) i.value = Math.round(auVolume*100); });
+}
+function auVolHtml(label){ return '<div class="au-vol"><svg class="ic" aria-hidden="true" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3l4-3.5v11L6 12H3z"/><path d="M13.5 7.5a3.5 3.5 0 0 1 0 5M15.8 5.2a6.8 6.8 0 0 1 0 9.6"/></g></svg>'+label
+  +'<input type="range" min="0" max="150" step="5" value="'+Math.round(auVolume*100)+'" aria-label="Volumen: '+label+'" oninput="auSetVol(this.value/100)"><span class="au-vp">'+Math.round(auVolume*100)+'%</span></div>'; }
+// cualquier toque reactiva el audio si el navegador lo había dejado en pausa
+document.addEventListener('pointerdown', ()=>{ if(auCtx && auCtx.state==='suspended') auCtx.resume().then(()=>{ if(AUS.blocked){ AUS.blocked = false; auStuUi(); } }).catch(()=>{}); }, true);
+/* medidor del micrófono del instructor (7 barras) mientras se ve el desplegable o el panel */
+var auMeter = { an:null, buf:null, t:0, src:null };
+function auMeterHtml(){ return '<span class="mtr" aria-hidden="true">'+[4,6,8,10,12,13,14].map(h=>'<b style="height:'+h+'px"></b>').join('')+'</span>'; }
+function auMeterShown(){ return document.getElementById('auPop').classList.contains('open') || (document.getElementById('settingsOverlay').classList.contains('open') && document.getElementById('auSec').open); }
+function auMeterRun(){
+  if(!(role==='instructor' && AU.stream && auMeterShown())){ clearInterval(auMeter.t); auMeter.t = 0; return; }
+  if(!auMeter.an || auMeter.src!==AU.stream){
+    try{ const ctx = auCtxGet(); auMeter.an = ctx.createAnalyser(); auMeter.an.fftSize = 512; ctx.createMediaStreamSource(AU.stream).connect(auMeter.an); auMeter.buf = new Uint8Array(auMeter.an.fftSize); auMeter.src = AU.stream; }catch(e){ return; }
+  }
+  if(auMeter.t) return;
+  auMeter.t = setInterval(()=>{
+    if(!AU.stream || !auMeterShown()){ clearInterval(auMeter.t); auMeter.t = 0; return; }
+    auMeter.an.getByteTimeDomainData(auMeter.buf); let sum = 0; for(const v of auMeter.buf){ const d = (v-128)/128; sum += d*d; }
+    const lvl = Math.min(7, Math.round(Math.sqrt(sum/auMeter.buf.length)*35));
+    document.querySelectorAll('.mtr').forEach(m=>[...m.children].forEach((b,i)=>b.classList.toggle('on', AU.micOn && i<lvl)));
+  }, 110);
+}
+/* indicador: etiqueta en la cabecera (móvil en horizontal) o franja bajo la cabecera (resto), y desplegable */
+const auLandMQ = matchMedia('(orientation:landscape) and (max-height:560px)');   // móvil en horizontal
+const AU_PERSON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="5.5" r="2.6"/><path d="M3 14c.6-2.8 2.6-4.2 5-4.2s4.4 1.4 5 4.2"/></svg>';
+function auCountAudio(){ return Object.values(AU.roster).filter(r=>['listen','hand','talk'].includes(r.st)).length; }
+function auStatus(){
+  if(role==='instructor') return (AU.micOn ? 'tu micro abierto' : 'tu micro silenciado') + (AU.talk ? ' · habla '+auName(AU.talk) : '');
+  return AUS.st==='talk' ? 'tienes la palabra · tu micro abierto' : AUS.st==='hand' ? 'has pedido la palabra' : (AUS.pc && AUS.pc.connectionState==='connected' ? 'escuchando al instructor' : 'conectando…');
+}
+function auUi(){
+  const isI = role==='instructor';
+  const on = isI ? AU.on : ['listen','hand','talk'].includes(AUS.st);
+  const live = isI ? (AU.on && (AU.micOn || !!AU.talk)) : (on && (AUS.live || AUS.st==='talk'));
+  const land = auLandMQ.matches;
+  const tag = document.getElementById('auLiveTag'), band = document.getElementById('auBand');
+  tag.hidden = !(on && land); band.hidden = !(on && !land);
+  document.body.classList.toggle('au-on', on); document.body.classList.toggle('au-live', live);
+  const n = isI ? auCountAudio() : null, nTxt = n===null ? '' : AU_PERSON+n;
+  const lbl = n===null ? '' : (n===1 ? '1 alumno en el audio' : n+' alumnos en el audio');
+  ['auLiveN','auBandN'].forEach(id=>{ const e = document.getElementById(id); e.innerHTML = nTxt; e.title = lbl; });
+  document.getElementById('auBandT').textContent = auStatus();
+  document.getElementById('auBandCut').textContent = isI ? 'Cortar' : 'Salir';
+  tag.setAttribute('aria-label', 'En directo: '+auStatus()+(lbl ? ', '+lbl : '')+'. Opciones');
+  // la franja ocupa sitio: las vistas de altura fija (alumno en 2 columnas) la descuentan
+  const bh = band.hidden ? 0 : band.offsetHeight + 8;
+  if(auUi._bh!==bh){ auUi._bh = bh; document.documentElement.style.setProperty('--au-band', bh+'px'); window.dispatchEvent(new Event('resize')); }
+  if(!on) auPopClose(); else if(document.getElementById('auPop').classList.contains('open')) auPopFill();
+}
+function auPopFill(){
+  const pop = document.getElementById('auPop'), isI = role==='instructor';
+  if(pop.contains(document.activeElement) && document.activeElement.type==='range') return;   // no repintar mientras se mueve el volumen
+  const MIC = '<svg class="ic" aria-hidden="true" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="6" height="10" rx="3"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></g></svg>';
+  const n = isI ? auCountAudio() : 0, st = auStatus();
+  let h = '<h4>'+MIC+' Audio en directo</h4><p class="lv-st">'+escapeHtml(st.charAt(0).toUpperCase()+st.slice(1))+(isI ? ' · '+(n===1?'1 alumno':n+' alumnos')+' en el audio' : '')+'</p>';
+  if(isI){
+    h += '<button type="button" onclick="auSetMic(!AU.micOn)">'+MIC+(AU.micOn ? 'Silenciar mi micrófono' : 'Abrir mi micrófono')+auMeterHtml()+'</button>'
+      + auVolHtml('Alumnos')
+      + '<button type="button" onclick="auPopClose(); openSettings(\'auSec\'); document.getElementById(\'auSec\').open = true; auMeterRun();"><span aria-hidden="true">☰</span> Abrir panel de audio</button>'
+      + '<hr><button type="button" class="danger" onclick="auCut()"><span aria-hidden="true">■</span> Cortar la transmisión para todos</button>';
+  } else {
+    h += auVolHtml('Instructor');
+    if(AUS.st==='talk') h += '<button type="button" onclick="auPopClose(); auStuDrop()"><span aria-hidden="true">✋</span> Dejar la palabra</button>';
+    else if(AUS.hands) h += '<button type="button" onclick="auStuHand()"><span aria-hidden="true">✋</span> '+(AUS.st==='hand' ? 'Cancelar la petición' : 'Pedir la palabra')+'</button>';
+    h += '<hr><button type="button" class="danger" onclick="auCut()"><span aria-hidden="true">■</span> Salir del audio</button>';
+  }
+  pop.innerHTML = h; auMeterRun();
+}
+function auPopToggle(anchor){
+  const pop = document.getElementById('auPop');
+  if(pop.classList.contains('open')){ auPopClose(); return; }
+  auPopFill(); pop.classList.add('open');
+  const r = anchor.getBoundingClientRect(), w = pop.offsetWidth;
+  const left = anchor.id==='auBand' ? r.left : r.right - w;
+  pop.style.left = Math.max(8, Math.min(innerWidth - w - 8, left))+'px'; pop.style.top = (r.bottom + 6)+'px';
+  anchor.setAttribute('aria-expanded','true'); auPopToggle._a = anchor;
+  const f = pop.querySelector('button, input'); if(f) f.focus({ preventScroll:true });
+  auMeterRun();
+}
+function auPopClose(){
+  const pop = document.getElementById('auPop'); if(!pop || !pop.classList.contains('open')) return;
+  pop.classList.remove('open'); const a = auPopToggle._a; if(a) a.setAttribute('aria-expanded','false');
+}
+document.addEventListener('pointerdown', e=>{ const pop = document.getElementById('auPop'); if(pop && pop.classList.contains('open') && !e.target.closest('#auPop, #auLiveTag, #auBand')) auPopClose(); }, true);
+document.addEventListener('keydown', e=>{ const pop = document.getElementById('auPop'); if(e.key==='Escape' && pop && pop.classList.contains('open')){ e.stopImmediatePropagation(); auPopClose(); } }, true);
+async function auCut(){
+  auPopClose();
+  if(role==='instructor'){
+    if(!(await appConfirm('¿Cortar la transmisión para todos?\n\nSe cerrarán los micrófonos y los alumnos dejarán de oírte.', { ok:'Cortar', danger:true }))) return;
+    auEnd('transmisión cortada');
+  } else { if(AUS.inst) auSend(AUS.inst, 'bye'); auStuClose(''); showToast('Has salido del audio en directo.'); }
+}
+if(auLandMQ.addEventListener) auLandMQ.addEventListener('change', ()=>{ auPopClose(); if(role) auUi(); });
+
 function auNoMic(e){ showToast(e && e.name==='NotAllowedError' ? 'Permiso de micrófono denegado. Actívalo en los ajustes del navegador o de la app.' : 'No se pudo abrir el micrófono.'); }
 function auMsg(p){
   if(!p || p.from===myId || (p.to && p.to!=='*' && p.to!==myId)) return;
@@ -8331,6 +8484,7 @@ function auRosterSync(){
 }
 function auStart(){
   if(!adminPin()) return;
+  try{ const c = auCtxGet(); if(c && c.state!=='running') c.resume(); }catch(e){}
   AU.on = true; AU.micOn = true;
   auSetMic(true); auBroadcastLive(); auRender();
 }
@@ -8360,7 +8514,7 @@ async function auConnect(id){
   t0.sender.replaceTrack(AU.stream ? AU.stream.getAudioTracks()[0] : null).catch(()=>{});
   t1.sender.replaceTrack(AU.talk && AU.talk!==id ? auTalkTrack() : null).catch(()=>{});
   pc.onicecandidate = e=>{ if(e.candidate) auSend(id, 'ice', { c:e.candidate.toJSON() }); };
-  pc.ontrack = e=>{ const a = auAudio('s-'+id); a.srcObject = new MediaStream([e.track]); auPlay(a); };
+  pc.ontrack = e=>auAttach('s-'+id, e.track);
   pc.onconnectionstatechange = ()=>{
     const r = AU.roster[id]; if(!r || AU.peers[id]!==pc) return;
     if(pc.connectionState==='failed'){ r.st = 'fail'; auDrop(id, true); auSend(id, 'end', { why:'net' }); }
@@ -8385,7 +8539,7 @@ function auRevoke(id){
 function auKick(id){ auSend(id, 'end', { why:'kick' }); auDrop(id); const r = AU.roster[id]; if(r) r.st = 'none'; auRender(); }
 function auDrop(id, keepState){
   const pc = AU.peers[id]; if(pc){ try{ pc.close(); }catch(e){} delete AU.peers[id]; }
-  const a = document.getElementById('auA-s-'+id); if(a){ a.srcObject = null; a.remove(); }
+  auDetach('s-'+id);
   if(AU.talk===id){ AU.talk = null; auRelay(); auBroadcastLive(); }
   if(!keepState){ const r = AU.roster[id]; if(r && r.st!=='gone') r.st = 'none'; }
 }
@@ -8402,7 +8556,7 @@ function auEnd(why){
 }
 function auBroadcastLive(){
   const live = AU.on && (AU.micOn || !!AU.talk);
-  document.body.classList.toggle('au-live', role==='instructor' && live);
+  auUi();
   if(AU.on) auSend('*', 'live', { on:live, hands:AU.hands, talk:AU.talk ? auName(AU.talk) : '' });
 }
 function auSetHands(on){ AU.hands = on; auBroadcastLive(); auRender(); }
@@ -8429,8 +8583,7 @@ const AU_ST = { none:['Sin audio',''], invited:['Invitado…','wait'], listen:['
 function auRender(){
   if(role!=='instructor') return;
   const box = document.getElementById('auBody'); if(!box) return;
-  const live = AU.on && (AU.micOn || !!AU.talk);
-  document.getElementById('auLiveTag').hidden = !live;
+  auUi();
   const list = AU.order.map(id=>AU.roster[id]).filter(r=>r && r.st!=='gone');
   const withAudio = list.filter(r=>['listen','hand','talk'].includes(r.st)).length;
   document.getElementById('auSum').textContent = AU.on ? withAudio+' con audio' : '';
@@ -8442,6 +8595,7 @@ function auRender(){
   const hands = list.filter(r=>r.st==='hand');
   let h = '<div class="st-row"><span>Tu micrófono<small>Te oyen todos los alumnos que han aceptado</small></span><div class="st-seg st-seg-act" role="group" aria-label="Tu micrófono">'
     + '<button type="button" class="'+(AU.micOn?'on':'')+'" onclick="auSetMic(true)">Abierto</button><button type="button" class="'+(!AU.micOn?'on':'')+'" onclick="auSetMic(false)">Silenciado</button></div></div>'
+    + '<div class="st-row au-volrow"><span>Volumen de los alumnos<small>Solo en este dispositivo · nivel de tu micro '+auMeterHtml()+'</small></span></div>'+auVolHtml('Alumnos')
     + '<div class="st-row"><span>Pedir la palabra<small>Los alumnos la piden y tú la concedes. Solo uno a la vez: como mucho habláis dos.</small></span>'
     + '<button type="button" class="st-sw" role="switch" aria-checked="'+(AU.hands?'true':'false')+'" aria-label="Pedir la palabra" onclick="auSetHands(!AU.hands)"></button></div>';
   hands.forEach(r=>{ h += '<div class="au-q">✋ <b>'+escapeHtml(auName(r.id))+'</b> pide la palabra <button type="button" class="st-go au-go" onclick="auGrant(\''+r.id+'\')">Conceder</button><button type="button" class="st-go" onclick="auRevoke(\''+r.id+'\')">Ignorar</button></div>'; });
@@ -8458,7 +8612,7 @@ function auRender(){
   const canInv = list.filter(r=>['none','rejected','fail'].includes(r.st)).length;
   h += '<div class="st-row"><span>Invitar a todos<small>'+(list.length===1?'1 alumno conectado':list.length+' alumnos conectados')+' · '+withAudio+' con audio</small></span><button type="button" class="st-go" onclick="auInviteAll()"'+(canInv?'':' disabled')+'>Invitar a todos</button></div>'
     + '<div class="st-row"><span><small style="margin:0">Al terminar el caso o el circuito de PCR, o al salir de la sala, se cierran todos los micrófonos.</small></span><button type="button" class="st-go au-stop" onclick="auEnd()">Cerrar audio</button></div>';
-  box.innerHTML = h;
+  box.innerHTML = h; auMeterRun();
 }
 
 /* ===== alumno ===== */
@@ -8472,7 +8626,8 @@ async function auStuMsg(p){
     if(AUS.st!=='asking') return;                       // el instructor canceló mientras tanto
     if(v===null){ AUS.st = 'none'; auSend(p.from, 'rej'); return; }
     AUS.name = (v || saved).slice(0,24); try{ if(v) localStorage.setItem('monitor-au-name', v); }catch(e){}
-    AUS.st = 'listen'; AUS.blocked = false; auSend(p.from, 'acc', { name:AUS.name }); auStuUi();
+    AUS.st = 'listen'; AUS.blocked = false; try{ const c = auCtxGet(); if(c && c.state!=='running') c.resume(); }catch(e){}
+    auSend(p.from, 'acc', { name:AUS.name }); auStuUi();
     return;
   }
   if(p.from!==AUS.inst) return;
@@ -8482,7 +8637,7 @@ async function auStuMsg(p){
       if(AUS.pc){ try{ AUS.pc.close(); }catch(e){} }
       const pc = AUS.pc = new RTCPeerConnection(AU_ICE); AUS.iceQ = [];
       pc.onicecandidate = e=>{ if(e.candidate) auSend(AUS.inst, 'ice', { c:e.candidate.toJSON() }); };
-      pc.ontrack = e=>{ const a = auAudio('i-'+(e.transceiver && e.transceiver.mid || '0')); a.srcObject = new MediaStream([e.track]); auPlay(a); };
+      pc.ontrack = e=>auAttach('i-'+(e.transceiver && e.transceiver.mid || '0'), e.track);
       pc.onconnectionstatechange = ()=>{ if(AUS.pc!==pc) return; if(pc.connectionState==='failed'){ auStuClose('no se pudo conectar con el instructor desde esta red (prueba con datos móviles)'); } else auStuUi(); };
       await pc.setRemoteDescription(p.sdp);
       const t0 = pc.getTransceivers()[0]; if(t0) t0.direction = 'sendrecv';
@@ -8512,28 +8667,29 @@ function auStuClose(why){
   if(AUS.st==='asking'){ const d = document.getElementById('appDialog'); if(d.classList.contains('open')) document.getElementById('adCancel').click(); }
   auStuMicOff();
   if(AUS.pc){ try{ AUS.pc.close(); }catch(e){} AUS.pc = null; }
-  document.querySelectorAll('audio[id^="auA-i-"]').forEach(a=>{ a.srcObject = null; a.remove(); });
+  document.querySelectorAll('audio[id^="auA-i-"]').forEach(a=>auDetach(a.id.slice(4)));
   AUS.st = 'none'; AUS.live = false; AUS.inst = null; auStuUi();
   if(why) showToast('Audio en directo cerrado: '+why+'.');
 }
 function auStuHand(){ if(AUS.st==='listen' && AUS.hands){ AUS.st = 'hand'; auSend(AUS.inst, 'hand'); } else if(AUS.st==='hand'){ AUS.st = 'listen'; auSend(AUS.inst, 'unhand'); } auStuUi(); }
 function auStuDrop(){ auStuMicOff(); AUS.st = 'listen'; auSend(AUS.inst, 'drop'); auStuUi(); }
-function auStuUnblock(){ document.querySelectorAll('audio[id^="auA-i-"]').forEach(a=>a.play().catch(()=>{})); AUS.blocked = false; auStuUi(); }
+function auStuUnblock(){ if(auCtx) auCtx.resume().catch(()=>{}); document.querySelectorAll('audio[id^="auA-i-"]').forEach(a=>a.play().catch(()=>{})); AUS.blocked = false; auStuUi(); }
 function auStuUi(){
   if(role!=='monitor') return;
-  const box = document.getElementById('auStu'), tag = document.getElementById('auLiveTag');
+  const box = document.getElementById('auStu');
   const on = AUS.st==='listen' || AUS.st==='hand' || AUS.st==='talk';
-  box.hidden = !on; tag.hidden = !(on && (AUS.live || AUS.st==='talk'));
-  tag.querySelector('b').textContent = AUS.st==='talk' ? ' · tu micro' : '';
-  document.body.classList.toggle('au-live', on && (AUS.live || AUS.st==='talk'));
+  box.hidden = !on; auUi();
   if(!on) return;
-  const conn = AUS.pc && AUS.pc.connectionState==='connected';
   const MIC = '<svg class="ic" aria-hidden="true" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="6" height="10" rx="3"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></g></svg>';
   box.classList.toggle('talk', AUS.st==='talk');
-  if(AUS.blocked) box.innerHTML = MIC+'<span>Audio en directo</span><button type="button" class="casebtn primary" onclick="auStuUnblock()">Toca para oír</button>';
-  else if(AUS.st==='talk') box.innerHTML = '<span class="dot" aria-hidden="true"></span><span>Tienes la palabra<small>Micrófono abierto</small></span><button type="button" class="casebtn" onclick="auStuDrop()">Terminar</button>';
-  else box.innerHTML = MIC+'<span>'+(conn ? 'Escuchando al instructor' : 'Conectando…')+(AUS.st==='hand' ? '<small>Has pedido la palabra</small>' : '')+'</span>'
+  let r1;
+  if(AUS.blocked) r1 = MIC+'<span>Audio en directo</span><button type="button" class="casebtn primary" onclick="auStuUnblock()">Toca para oír</button>';
+  else if(AUS.st==='talk') r1 = '<span class="dot" aria-hidden="true"></span><span>Tienes la palabra<small>Micrófono abierto</small></span><button type="button" class="casebtn" onclick="auStuDrop()">Terminar</button>';
+  else r1 = MIC+'<span>'+(AUS.pc && AUS.pc.connectionState==='connected' ? 'Escuchando al instructor' : 'Conectando…')+(AUS.st==='hand' ? '<small>Has pedido la palabra</small>' : '')+'</span>'
     + (AUS.hands ? '<button type="button" class="casebtn'+(AUS.st==='hand'?'':' primary')+'" onclick="auStuHand()">'+(AUS.st==='hand' ? 'Cancelar' : '✋ Pedir la palabra')+'</button>' : '');
+  const r = box.querySelector('.r1');
+  if(r && box.querySelector('.au-vol')){ r.innerHTML = r1; return; }   // el control de volumen no se repinta (se puede estar moviendo)
+  box.innerHTML = '<div class="r1">'+r1+'</div>'+auVolHtml('Volumen');
 }
 // sin instructor en la sala no hay audio
 function auStuPresence(){
