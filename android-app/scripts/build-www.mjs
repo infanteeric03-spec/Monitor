@@ -24,7 +24,7 @@ const info = {
   name: process.env.APK_NAME || 'dev',
   web: changes[0] ? changes[0].v : '',
   built: new Date().toISOString(),
-  repo: 'infanteeric03-spec/Monitor'
+  repo: 'infanteeric03-spec/simula-urg'
 };
 fs.writeFileSync(path.join(www, 'apk-version.json'), JSON.stringify(info, null, 2));
 console.log('www listo:', info);
