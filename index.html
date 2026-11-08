@@ -639,6 +639,8 @@
   .role-card .name{ font-size:13px; font-weight:600; }
   .role-card .desc{ font-size:10.5px; color:var(--text-dim); margin-top:3px; line-height:1.4; }
   #gateRoomStep{ display:none; }
+  /* navegadores que no redimensionan la página con el teclado (Safari): la entrada se encoge a la zona visible, centrada */
+  #gate.kb{ overflow-y:auto; }
   .code-row{ display:flex; gap:8px; margin-bottom:10px; }
   .code-row input{
     flex:1; background:var(--field); border:1px solid var(--line); color:var(--text);
@@ -3546,7 +3548,20 @@ function selectRole(r){
 }
 
 /* Teclado: en el navegador la página se redimensiona al abrirse, igual que en la APK
-   (meta viewport interactive-widget=resizes-content), así la entrada queda centrada en la zona visible. */
+   (meta viewport interactive-widget=resizes-content), así la entrada queda centrada en la zona visible.
+   Los navegadores que no lo hacen (Safari en iPhone/iPad) tapan la parte de abajo: ahí la entrada se encoge
+   a la zona visible (visualViewport), igual que en la APK, sin mover el contenido arriba. En Chrome y en la
+   APK la página ya se redimensiona, la diferencia es 0 y esto no hace nada. */
+(function(){
+  const vv = window.visualViewport; if(!vv) return;
+  const fit = ()=>{
+    const g = document.getElementById('gate'); if(!g || getComputedStyle(g).display==='none') return;
+    const kb = window.innerHeight - vv.height > 120;
+    g.classList.toggle('kb', kb);
+    g.style.height = kb ? vv.height+'px' : ''; g.style.top = kb ? vv.offsetTop+'px' : ''; g.style.bottom = kb ? 'auto' : '';
+  };
+  vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit);
+})();
 function backToRoleStep(){
   document.getElementById('gateRoomStep').style.display = 'none';
   document.getElementById('gateRoleStep').style.display = 'block';
