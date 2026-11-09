@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Propuesta · Guía rápida</title>
+<style>
+*{ box-sizing:border-box; }
+body{ margin:0; background:#e4eaec; color:#14232b; font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; padding:26px 16px 60px; }
+h1{ font-size:22px; margin:0 0 4px; } .lead{ color:#4b5d66; margin:0 0 18px; max-width:1100px; }
+h2{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:#0f5c4a; margin:30px 0 10px; }
+.row{ display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
+/* tokens */
+.L{ --bg:#f5f8f9; --card:#fff; --line:#dbe4e7; --ink:#14232b; --dim:#5c6e76; --pri:#0f5c4a; --pri2:#e3f3ee; --stu:#1d5fa8; --stu2:#e6f0fb; --art:#eef4f5; --mon:#05080a; }
+.D{ --bg:#0c1517; --card:#132024; --line:#22353a; --ink:#e3eef0; --dim:#94aaae; --pri:#1f8a66; --pri2:#173a31; --stu:#2f74c4; --stu2:#16283d; --art:#0f1a1d; --mon:#05080a; }
+/* tarjeta de la guía */
+.slide{ width:300px; background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:0 18px 40px rgba(15,40,50,.18); display:flex; flex-direction:column; }
+.art{ background:var(--art); height:170px; display:grid; place-items:center; position:relative; border-bottom:1px solid var(--line); }
+.art svg{ width:100%; height:100%; display:block; }
+.tx{ padding:14px 16px 4px; } .tx .k{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--pri); }
+.slide.s .tx .k{ color:var(--stu); }
+.tx b{ display:block; font-size:17px; line-height:1.25; margin:3px 0 4px; } .tx p{ margin:0; font-size:13.5px; color:var(--dim); }
+.ft{ display:flex; align-items:center; gap:8px; padding:12px 16px 14px; margin-top:auto; }
+.dots{ display:flex; gap:5px; } .dots i{ width:7px; height:7px; border-radius:50%; background:var(--line); } .dots i.on{ width:18px; border-radius:6px; background:var(--pri); }
+.slide.s .dots i.on{ background:var(--stu); }
+.skip{ margin-left:auto; font-size:13px; color:var(--dim); font-weight:600; }
+.nx{ background:var(--pri); color:#fff; border-radius:10px; padding:8px 14px; font-size:13.5px; font-weight:700; }
+.slide.s .nx{ background:var(--stu); }
+.mlink{ font-size:12.5px; color:var(--pri); font-weight:700; padding:0 16px 2px; }
+/* contexto */
+.tablet{ width:820px; max-width:100%; aspect-ratio:1180/820; border-radius:24px; border:10px solid #111; overflow:hidden; position:relative; background:#f5f8f9; box-shadow:0 18px 44px rgba(0,0,0,.22); }
+.tablet img, .tablet .fake{ position:absolute; inset:0; }
+.dim{ position:absolute; inset:0; background:rgba(20,35,43,.5); display:grid; place-items:center; }
+.phone{ width:300px; height:620px; border-radius:36px; border:8px solid #111; overflow:hidden; position:relative; box-shadow:0 18px 44px rgba(0,0,0,.22); background:#0c1517; }
+.phone .dim{ align-items:end; padding:0 0 12px; }
+.phone .slide{ width:270px; margin:0 auto; }
+.notes{ display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:14px; max-width:1150px; margin-top:24px; }
+.box{ background:#fff; border:1px solid #d6e0e3; border-radius:14px; padding:14px 16px; font-size:14px; } .box h3{ margin:0 0 6px; font-size:15px; } .box ul{ margin:0; padding-left:18px; } .box li{ margin:0 0 5px; }
+</style></head><body>
+
+<h1>Guía rápida · propuesta</h1>
+<p class="lead">Propuesta, sin aplicar. La guía actual tiene 16 pasos para el docente, con un foco sobre cada botón y una mano que lo señala. La propuesta la cambia por <b>tarjetas con un dibujo y una o dos frases</b>, en el mismo estilo que la nueva entrada: <b>7 pasos para el docente y 4 para el estudiante</b>. Se pasan con «Siguiente» o deslizando, y el detalle queda en el Manual de uso.</p>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+ <!-- piezas comunes -->
+ <symbol id="ecgS" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 20 H12 l2-2 2 2 H22 l2 3 3-18 3 21 2-5 H40 q4-6 8 0 H58 l2-2 2 2 H68 l2 3 3-18 3 21 2-5 H86 q4-6 8 0 H120" fill="none" stroke="#35ff6b" stroke-width="1.6" vector-effect="non-scaling-stroke"/></symbol>
+ <symbol id="plS" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 22 q6 0 9-14 q3 10 7 11 q8 2 18 2 q6 0 9-14 q3 10 7 11 q8 2 18 2 q6 0 9-14 q3 10 7 11 q8 2 18 2 q6 0 9-14" fill="none" stroke="#21d4fd" stroke-width="1.6" vector-effect="non-scaling-stroke"/></symbol>
+ <symbol id="rsS" viewBox="0 0 120 30" preserveAspectRatio="none"><path d="M0 20 q20-16 40 0 t40 0 t40 0" fill="none" stroke="#ffd400" stroke-width="1.6" vector-effect="non-scaling-stroke"/></symbol>
+ <symbol id="mini" viewBox="0 0 200 120">
+  <rect width="200" height="120" rx="10" fill="#05080a"/>
+  <svg x="8" y="10" width="130" height="30"><use href="#ecgS"/></svg><text x="190" y="32" text-anchor="end" font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="24" fill="#35ff6b">75</text>
+  <svg x="8" y="44" width="130" height="26"><use href="#plS"/></svg><text x="190" y="64" text-anchor="end" font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="20" fill="#21d4fd">98</text>
+  <svg x="8" y="72" width="130" height="20"><use href="#rsS"/></svg><text x="190" y="90" text-anchor="end" font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="16" fill="#ffd400">16</text>
+  <text x="10" y="113" font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="15" fill="#ff6e6e">120/78</text><text x="190" y="113" text-anchor="end" font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="13" fill="#eee">36.6</text>
+ </symbol>
+</defs></svg>
+
+<h2>Docente · 7 pasos</h2>
+<div class="row L">
+ <!-- 1 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="34" y="34" width="132" height="96" rx="10" fill="#fff" stroke="#c9d6da"/><rect x="42" y="42" width="116" height="62" rx="6" fill="#05080a"/><svg x="46" y="50" width="108" height="26"><use href="#ecgS"/></svg>
+   <g fill="#e3f3ee" stroke="#cfe3dc"><rect x="42" y="110" width="26" height="12" rx="3"/><rect x="72" y="110" width="26" height="12" rx="3"/><rect x="102" y="110" width="26" height="12" rx="3"/><rect x="132" y="110" width="26" height="12" rx="3"/></g>
+   <rect x="208" y="40" width="62" height="104" rx="12" fill="#fff" stroke="#c9d6da"/><use href="#mini" x="213" y="62" width="52" height="40"/>
+   <path d="M170 82 C186 70 196 70 204 82" fill="none" stroke="#0f5c4a" stroke-width="2.5" stroke-dasharray="4 4"/><circle cx="204" cy="82" r="3.5" fill="#0f5c4a"/>
+   <text x="100" y="150" text-anchor="middle" font-size="11" font-weight="700" fill="#0f5c4a">Docente</text><text x="239" y="158" text-anchor="middle" font-size="11" font-weight="700" fill="#1d5fa8">Estudiante</text></svg></div>
+  <div class="tx"><span class="k">Bienvenida</span><b>Tú llevas al paciente; ellos lo ven en su monitor.</b><p>Siete pasos para empezar.</p></div>
+  <div class="ft"><span class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Empezar</span></div></div>
+ <!-- 2 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="60" y="34" width="180" height="40" rx="20" fill="#fff" stroke="#c9d6da"/><circle cx="84" cy="54" r="5" fill="#2e9d5b"/><text x="96" y="59" font-size="15" font-weight="700" fill="#14232b">Sala 4821</text><path d="M184 46 v16 M196 46 v16" stroke="#dbe4e7"/><text x="204" y="59" font-size="14" font-weight="700" fill="#0f5c4a">👤 3</text>
+   <g font-family="Roboto Condensed,Arial Narrow,sans-serif" font-size="30" fill="#14232b" text-anchor="middle"><rect x="66" y="94" width="38" height="48" rx="8" fill="#fff" stroke="#0f5c4a" stroke-width="2"/><text x="85" y="129">4</text><rect x="112" y="94" width="38" height="48" rx="8" fill="#fff" stroke="#c9d6da"/><text x="131" y="129">8</text><rect x="158" y="94" width="38" height="48" rx="8" fill="#fff" stroke="#c9d6da"/><text x="177" y="129">2</text><rect x="204" y="94" width="38" height="48" rx="8" fill="#fff" stroke="#c9d6da"/><text x="223" y="129">1</text></g></svg></div>
+  <div class="tx"><span class="k">Sala</span><b>Comparte el código de tu sala.</b><p>Arriba ves cuántos estudiantes están conectados.</p></div>
+  <div class="ft"><span class="dots"><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <!-- 3 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <g><rect x="22" y="30" width="150" height="56" rx="9" fill="#fff" stroke="#dbe4e7"/><rect x="22" y="30" width="150" height="5" rx="2" fill="#ff6e6e"/><text x="32" y="50" font-size="10" font-weight="700" fill="#5c6e76">TA</text>
+    <g font-size="12" font-weight="700" fill="#14232b" text-anchor="middle"><rect x="30" y="58" width="30" height="20" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><text x="45" y="72">−5</text><rect x="64" y="58" width="30" height="20" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><text x="79" y="72">+5</text><rect x="100" y="58" width="30" height="20" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><text x="115" y="72">−5</text><rect x="134" y="58" width="30" height="20" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><text x="149" y="72">+5</text></g></g>
+   <g><rect x="180" y="30" width="98" height="56" rx="9" fill="#fff" stroke="#dbe4e7"/><rect x="180" y="30" width="98" height="5" rx="2" fill="#3ddc84"/><text x="190" y="50" font-size="10" font-weight="700" fill="#5c6e76">FC</text>
+    <g font-size="12" font-weight="700" fill="#14232b" text-anchor="middle"><rect x="188" y="58" width="40" height="20" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><text x="208" y="72">−5</text><rect x="232" y="58" width="40" height="20" rx="5" fill="#e3f3ee" stroke="#0f5c4a" stroke-width="1.5"/><text x="252" y="72">+5</text></g></g>
+   <g><rect x="22" y="94" width="82" height="50" rx="9" fill="#fff" stroke="#dbe4e7"/><rect x="22" y="94" width="82" height="5" rx="2" fill="#29b6f6"/><rect x="110" y="94" width="82" height="50" rx="9" fill="#fff" stroke="#dbe4e7"/><rect x="110" y="94" width="82" height="5" rx="2" fill="#ffca28"/><rect x="198" y="94" width="80" height="50" rx="9" fill="#fff" stroke="#dbe4e7"/><rect x="198" y="94" width="80" height="5" rx="2" fill="#9aa7ad"/>
+    <g font-size="9.5" font-weight="700" fill="#5c6e76"><text x="30" y="112">SpO₂</text><text x="118" y="112">FR</text><text x="206" y="112">Tª</text></g>
+    <g fill="#f5f8f9" stroke="#dbe4e7"><rect x="30" y="118" width="32" height="18" rx="5"/><rect x="66" y="118" width="32" height="18" rx="5"/><rect x="118" y="118" width="32" height="18" rx="5"/><rect x="154" y="118" width="32" height="18" rx="5"/><rect x="206" y="118" width="32" height="18" rx="5"/><rect x="242" y="118" width="32" height="18" rx="5"/></g></g>
+   <circle cx="252" cy="68" r="14" fill="none" stroke="#0f5c4a" stroke-width="2" opacity=".5"/></svg></div>
+  <div class="tx"><span class="k">Constantes</span><b>Cambia cada constante con − y +.</b><p>Con <b style="display:inline;font-size:inherit">Sincro</b> activado, el estudiante lo ve al instante.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <!-- 4 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="24" y="30" width="176" height="34" rx="8" fill="#fff" stroke="#dbe4e7"/><text x="36" y="52" font-size="13" font-weight="600" fill="#14232b">Fibrilación auricular</text><path d="M182 44 l5 5 5-5" fill="none" stroke="#5c6e76" stroke-width="2"/>
+   <rect x="208" y="30" width="68" height="34" rx="8" fill="#0f5c4a"/><text x="242" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Enviar</text>
+   <rect x="24" y="76" width="252" height="70" rx="10" fill="#fff" stroke="#dbe4e7"/><rect x="24" y="76" width="5" height="70" rx="2" fill="#0f5c4a"/>
+   <text x="40" y="96" font-size="10" font-weight="800" fill="#8a9aa1" letter-spacing="1">FICHA DEL RITMO</text>
+   <rect x="40" y="104" width="96" height="34" rx="4" fill="#fdf0f0"/><path d="M40 124 H52 l2 3 3-14 3 16 2-5 H70 q2-4 5-1 q3 3 5-1 q2-4 5 0 H92 l2 3 3-14 3 16 2-5 H136" stroke="#333" stroke-width="1.2" fill="none"/>
+   <rect x="146" y="106" width="116" height="7" rx="3" fill="#dbe4e7"/><rect x="146" y="119" width="96" height="7" rx="3" fill="#dbe4e7"/><rect x="146" y="132" width="106" height="7" rx="3" fill="#dbe4e7"/></svg></div>
+  <div class="tx"><span class="k">Ritmo</span><b>Elige el ritmo y envía su ficha.</b><p>El estudiante ve el nombre y el ECG de 12 derivaciones.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <!-- 5 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="24" y="26" width="252" height="120" rx="12" fill="#fff" stroke="#dbe4e7"/>
+   <g font-size="11" font-weight="800" fill="#8a9aa1" text-anchor="middle"><text x="70" y="48">RITMO</text><text x="150" y="48" fill="#0f5c4a">CASO</text><text x="230" y="48" fill="#0f5c4a">PREGUNTAS</text></g>
+   <path d="M110 56 H190" stroke="#0f5c4a" stroke-width="3"/><path d="M24 57 H276" stroke="#dbe4e7"/>
+   <rect x="38" y="68" width="110" height="64" rx="8" fill="#f5f8f9" stroke="#dbe4e7"/><text x="48" y="86" font-size="10.5" font-weight="700" fill="#14232b">Dolor torácico</text><rect x="48" y="94" width="88" height="6" rx="3" fill="#dbe4e7"/><rect x="48" y="104" width="70" height="6" rx="3" fill="#dbe4e7"/><rect x="48" y="116" width="44" height="10" rx="5" fill="#0f5c4a"/>
+   <rect x="156" y="68" width="106" height="64" rx="8" fill="#f5f8f9" stroke="#dbe4e7"/><text x="166" y="86" font-size="10.5" font-weight="700" fill="#14232b">¿Qué ritmo es?</text>
+   <g fill="#fff" stroke="#dbe4e7"><rect x="166" y="92" width="86" height="10" rx="4"/><rect x="166" y="105" width="86" height="10" rx="4" stroke="#0f5c4a"/><rect x="166" y="118" width="86" height="10" rx="4"/></g></svg></div>
+  <div class="tx"><span class="k">Casos y preguntas</span><b>Lanza un caso clínico o envía una pregunta.</b><p>El caso avanza solo; la respuesta del estudiante te llega al momento.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <!-- 6 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <use href="#mini" x="40" y="34" width="220" height="132"/>
+   <g transform="translate(196 6)"><rect width="22" height="18" rx="5" fill="#0b1113" stroke="#3a5054"/><rect x="5" y="4" width="12" height="8" rx="1.5" fill="none" stroke="#9cb" stroke-width="1.5"/>
+   <rect x="28" width="22" height="18" rx="5" fill="#0b1113" stroke="#3a5054"/><path d="M34 12 l10-6 M40 6 h4 v4 M34 12 h-0" stroke="#9cb" stroke-width="1.6" fill="none"/></g>
+   <circle cx="207" cy="15" r="14" fill="none" stroke="#0f5c4a" stroke-width="2" opacity=".7"/><circle cx="235" cy="15" r="14" fill="none" stroke="#0f5c4a" stroke-width="2" opacity=".7"/></svg></div>
+  <div class="tx"><span class="k">Monitor</span><b>Amplía tu monitor o el del estudiante.</b><p>📺 lo amplía en su pantalla; ⤢ solo en la tuya.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <!-- 7 -->
+ <div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="70" y="20" width="160" height="136" rx="14" fill="#f5f8f9" stroke="#dbe4e7"/>
+   <rect x="82" y="32" width="136" height="24" rx="8" fill="#e9eff1"/><rect x="128" y="35" width="44" height="18" rx="6" fill="#fff"/>
+   <g font-size="9" font-weight="700" text-anchor="middle" fill="#5c6e76"><text x="104" y="48">General</text><text x="150" y="48" fill="#0f5c4a">Clase</text><text x="196" y="48">Estud.</text></g>
+   <g fill="#fff" stroke="#dbe4e7"><rect x="82" y="64" width="136" height="24" rx="7"/><rect x="82" y="94" width="136" height="24" rx="7"/></g>
+   <rect x="82" y="124" width="136" height="24" rx="7" fill="#e3f3ee" stroke="#bfe3cc"/><text x="150" y="140" text-anchor="middle" font-size="10" font-weight="700" fill="#0f5c4a">📖 Manual de uso</text>
+   <rect x="236" y="20" width="34" height="30" rx="8" fill="#fff" stroke="#dbe4e7"/><path d="M245 29 h16 M245 35 h16 M245 41 h16" stroke="#5c6e76" stroke-width="2"/></svg></div>
+  <div class="tx"><span class="k">Menú</span><b>En ☰ tienes el resto de opciones.</b><p>Tema, alarmas, audio en directo y el Manual de uso con todo el detalle.</p></div>
+  <div class="mlink">Abrir el manual ›</div>
+  <div class="ft"><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i></span><span class="skip">Repetir</span><span class="nx">¡Listo!</span></div></div>
+</div>
+
+<h2>Estudiante · 4 pasos</h2>
+<div class="row L">
+ <div class="slide s"><div class="art"><svg viewBox="0 0 300 170"><rect x="104" y="14" width="92" height="146" rx="16" fill="#fff" stroke="#c9d6da"/><use href="#mini" x="110" y="40" width="80" height="60"/><rect x="112" y="108" width="40" height="22" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/><rect x="156" y="108" width="32" height="22" rx="5" fill="#f5f8f9" stroke="#dbe4e7"/></svg></div>
+  <div class="tx"><span class="k">Bienvenida</span><b>Esta pantalla es el monitor de tu paciente.</b><p>El docente controla lo que ves.</p></div>
+  <div class="ft"><span class="dots"><i class="on"></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Empezar</span></div></div>
+ <div class="slide s"><div class="art"><svg viewBox="0 0 300 170"><use href="#mini" x="24" y="20" width="200" height="120"/>
+   <g font-size="10" font-weight="700"><path d="M214 34 H236" stroke="#35ff6b"/><text x="240" y="38" fill="#14232b">FC</text><path d="M214 74 H236" stroke="#21d4fd"/><text x="240" y="78" fill="#14232b">SpO₂</text><path d="M214 104 H236" stroke="#ffd400"/><text x="240" y="108" fill="#14232b">FR</text><path d="M60 140 V152" stroke="#ff6e6e"/><text x="44" y="164" fill="#14232b">TA · TAM</text></g></svg></div>
+  <div class="tx"><span class="k">Cómo leerlo</span><b>Cada cifra va junto a su curva.</b><p>FC, SpO₂ y FR a la derecha; TA y Tª abajo.</p></div>
+  <div class="ft"><span class="dots"><i></i><i class="on"></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <div class="slide s"><div class="art"><svg viewBox="0 0 300 170"><use href="#mini" x="50" y="30" width="200" height="120"/><rect x="216" y="36" width="26" height="20" rx="5" fill="#0b1113" stroke="#3a5054"/><path d="M223 50 l12-8 M229 42 h6 v6" stroke="#9cb" stroke-width="1.6" fill="none"/><circle cx="229" cy="46" r="17" fill="none" stroke="#7db5f2" stroke-width="2"/><text x="58" y="26" font-size="10" font-weight="700" fill="#1d5fa8">ECG · II ▾</text></svg></div>
+  <div class="tx"><span class="k">Monitor</span><b>⤢ lo amplía a pantalla completa.</b><p>Toca «ECG · II» para cambiar la derivación.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i class="on"></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div>
+ <div class="slide s"><div class="art"><svg viewBox="0 0 300 170"><use href="#mini" x="18" y="34" width="160" height="96"/><rect x="186" y="34" width="96" height="96" rx="10" fill="#fff" stroke="#dbe4e7"/><text x="196" y="54" font-size="10" font-weight="700" fill="#14232b">Caso clínico</text><rect x="196" y="62" width="74" height="6" rx="3" fill="#dbe4e7"/><rect x="196" y="72" width="60" height="6" rx="3" fill="#dbe4e7"/><rect x="196" y="88" width="76" height="12" rx="5" fill="#e6f0fb" stroke="#1d5fa8"/><rect x="196" y="104" width="76" height="12" rx="5" fill="#fff" stroke="#dbe4e7"/></svg></div>
+  <div class="tx"><span class="k">Durante la sesión</span><b>El caso, las preguntas y la ficha aparecen a tu lado.</b><p>Responde tocando la opción.</p></div>
+  <div class="ft"><span class="dots"><i></i><i></i><i></i><i class="on"></i></span><span class="skip">Repetir</span><span class="nx">¡Listo!</span></div></div>
+</div>
+
+<h2>Cómo se ve en la app</h2>
+<div class="row">
+ <div class="tablet"><div class="fake" style="background:#f5f8f9">
+   <div style="height:44px;background:#fff;border-bottom:1px solid #dbe4e7;display:flex;align-items:center;padding:0 14px;gap:8px;font-weight:800;color:#0f5c4a">SimulaURG <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:#e3f3ee;color:#0a3f33">Docente</span></div>
+   <div style="position:absolute;left:10px;top:54px;width:61%;height:62%;background:#05080a;border-radius:10px"></div>
+   <div style="position:absolute;left:10px;top:calc(54px + 62% + 8px);width:61%;bottom:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px"><div style="background:#fff;border-radius:8px;border-top:3px solid #ff6e6e"></div><div style="background:#fff;border-radius:8px;border-top:3px solid #3ddc84"></div><div style="background:#fff;border-radius:8px;border-top:3px solid #29b6f6"></div><div style="background:#fff;border-radius:8px;border-top:3px solid #ffca28"></div><div style="background:#fff;border-radius:8px;border-top:3px solid #9aa7ad"></div></div>
+   <div style="position:absolute;right:10px;top:54px;width:35%;bottom:10px;background:#fff;border-radius:12px;border:1px solid #dbe4e7"></div></div>
+  <div class="dim L"><div class="slide"><div class="art"><svg viewBox="0 0 300 170">
+   <rect x="24" y="30" width="176" height="34" rx="8" fill="#fff" stroke="#dbe4e7"/><text x="36" y="52" font-size="13" font-weight="600" fill="#14232b">Fibrilación auricular</text><rect x="208" y="30" width="68" height="34" rx="8" fill="#0f5c4a"/><text x="242" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Enviar</text>
+   <rect x="24" y="76" width="252" height="70" rx="10" fill="#fff" stroke="#dbe4e7"/><rect x="24" y="76" width="5" height="70" rx="2" fill="#0f5c4a"/><text x="40" y="96" font-size="10" font-weight="800" fill="#8a9aa1" letter-spacing="1">FICHA DEL RITMO</text><rect x="40" y="104" width="96" height="34" rx="4" fill="#fdf0f0"/><rect x="146" y="106" width="116" height="7" rx="3" fill="#dbe4e7"/><rect x="146" y="119" width="96" height="7" rx="3" fill="#dbe4e7"/></svg></div>
+   <div class="tx"><span class="k">Ritmo</span><b>Elige el ritmo y envía su ficha.</b><p>El estudiante ve el nombre y el ECG de 12 derivaciones.</p></div>
+   <div class="ft"><span class="dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div></div>
+ </div>
+ <div class="phone"><div style="position:absolute;inset:0;background:#0c1517"><div style="height:52px;background:#101b1e;border-bottom:1px solid #22353a"></div><div style="margin:8px;height:250px;background:#05080a;border-radius:10px;border:1px solid #1c2a2c"></div></div>
+  <div class="dim D"><div class="slide s"><div class="art"><svg viewBox="0 0 300 170"><use href="#mini" x="24" y="20" width="200" height="120"/><g font-size="10" font-weight="700"><path d="M214 34 H236" stroke="#35ff6b"/><text x="240" y="38" fill="#e3eef0">FC</text><path d="M214 74 H236" stroke="#21d4fd"/><text x="240" y="78" fill="#e3eef0">SpO₂</text><path d="M214 104 H236" stroke="#ffd400"/><text x="240" y="108" fill="#e3eef0">FR</text></g></svg></div>
+   <div class="tx"><span class="k">Cómo leerlo</span><b>Cada cifra va junto a su curva.</b><p>FC, SpO₂ y FR a la derecha; TA y Tª abajo.</p></div>
+   <div class="ft"><span class="dots"><i></i><i class="on"></i><i></i><i></i></span><span class="skip">Saltar</span><span class="nx">Siguiente</span></div></div></div>
+ </div>
+</div>
+
+<div class="notes">
+ <div class="box"><h3>Cómo funciona</h3><ul>
+  <li>Sale sola la primera vez en cada papel, como ahora, y se repite desde ☰ › General › Guías › Rápida.</li>
+  <li>Es una tarjeta centrada en la tablet y el ordenador, y una hoja abajo en el móvil, sobre la app oscurecida. Se pasa con «Siguiente» o deslizando, y se cierra con «Saltar» o con atrás.</li>
+  <li>Sigue el tema elegido: claro u oscuro.</li></ul></div>
+ <div class="box"><h3>Qué cambia respecto a la actual</h3><ul>
+  <li>Pasa de 16 a 7 pasos en el docente y de 5 a 4 en el estudiante.</li>
+  <li>Un dibujo propio en cada paso, en lugar del foco sobre la pantalla real y la mano.</li>
+  <li>Una frase destacada y, como mucho, otra de apoyo. El detalle (banco de ECG, RCP, compás, audio…) queda en el Manual de uso.</li></ul></div>
+ <div class="box"><h3>Para decidir</h3><ul>
+  <li>¿Quitamos el foco sobre la pantalla real? Otra opción es mantenerlo de fondo, iluminando la zona de cada paso detrás de la tarjeta.</li>
+  <li>¿Algún paso más? Por ejemplo, el audio en directo o el banco de ECG para el docente.</li></ul></div>
+</div>
+</body></html>
