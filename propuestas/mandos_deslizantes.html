@@ -64,15 +64,15 @@
   .side .pl{ align-self:flex-start; border:1px solid var(--green); border-radius:7px; padding:3px 9px; color:var(--green); font-family:ui-monospace,monospace; background:var(--tint); }
   .side .fi{ border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; padding:7px 9px; font-weight:700; color:var(--ink); font-size:12px; }
   .pad{ position:relative; border-radius:10px; background:#fff; border:1px solid var(--line); touch-action:none; user-select:none; -webkit-user-select:none;
-    display:flex; flex-direction:column; justify-content:center; padding:2px 12px 2px 8px; overflow:hidden; cursor:ns-resize; transition:box-shadow .15s, border-color .15s; min-width:0; }
+    display:flex; flex-direction:column; justify-content:center; padding:2px 15px 2px 8px; overflow:hidden; cursor:ns-resize; transition:box-shadow .15s, border-color .15s; min-width:0; }
   .pad::before{ content:""; position:absolute; left:0; right:0; top:0; height:4px; background:var(--c); opacity:.9; }
   .pad .nm{ font-size:10px; font-weight:700; color:var(--mut); letter-spacing:.02em; display:flex; align-items:center; gap:4px; white-space:nowrap; }
   .pad .nm .gr{ display:none; }
-  .pad .vl{ font-size:clamp(14px, 6.5cqh, 26px); white-space:nowrap; font-weight:600; font-variant-numeric:tabular-nums; font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif; letter-spacing:-.02em; line-height:1.05; }
+  .pad .vl{ font-size:var(--vf, 20px); white-space:nowrap; overflow:hidden; max-width:100%; font-weight:600; font-variant-numeric:tabular-nums; font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif; letter-spacing:-.02em; line-height:1.05; }
   .pad .vl small{ font-size:.5em; color:var(--mut); font-weight:500; margin-left:2px; }
   .pad.drag{ border-color:var(--cd); box-shadow:0 0 0 3px color-mix(in srgb, var(--cd) 22%, transparent); }
-  .port .pad{ padding:2px 9px 2px 6px; }
-  .port .pad .vl{ font-size:clamp(13px, 2.3cqh, 20px); letter-spacing:-.03em; }
+  .port .pad{ padding:2px 13px 2px 6px; }
+  .port .pad .vl{ letter-spacing:-.03em; }
   .port .pad .vl small{ display:none; }
   .port .pads{ grid-template-columns:1.6fr 1fr 1fr 1fr 1.15fr; }
   .pad .rail{ position:absolute; right:4px; top:8px; bottom:5px; width:3px; border-radius:3px; background:#eef3f4; }
@@ -283,6 +283,27 @@ $('mode').onclick=e=>{ const b=e.target.closest('button'); if(b) setMode(b.datas
 $('sens').oninput=e=>{ sens=+e.target.value; $('sensV').textContent=sens; };
 $('vib').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; vibOn=b.dataset.v==='1'; document.querySelectorAll('#vib button').forEach(x=>x.classList.toggle('on',x===b)); };
 paint();
+
+/* Tamaño de las cifras: el mayor que quepa en TODAS las tarjetas con su valor más ancho posible,
+   igual para todas, y sin invadir la marca lateral. Se recalcula al cambiar el tamaño. */
+const WIDEST = { ta:'260/180', fc:'250', spo2:'100%', fr:'60', t:'43,0°' };
+const meas = document.createElement('span'); meas.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;left:-9999px;top:0';
+document.body.appendChild(meas);
+function fitNums(){
+  const pads=[...document.querySelectorAll('.pads .pad')]; if(!pads.length || !pads[0].offsetWidth) return;
+  const vl0=pads[0].querySelector('.vl'), cs=getComputedStyle(vl0);
+  meas.style.fontFamily=cs.fontFamily; meas.style.fontWeight=cs.fontWeight; meas.style.letterSpacing=cs.letterSpacing;
+  let best=40;
+  for(const el of pads){ const pcs=getComputedStyle(el);
+    const w=el.clientWidth-parseFloat(pcs.paddingLeft)-parseFloat(pcs.paddingRight)-2;
+    const h=el.clientHeight-(el.querySelector('.nm').offsetHeight)-8;
+    meas.innerHTML=WIDEST[el.dataset.k].replace('%','<small style="font-size:.5em">%</small>').replace('°','<small style="font-size:.5em">°</small>');
+    meas.style.fontSize='100px'; const r=meas.offsetWidth/100;
+    best=Math.min(best, w/r, h/1.05); }
+  document.documentElement.style.setProperty('--vf', Math.max(11, Math.floor(best))+'px');
+}
+new ResizeObserver(fitNums).observe(document.querySelector('.pads'));
+if(document.fonts) document.fonts.ready.then(fitNums);
 
 // monitor simulado (ECG, SpO₂, FR)
 const cv=$('cv'), cx=cv.getContext('2d'); let x=0, last=performance.now(), ph=0, phr=0;
