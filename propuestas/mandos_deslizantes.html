@@ -27,26 +27,56 @@
   .hdr .lab{ background:var(--tint); color:var(--green); font-weight:700; border-radius:6px; padding:2px 7px; font-size:11px; }
   .body{ flex:1; min-height:0; display:flex; gap:6px; padding:6px; }
   .port .body{ flex-direction:column; }
+  .left{ flex:1.27; min-width:0; min-height:0; display:flex; flex-direction:column; gap:6px; }
+  .port .left{ flex:none; }
   .mon{ flex:1; min-width:0; min-height:0; background:#05080a; border-radius:10px; position:relative; overflow:hidden; }
-  .port .mon{ flex:none; height:38%; }
+  .port .mon{ flex:none; height:24cqh; }
   .mon canvas{ position:absolute; inset:0; width:100%; height:100%; }
 
-  /* ---- columna de mandos ---- */
-  .pads{ flex:none; display:grid; gap:6px; }
-  .land .pads{ width:30%; grid-template-columns:1fr 1fr; grid-auto-rows:1fr; }
-  .land .pads .pad.ta{ grid-column:1 / -1; }
-  .port .pads{ flex:1; grid-template-columns:1fr 1fr; grid-auto-rows:1fr; }
-  .port .pads .pad.ta{ grid-column:1 / -1; }
-  .pad{ position:relative; border-radius:12px; background:#fff; border:1px solid var(--line); touch-action:none; user-select:none; -webkit-user-select:none;
-    display:flex; flex-direction:column; justify-content:center; padding:4px 10px; overflow:hidden; cursor:ns-resize; transition:box-shadow .15s, border-color .15s; }
-  .pad::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--c); opacity:.9; }
-  .pad .nm{ font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.02em; display:flex; align-items:center; gap:4px; }
-  .pad .nm .gr{ margin-left:auto; opacity:.45; font-size:12px; line-height:1; }
-  .pad .vl{ font-size:clamp(18px, 7cqh, 30px); font-weight:600; font-variant-numeric:tabular-nums; font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif; letter-spacing:-.02em; line-height:1.05; }
+  /* ---- fila de pulsadores bajo el monitor ---- */
+  .pads{ flex:none; display:grid; gap:5px; grid-template-columns:1.55fr 1fr 1fr 1fr 1fr; }
+  .land .pads{ height:21cqh; }
+  .port .pads{ height:8.5cqh; }
+  body.m-btn .pads{ display:none; }
+
+  /* ---- botones −/+ actuales (para comparar) ---- */
+  .olds{ display:none; flex:none; flex-direction:column; gap:5px; }
+  body.m-btn .olds{ display:flex; }
+  .land .olds{ height:44cqh; }
+  .port .olds{ height:21cqh; }
+  .olds .orow{ flex:1; display:grid; gap:5px; }
+  .olds .orow.a{ grid-template-columns:2fr 1fr; } .olds .orow.b{ grid-template-columns:1fr 1fr 1.3fr; }
+  .oc2{ background:#fff; border:1px solid var(--line); border-top:4px solid var(--c); border-radius:10px; padding:3px 6px; display:flex; flex-direction:column; min-height:0; }
+  .oc2 .nm{ font-size:9.5px; color:var(--mut); letter-spacing:.06em; }
+  .oc2 .bb{ flex:1; display:flex; gap:4px; margin-top:2px; min-height:0; }
+  .oc2 button{ flex:1; border:1px solid var(--line); background:#f3f6f7; border-radius:8px; font:inherit; font-size:13px; color:var(--ink); padding:0; cursor:pointer; }
+
+  /* ---- columna derecha (pestañas) ---- */
+  .side{ flex:1; min-width:0; min-height:0; background:#fff; border:1px solid var(--line); border-radius:12px; display:flex; flex-direction:column; overflow:hidden; }
+  .side .tb{ display:flex; border-bottom:1px solid var(--line); font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--mut); }
+  .side .tb span{ flex:1; text-align:center; padding:8px 2px; white-space:nowrap; }
+  .side .tb span.on{ color:var(--green); box-shadow:inset 0 -3px 0 var(--green); }
+  .side .tb span.ic{ flex:none; width:34px; border-left:1px solid var(--line); color:var(--green); }
+  .side .sc{ padding:8px 10px; font-size:11px; color:var(--mut); display:flex; flex-direction:column; gap:7px; overflow:auto; }
+  .side .sel{ display:flex; gap:6px; }
+  .side .sel div{ flex:1; border:1px solid var(--line); background:#f5f8f9; border-radius:8px; padding:7px 9px; color:var(--ink); font-size:12px; }
+  .side .sel b{ flex:none; width:34px; border:1.5px solid var(--green); border-radius:8px; display:grid; place-items:center; color:var(--green); }
+  .side .pl{ align-self:flex-start; border:1px solid var(--green); border-radius:7px; padding:3px 9px; color:var(--green); font-family:ui-monospace,monospace; background:var(--tint); }
+  .side .fi{ border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; padding:7px 9px; font-weight:700; color:var(--ink); font-size:12px; }
+  .pad{ position:relative; border-radius:10px; background:#fff; border:1px solid var(--line); touch-action:none; user-select:none; -webkit-user-select:none;
+    display:flex; flex-direction:column; justify-content:center; padding:2px 12px 2px 8px; overflow:hidden; cursor:ns-resize; transition:box-shadow .15s, border-color .15s; min-width:0; }
+  .pad::before{ content:""; position:absolute; left:0; right:0; top:0; height:4px; background:var(--c); opacity:.9; }
+  .pad .nm{ font-size:10px; font-weight:700; color:var(--mut); letter-spacing:.02em; display:flex; align-items:center; gap:4px; white-space:nowrap; }
+  .pad .nm .gr{ display:none; }
+  .pad .vl{ font-size:clamp(14px, 6.5cqh, 26px); white-space:nowrap; font-weight:600; font-variant-numeric:tabular-nums; font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif; letter-spacing:-.02em; line-height:1.05; }
   .pad .vl small{ font-size:.5em; color:var(--mut); font-weight:500; margin-left:2px; }
   .pad.drag{ border-color:var(--cd); box-shadow:0 0 0 3px color-mix(in srgb, var(--cd) 22%, transparent); }
-  .pad .rail{ position:absolute; right:8px; top:8px; bottom:8px; width:4px; border-radius:4px; background:#eef3f4; }
-  .pad .rail i{ position:absolute; left:-3px; width:10px; height:10px; border-radius:50%; background:var(--cd); top:50%; transform:translateY(-50%); transition:top .05s; }
+  .port .pad{ padding:2px 9px 2px 6px; }
+  .port .pad .vl{ font-size:clamp(13px, 2.3cqh, 20px); letter-spacing:-.03em; }
+  .port .pad .vl small{ display:none; }
+  .port .pads{ grid-template-columns:1.6fr 1fr 1fr 1fr 1.15fr; }
+  .pad .rail{ position:absolute; right:4px; top:8px; bottom:5px; width:3px; border-radius:3px; background:#eef3f4; }
+  .pad .rail i{ position:absolute; left:-2.5px; width:8px; height:8px; border-radius:50%; background:var(--cd); top:50%; transform:translateY(-50%); transition:top .05s; }
   .pad.ta .two{ display:flex; gap:10px; align-items:baseline; }
   #c-fc{ --c:#35c46b; --cd:#0c8a3a; } #c-spo2{ --c:var(--spo2); --cd:#0a78a6; } #c-fr{ --c:var(--resp); --cd:#9a7100; }
   #c-ta{ --c:var(--bp); --cd:#c62828; } #c-t{ --c:#9aa9ad; --cd:#4c5d61; }
@@ -98,7 +128,8 @@
 <div class="doc">
   <span class="tag">Maqueta · no aplicada</span>
   <h1>Mandos deslizantes para el docente en el móvil</h1>
-  <p>Cada constante es un <b>pulsador</b>: se mantiene pulsado y se desliza el dedo <b>hacia arriba para subir</b> y <b>hacia abajo para bajar</b>. Mientras se desliza, aparece el valor grande junto al dedo y una marca en el lateral. Al soltar, se envía. Pruébalo con el ratón o, mejor, abriéndolo en el móvil.</p>
+  <p>La distribución es la actual del docente: <b>monitor y mandos a la izquierda</b>, y a la derecha la <b>columna de Ritmo, Caso clínico y Preguntas, que no cambia</b>. Solo se sustituyen las dos filas de botones −/+ por <b>una fila de pulsadores</b>, y el monitor gana ese alto.</p>
+  <p>Cada pulsador se mantiene pulsado y se desliza <b>hacia arriba para subir</b> y <b>hacia abajo para bajar</b>; junto al dedo sale el valor en grande. Un toque en la TA abre sistólica y diastólica por separado. Usa «Tipo de mando › Botones −/+» para comparar con la vista actual.</p>
 
   <div class="tabs" id="orient">
     <button class="on" data-o="land">Móvil en horizontal</button>
@@ -112,15 +143,35 @@
         <button class="exit" id="exit">✕</button>
         <div class="hdr"><b>SimulaURG</b><span class="lab">Docente</span><span class="r">Sala 4821 · 👤 3 · ☰</span></div>
         <div class="body">
+         <div class="left">
           <div class="mon"><canvas id="cv"></canvas></div>
+          <div class="olds">
+            <div class="orow a">
+              <div class="oc2" style="--c:#ff7a7a"><div class="nm">TA</div><div class="bb"><button data-o="sis:-5">−5</button><button data-o="sis:5">+5</button><button data-o="dia:-5">−5</button><button data-o="dia:5">+5</button></div></div>
+              <div class="oc2" style="--c:#35c46b"><div class="nm">FC</div><div class="bb"><button data-o="fc:-5">−5</button><button data-o="fc:5">+5</button></div></div></div>
+            <div class="orow b">
+              <div class="oc2" style="--c:#21b4ea"><div class="nm">SPO₂</div><div class="bb"><button data-o="spo2:-2">−2</button><button data-o="spo2:2">+2</button></div></div>
+              <div class="oc2" style="--c:#f2c200"><div class="nm">FR</div><div class="bb"><button data-o="fr:-2">−2</button><button data-o="fr:2">+2</button></div></div>
+              <div class="oc2" style="--c:#9aa9ad"><div class="nm">Tª</div><div class="bb"><button data-o="t:-2">−0,2</button><button data-o="t:2">+0,2</button></div></div></div>
+          </div>
           <div class="pads">
-            <div class="pad ta" id="c-ta" data-k="ta"><div class="nm">TA <span class="note" style="font-weight:500">· toca para separar</span><span class="gr">⇕</span></div>
-              <div class="two"><span class="vl" id="v-ta">120/80</span><span class="note" id="v-pam">(93)</span></div><div class="rail"><i></i></div></div>
+            <div class="pad ta" id="c-ta" data-k="ta"><div class="nm">TA <span style="font-weight:500;opacity:.7" id="v-pam">(93)</span></div>
+              <div class="vl" id="v-ta">120/80</div><div class="rail"><i></i></div></div>
             <div class="pad" id="c-fc" data-k="fc"><div class="nm">FC<span class="gr">⇕</span></div><div class="vl" id="v-fc">80</div><div class="rail"><i></i></div></div>
             <div class="pad" id="c-spo2" data-k="spo2"><div class="nm">SpO₂<span class="gr">⇕</span></div><div class="vl" id="v-spo2">98<small>%</small></div><div class="rail"><i></i></div></div>
             <div class="pad" id="c-fr" data-k="fr"><div class="nm">FR<span class="gr">⇕</span></div><div class="vl" id="v-fr">16</div><div class="rail"><i></i></div></div>
             <div class="pad" id="c-t" data-k="t"><div class="nm">Tª<span class="gr">⇕</span></div><div class="vl" id="v-t">36,8<small>°</small></div><div class="rail"><i></i></div></div>
           </div>
+         </div>
+         <div class="side">
+           <div class="tb"><span class="on">RITMO</span><span>CASO CLÍNICO</span><span>PREGUNTAS</span><span class="ic">∿</span></div>
+           <div class="sc">RITMO CARDIACO
+             <div class="sel"><div>Ritmo sinusal normal ⌄</div><b>➤</b></div>
+             <span class="pl">● pulso presente</span>
+             <div class="fi">Ritmo sinusal normal</div>
+             <span class="note">Esta columna no cambia: Ritmo, Caso clínico, Preguntas y Banco de ECG siguen igual.</span>
+           </div>
+         </div>
         </div>
         <div class="taPop" id="taPop"><div class="taBox">
           <div class="tt">Tensión arterial · desliza cada una<button id="taOk">Listo</button></div>
@@ -152,18 +203,12 @@
   <h2>¿Es viable?</h2>
   <ul>
     <li><b>Sí, técnicamente es sencillo:</b> son eventos de puntero que ya usa la app (compás, caja de tiempo de la PCR). No necesita librerías y funciona igual en la web, en el iPhone y en la APK.</li>
-    <li><b>Ahorro de espacio:</b> en horizontal desaparecen las dos filas de botones −/+; cada constante cabe en una tarjeta pequeña y el monitor gana alrededor de un 20–25 % de ancho.</li>
+    <li><b>Ahorro de espacio:</b> en horizontal, las dos filas de botones −/+ (casi la mitad de la columna izquierda) pasan a una sola fila baja; el monitor gana alrededor de un 25 % de alto. La columna derecha no se toca.</li>
     <li><b>TA:</b> deslizar sobre la tarjeta mueve las dos cifras a la vez (mantiene la diferencia); un toque abre sistólica y diastólica por separado.</li>
     <li><b>Riesgos a cuidar:</b> que el gesto no desplace la página (se bloquea con <code>touch-action:none</code>), que un toque corto no cambie nada por accidente, y que se envíe al estudiante al soltar (o como mucho cada 300 ms) para no saturar Supabase.</li>
     <li><b>Propuesta:</b> activarlo solo en el móvil, con la opción de volver a los botones −/+ en Configuración. En tablet y ordenador seguirían los botones.</li>
   </ul>
 
-  <div class="cmp">
-    <div class="box"><h3>Ahora (botones −/+)</h3>
-      <div class="old"><div class="oc">TA<div><span>−</span><span>+</span><span>−</span><span>+</span></div></div><div class="oc">FC<div><span>−</span><span>+</span></div></div>
-        <div class="oc">SpO₂<div><span>−</span><span>+</span></div></div><div class="oc">FR<div><span>−</span><span>+</span></div></div></div></div>
-    <div class="box"><h3>Con pulsadores</h3><p class="note">Las mismas cinco constantes en la mitad de alto, sin botones: el valor queda siempre visible y el gesto sirve en toda la tarjeta.</p></div>
-  </div>
 </div>
 <div class="bubble" id="bubble"></div>
 
@@ -218,6 +263,7 @@ function bindPad(el){
 }
 function buzz(){ if(vibOn && navigator.vibrate) try{ navigator.vibrate(4); }catch(_){} }
 document.querySelectorAll('.pad').forEach(bindPad);
+document.querySelectorAll('.olds button').forEach(b=>b.onclick=()=>{ const [k,n]=b.dataset.o.split(':'); step(k,+n); paint(); });
 $('taOk').onclick=()=>$('taPop').classList.remove('open');
 $('taPop').addEventListener('pointerdown',e=>{ if(e.target.id==='taPop') $('taPop').classList.remove('open'); });
 
@@ -231,8 +277,8 @@ addEventListener('resize',()=>{ if(document.body.classList.contains('full')) $('
 // ajustes
 const HELP={ slide:'Desliza: cada tramo de recorrido sube o baja un paso. Para cambios grandes, haz un gesto largo.',
   joy:'Joystick: separa el dedo del punto inicial y mantenlo; cuanto más lejos, más rápido cambia. Vuelve al centro para parar.',
-  btn:'Botones −/+: la vista actual (en esta maqueta los pulsadores no responden en este modo).' };
-function setMode(m){ mode=m; document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); $('modeHelp').textContent=HELP[m]; }
+  btn:'Botones −/+: la vista actual, para comparar el espacio que ocupa.' };
+function setMode(m){ mode=m; document.body.classList.toggle('m-btn', m==='btn'); document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); $('modeHelp').textContent=HELP[m]; }
 $('mode').onclick=e=>{ const b=e.target.closest('button'); if(b) setMode(b.dataset.m); }; setMode('slide');
 $('sens').oninput=e=>{ sens=+e.target.value; $('sensV').textContent=sens; };
 $('vib').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; vibOn=b.dataset.v==='1'; document.querySelectorAll('#vib button').forEach(x=>x.classList.toggle('on',x===b)); };
