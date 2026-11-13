@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Maqueta · Nombre SIMURG</title>
+<style>
+  :root{ --bg:#f5f8f9; --card:#fff; --ink:#1b2a2e; --mut:#5d6f74; --line:#dbe4e7; --green:#0f5c4a; --tint:#e3f3ee; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#0c1517; --card:#132024; --ink:#e6eef0; --mut:#93a6ab; --line:#22363b; --green:#7fe0b8; --tint:#173a31; } }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .doc{ max-width:1180px; margin:0 auto; padding:20px 16px 60px; }
+  h1{ font-size:22px; margin:6px 0 4px; } h2{ font-size:16px; margin:28px 0 10px; }
+  p,li{ font-size:14px; line-height:1.55; }
+  .tag{ display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--tint); color:var(--green); }
+  .row{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+  figure{ margin:0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:10px; }
+  figure img{ width:100%; display:block; border-radius:10px; border:1px solid var(--line); }
+  figcaption{ font-size:13px; margin-top:8px; } figcaption b{ display:block; font-size:14px; } figcaption span{ color:var(--mut); }
+  .hdr{ display:grid; gap:10px; } .hdr figure{ padding:8px 10px; } .hdr img{ border:none; }
+  .seg{ display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; margin:4px 0 12px; }
+  .seg button{ border:0; background:var(--card); color:var(--ink); padding:7px 14px; font:inherit; font-size:13px; cursor:pointer; }
+  .seg button.on{ background:var(--green); color:var(--bg); }
+  code{ font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <span class="tag">Maqueta · no aplicada</span>
+  <h1>Nuevo nombre: SIMURG</h1>
+  <p>Pantalla de entrada real de la app (capturas), con el nombre cambiado en tres estilos. Solo cambia el nombre: colores, tarjetas y textos son los de ahora.</p>
+
+  <div class="seg" id="mode"><button class="on" data-m="light">Modo claro</button><button data-m="dark">Modo oscuro</button></div>
+  <div class="row" id="gates">
+    <figure><img src="simurg/actual_light.png" data-l="simurg/actual_light.png" data-d="simurg/actual_light.png" alt="Pantalla de entrada actual"><figcaption><b>Ahora</b><span>«SimulaURG»</span></figcaption></figure>
+    <figure><img src="simurg/A_light.png" data-l="simurg/A_light.png" data-d="simurg/A_dark.png" alt="Variante A"><figcaption><b>A · Igual que ahora</b><span>Misma letra y peso; solo cambia el nombre.</span></figcaption></figure>
+    <figure><img src="simurg/B_light.png" data-l="simurg/B_light.png" data-d="simurg/B_dark.png" alt="Variante B"><figcaption><b>B · Dos tonos</b><span>«SIM» blanco y «URG» verde claro: se leen las dos partes (simulación + urgencias).</span></figcaption></figure>
+    <figure><img src="simurg/C_light.png" data-l="simurg/C_light.png" data-d="simurg/C_dark.png" alt="Variante C"><figcaption><b>C · Espaciada</b><span>Letras separadas, estilo rótulo de monitor.</span></figcaption></figure>
+  </div>
+
+  <h2>Cabecera de las consolas (docente y estudiante)</h2>
+  <div class="hdr">
+    <figure><img src="simurg/A_hdr.png" alt="Cabecera A"><figcaption><b>A</b></figcaption></figure>
+    <figure><img src="simurg/B_hdr.png" alt="Cabecera B"><figcaption><b>B</b> <span>(«URG» en el verde del tema)</span></figcaption></figure>
+    <figure><img src="simurg/C_hdr.png" alt="Cabecera C"><figcaption><b>C</b></figcaption></figure>
+  </div>
+
+  <h2>Qué cambiaría al aplicarlo</h2>
+  <ul>
+    <li><b>Pantalla de entrada y cabecera de las consolas:</b> «SimulaURG» pasa a ser «SIMURG», con el estilo elegido.</li>
+    <li><b>Nombre en la pestaña del navegador y en el icono instalado</b> (web en iPhone/Android y la APK): ahora pone «Simulador de Urgencias» o «Simulador Urgencias»; pasaría a «SIMURG». En la web instalada, el nombre del icono se actualiza al volver a instalarla.</li>
+    <li><b>Manual, novedades y README:</b> las menciones al nombre.</li>
+    <li><b>APK:</b> nombre de la app en Android y título de las Releases («SIMURG 2026.11.…»); el archivo pasaría a <code>SIMURG-….apk</code>. Se instala encima de la actual (misma firma e identificador).</li>
+    <li><b>Lo que no cambia:</b> la dirección web (<code>…/simula-urg/</code>), el repositorio, las salas e invitaciones, los ajustes guardados y el icono (sus tres propuestas siguen pendientes).</li>
+  </ul>
+</div>
+<script>
+document.getElementById('mode').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on', x===b));
+  document.querySelectorAll('#gates img').forEach(i=>i.src = b.dataset.m==='dark' ? i.dataset.d : i.dataset.l); });
+</script>
+</body>
+</html>
