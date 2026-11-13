@@ -1,4 +1,4 @@
-# SIMURG
+# P•SINUSAL
 
 Simulación clínica de urgencias: monitor de constantes y arritmias para formación (docente y estudiante).
 

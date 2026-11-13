@@ -1,6 +1,6 @@
 {
-  "name": "SIMURG · Simulación clínica de urgencias",
-  "short_name": "SIMURG",
+  "name": "P•SINUSAL · Simulación clínica de urgencias",
+  "short_name": "PSINUSAL",
   "description": "Simulador educativo de monitor de constantes y arritmias para formación clínica.",
   "start_url": "./index.html",
   "scope": "./",

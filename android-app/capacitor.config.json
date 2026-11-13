@@ -1,6 +1,6 @@
 {
   "appId": "io.github.infanteeric03.simulador",
-  "appName": "SIMURG",
+  "appName": "PSINUSAL",
   "webDir": "www",
   "android": { "allowMixedContent": false, "backgroundColor": "#f5f8f9" },
   "server": { "androidScheme": "https" }
