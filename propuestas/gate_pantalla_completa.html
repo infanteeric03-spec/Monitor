@@ -115,13 +115,15 @@
   const dot = document.getElementById('dot');
   const cmPx = 96 / 2.54;
 
-  // Latido sinusal: 160 unidades de ancho, línea base en y=60
-  // P 20-34 · PR 34-48 · Q 48-52 · R 52-56 (pico y=8) · S 56-60 · ST 64-78 · T 78-102 (pico y=22)
+  // Latido sinusal según el boceto: P pequeña, Q leve, R alta, S profunda, T pequeña.
+  // Unidades: 160 de ancho, línea base en y=60; R llega a y=0 (60 u); S baja a y=96 (36 u).
+  const CM_R = 1.0;            // distancia de la R al final de «urgencias» (ajustable)
+  const R_H = 60, S_D = 36;    // altura de la R y profundidad de la S, en unidades
   function beat(bx, s, baseY){
     const X = x => bx + x*s, Y = y => baseY - (60 - y)*s;
-    return ` L ${X(20)} ${Y(60)} Q ${X(27)} ${Y(44)} ${X(34)} ${Y(60)}`
-         + ` L ${X(48)} ${Y(60)} L ${X(52)} ${Y(66)} L ${X(56)} ${Y(8)} L ${X(60)} ${Y(74)} L ${X(64)} ${Y(60)}`
-         + ` L ${X(78)} ${Y(60)} Q ${X(90)} ${Y(22)} ${X(102)} ${Y(60)} L ${X(160)} ${Y(60)}`;
+    return ` L ${X(20)} ${Y(60)} Q ${X(27)} ${Y(48)} ${X(34)} ${Y(60)}`
+         + ` L ${X(48)} ${Y(60)} L ${X(52)} ${Y(66)} L ${X(56)} ${Y(60-R_H)} L ${X(60)} ${Y(60+S_D)} L ${X(64)} ${Y(60)}`
+         + ` L ${X(78)} ${Y(60)} Q ${X(87)} ${Y(40)} ${X(100)} ${Y(60)} L ${X(160)} ${Y(60)}`;
   }
 
   function build(){
@@ -129,12 +131,13 @@
     const W = hr.width, H = hr.height;
     const sr = sub.getBoundingClientRect();
     const subEndX = sr.right - hr.left;
-    const subCY = sr.top + sr.height/2 - hr.top;
+    const subBottom = sr.bottom - hr.top;
 
-    const baseY = H - 14;
-    const s = (baseY - subCY) / 52;             // R llega a la altura del subtítulo
+    // Ajusta la escala para que la R llegue a la base del subtítulo y la S quepa en la cabecera
+    const baseY = (H - 12 + (S_D/R_H)*subBottom) / (1 + S_D/R_H);
+    const s = (baseY - subBottom) / R_H;
     const period = 160 * s;
-    const targetX = subEndX + 0.5*cmPx;         // R a 0,5 cm a la derecha del final de «urgencias»
+    const targetX = subEndX + CM_R*cmPx;        // R a 1 cm a la derecha del final de «urgencias»
     const off = (((targetX - 56*s) % period) + period) % period;
     const start = off - 2*period;
 
