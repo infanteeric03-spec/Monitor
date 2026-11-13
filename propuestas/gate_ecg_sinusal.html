@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Maqueta · ECG sinusal en la pantalla de inicio</title>
+<style>
+  :root{ --bg:#f5f8f9; --ink:#1b2a2e; --mut:#5d6f74; --line:#dbe4e7; --green:#0f5c4a; --tint:#e3f3ee; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#0c1517; --ink:#e6eef0; --mut:#93a6ab; --line:#22363b; --green:#7fe0b8; --tint:#173a31; } }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .doc{ max-width:640px; margin:0 auto; padding:20px 16px 60px; }
+  h1{ font-size:20px; margin:6px 0 4px; } p,li{ font-size:14px; line-height:1.55; }
+  .tag{ display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--tint); color:var(--green); }
+
+  /* Cabecera de inicio (maqueta) */
+  .gate{ position:relative; height:300px; border-radius:16px; overflow:hidden; background:#2e5c4c; color:#fff; padding:44px 22px 0; }
+  .gate .wm{ font-size:34px; font-weight:800; letter-spacing:.14em; margin:0; line-height:1; }
+  .gate .wm .u{ color:#a8ecc9; }
+  .gate .sub{ font-size:17px; margin-top:12px; color:#e6f3ee; letter-spacing:.01em; }
+  .gate svg{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+  .gate .trace{ fill:none; stroke:#a8ecc9; stroke-width:2.4; stroke-linejoin:round; stroke-linecap:round; opacity:.45; }
+  .gate .glow{ fill:none; stroke:#d9fff0; stroke-width:3.2; stroke-linejoin:round; stroke-linecap:round; filter:drop-shadow(0 0 4px #a8ecc9); }
+  .gate .dot{ fill:#ffffff; filter:drop-shadow(0 0 6px #a8ecc9); }
+
+  .note{ margin-top:14px; }
+  .note li{ margin:4px 0; }
+  code{ font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <span class="tag">Maqueta · no aplicada</span>
+  <h1>ECG sinusal en la pantalla de inicio</h1>
+  <p>Onda con P, QRS y T. La R queda a la altura de «urgencias» y un poco a la derecha. Un pulso recorre la línea de un lado a otro.</p>
+
+  <div class="gate" id="gate">
+    <p class="wm" id="wm">P<span class="u">•SINUSAL</span></p>
+    <p class="sub" id="sub">Simulación clínica de urgencias</p>
+    <svg id="ecg" aria-hidden="true">
+      <path id="trace" class="trace" d=""/>
+      <path id="glow" class="glow" d=""/>
+      <circle id="dot" class="dot" r="4" cx="0" cy="0"/>
+    </svg>
+  </div>
+
+  <ul class="note">
+    <li>La R se coloca midiendo el final de «urgencias» en pantalla y sumando 0,5 cm (aprox. 19 px a 96 ppp). En el móvil real se recalcula al cargar.</li>
+    <li>Morfología de cada latido: P pequeña, intervalo PR, Q, R alta, S, segmento ST y onda T.</li>
+    <li>El punto blanco recorre toda la línea de izquierda a derecha y vuelve a empezar, como un pulso monitorizado.</li>
+  </ul>
+</div>
+
+<script>
+(function(){
+  const gate = document.getElementById('gate');
+  const sub = document.getElementById('sub');
+  const svg = document.getElementById('ecg');
+  const trace = document.getElementById('trace');
+  const glow = document.getElementById('glow');
+  const dot = document.getElementById('dot');
+  const cmPx = 96 / 2.54;
+
+  // Latido sinusal de referencia (unidades: 160 de ancho, línea base en y=60)
+  // P: 20-34 · PR: 34-48 · Q: 48-52 · R: 52-56 (pico y=8) · S: 56-60 · ST: 64-78 · T: 78-102 (pico y=22)
+  function beat(bx, s, baseY){
+    const X = x => bx + x*s, Y = y => baseY - (60 - y)*s;
+    let d = '';
+    d += ` L ${X(20)} ${Y(60)} Q ${X(27)} ${Y(44)} ${X(34)} ${Y(60)}`;
+    d += ` L ${X(48)} ${Y(60)} L ${X(52)} ${Y(66)} L ${X(56)} ${Y(8)} L ${X(60)} ${Y(74)} L ${X(64)} ${Y(60)}`;
+    d += ` L ${X(78)} ${Y(60)} Q ${X(90)} ${Y(22)} ${X(102)} ${Y(60)} L ${X(160)} ${Y(60)}`;
+    return d;
+  }
+
+  function build(){
+    const gr = gate.getBoundingClientRect();
+    const W = gr.width, H = gr.height;
+    const sr = sub.getBoundingClientRect();
+    const subEndX = sr.right - gr.left;
+    const subCY = sr.top + sr.height/2 - gr.top;
+
+    const baseY = H - 18;                       // línea base cerca del borde inferior
+    const s = (baseY - subCY) / 52;             // R llega a la altura del subtítulo
+    const period = 160 * s;
+    const targetX = subEndX + 0.5*cmPx;         // R a 0,5 cm a la derecha del final de «urgencias»
+    const Rrel = 56 * s;
+    const off = (((targetX - Rrel) % period) + period) % period;
+    const start = off - 2*period;
+
+    let d = `M ${start} ${baseY}`;
+    for (let bx = start; bx < W + period; bx += period){
+      d += beat(bx, s, baseY);
+    }
+    trace.setAttribute('d', d);
+    glow.setAttribute('d', d);
+
+    // Punto que recorre la línea
+    dot.innerHTML = '';
+    const len = trace.getTotalLength();
+    const dur = Math.max(3, len / 260); // velocidad aprox. constante
+    dot.innerHTML = `<animateMotion dur="${dur}s" repeatCount="indefinite" path="${d}"/>`;
+
+    // Trazo brillante que avanza
+    glow.setAttribute('stroke-dasharray', `${Math.max(60, period*0.9)} ${len}`);
+    glow.innerHTML = `<animate attributeName="stroke-dashoffset" from="${Math.max(60, period*0.9)}" to="${-len}" dur="${dur}s" repeatCount="indefinite"/>`;
+  }
+
+  // Redibujar al cargar y al cambiar tamaño
+  const ro = new ResizeObserver(build);
+  ro.observe(gate);
+  build();
+})();
+</script>
+</body>
+</html>
