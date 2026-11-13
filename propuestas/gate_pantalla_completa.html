@@ -101,7 +101,7 @@
 
   <ul class="legend">
     <li>La cabecera conserva el color del tema y el nombre P•SINUSAL, con «•SINUSAL» en verde claro.</li>
-    <li>La línea ECG está dentro de la cabecera. La R queda a la altura del subtítulo, 0,5 cm a su derecha, y un punto recorre la línea de un extremo al otro.</li>
+    <li>La línea ECG está dentro de la cabecera. La R queda a la altura del subtítulo, 2 cm a la derecha del final del texto, y un punto recorre la línea de un extremo al otro.</li>
     <li>Los dos roles y el texto de ayuda son los actuales; solo cambian el nombre y la línea ECG.</li>
   </ul>
 </div>
@@ -130,14 +130,17 @@
     const hr = hero.getBoundingClientRect();
     const W = hr.width, H = hr.height;
     const sr = sub.getBoundingClientRect();
-    const subEndX = sr.right - hr.left;
+    // Final real del texto del subtítulo (no el borde del bloque, que llega hasta el margen)
+    const range = document.createRange(); range.selectNodeContents(sub);
+    const textEndX = range.getBoundingClientRect().right - hr.left;
+    const subEndX = textEndX;
     const subBottom = sr.bottom - hr.top;
 
     // Ajusta la escala para que la R llegue a la base del subtítulo y la S quepa en la cabecera
     const baseY = (H - 12 + (S_D/R_H)*subBottom) / (1 + S_D/R_H);
     const s = (baseY - subBottom) / R_H;
     const period = 160 * s;
-    const targetX = subEndX + CM_R*cmPx;        // R a 1 cm a la derecha del final de «urgencias»
+    const targetX = subEndX + CM_R*cmPx;        // R a CM_R cm a la derecha del final del texto
     const off = (((targetX - 56*s) % period) + period) % period;
     const start = off - 2*period;
 
