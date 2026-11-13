@@ -104,10 +104,10 @@ jobs:
           export KEYSTORE_FILE="$GITHUB_WORKSPACE/android-app/keystore/simulador-release.jks" KEY_ALIAS=simulador
           gw
           mkdir -p "$GITHUB_WORKSPACE/dist"
-          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/dist/SimuladorUrgencias-$APK_NAME.apk"
+          cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/dist/SIMURG-$APK_NAME.apk"
 
       - name: Publicar
         if: steps.gate.outputs.go == 'true'
         run: |
           node android-app/scripts/notes.mjs "${{ steps.gate.outputs.lastweb }}" > notes.md
-          gh release create "apk-$APK_CODE" dist/*.apk --title "App Android $APK_NAME" --notes-file notes.md --latest
+          gh release create "apk-$APK_CODE" dist/*.apk --title "SIMURG · App Android $APK_NAME" --notes-file notes.md --latest
