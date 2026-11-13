@@ -117,7 +117,7 @@
 
   // Latido sinusal según el boceto: P pequeña, Q leve, R alta, S profunda, T pequeña.
   // Unidades: 160 de ancho, línea base en y=60; R llega a y=0 (60 u); S baja a y=96 (36 u).
-  const CM_R = 1.0;            // distancia de la R al final de «urgencias» (ajustable)
+  const CM_R = 2.0;            // distancia de la R al final de «urgencias» (ajustable)
   const R_H = 60, S_D = 36;    // altura de la R y profundidad de la S, en unidades
   function beat(bx, s, baseY){
     const X = x => bx + x*s, Y = y => baseY - (60 - y)*s;
