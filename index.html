@@ -2093,7 +2093,7 @@
   #gate.clin .gh-cut path{ fill:var(--c-bg); }
   #gate.clin .gate-hero:not(.sub){ padding-bottom:130px; }
   #gate.clin .gate-hero.sub .gh-ecg{ display:none; }
-  @media (max-height:560px){ #gate.clin .gate-hero:not(.sub){ padding-bottom:30px; } #gate.clin .gh-ecg{ display:none; } }
+  @media (orientation:landscape) and (max-height:560px){ #gate.clin .gate-hero:not(.sub){ padding-bottom:30px; } #gate.clin .gh-ecg{ display:none; } }
   /* Onda ECG sinusal dentro de la cabecera de entrada (se dibuja en JS, sin tocar el texto) */
   #gate.clin .gh-ecg{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
   #gate.clin .gh-ecg .trace{ fill:none; stroke:#a8ecc9; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round; opacity:.4; }
@@ -2137,9 +2137,11 @@
   #gate.clin.dk{ --c-pri:#1f8a66; --c-pri2:#173a31; --c-stu:#2f74c4; --c-stu2:#16283d; --c-bg:#0c1517; --c-line:#22353a; --c-ink:#e3eef0; --c-dim:#94aaae; --c-mute:#6d8488;
     --c-hero:#0b3a30; --c-card:#132024; --c-field:#0f1a1d; --c-pri-ic:#5fd3a5; --c-stu-ic:#7db5f2; --c-on:#ffffff; --c-ph:#4f6468; --c-sh:rgba(0,0,0,.35); --c-bad:#3a1c1f; color-scheme:dark; }
   /* móvil en horizontal: cabecera compacta */
-  @media (max-height:560px){
+  @media (orientation:landscape) and (max-height:560px){
     #gate.clin .gate-hero{ padding:calc(max(10px, env(safe-area-inset-top, 0px)) + 6px) 22px 30px; }
     #gate.clin .gh-t{ font-size:22px; } #gate.clin .gh-s{ font-size:12.5px; }
+  }
+  @media (max-height:560px){
     #gate.clin .rc-ic{ width:44px; height:44px; border-radius:12px; margin-bottom:4px; } #gate.clin .rc-ic svg{ width:26px; height:26px; }
     #gate.clin .gate-foot{ display:none; }
     #gate.clin .gate-box{ max-width:560px; padding:6px 16px 16px; }
