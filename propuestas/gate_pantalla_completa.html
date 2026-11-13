@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Maqueta · Pantalla de inicio completa con ECG</title>
+<style>
+  :root{ --bg:#f5f8f9; --card:#ffffff; --ink:#14232b; --dim:#5c6e76; --line:#dbe4e7; --pri:#0f5c4a; --pri2:#e3f3ee; --stu:#1d5fa8; --stu2:#e6f0fb; --hero:#0f5c4a; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#e9eef0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif; color:var(--ink); }
+  .wrap{ max-width:720px; margin:0 auto; padding:18px 14px 50px; }
+  .tag{ display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--pri2); color:var(--pri); }
+  h1{ font-size:18px; margin:8px 0 4px; } .lead{ font-size:13px; color:var(--dim); margin:0 0 14px; line-height:1.5; }
+
+  /* Teléfono de referencia */
+  .phone{ width:380px; max-width:100%; margin:0 auto; background:var(--bg); border-radius:28px; overflow:hidden; box-shadow:0 18px 40px rgba(15,60,70,.18); border:8px solid #1b2a2e; }
+  #gate{ background:var(--bg); min-height:760px; display:flex; flex-direction:column; }
+
+  /* Cabecera de inicio */
+  .gate-hero{ position:relative; background:var(--hero); color:#fff; padding:44px 22px 84px; height:290px; overflow:hidden; }
+  .gh-in{ max-width:440px; margin:0 auto; }
+  .gh-t{ font-size:28px; font-weight:800; letter-spacing:.14em; line-height:1.1; }
+  .gh-t .u{ color:#9ff0c9; }
+  .gh-s{ font-size:14px; color:#cfe8e1; margin-top:6px; }
+  .gh-ecg{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+  .gh-ecg .trace{ fill:none; stroke:#a8ecc9; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round; opacity:.4; }
+  .gh-ecg .glow{ fill:none; stroke:#d9fff0; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; filter:drop-shadow(0 0 4px #a8ecc9); }
+  .gh-ecg .dot{ fill:#fff; filter:drop-shadow(0 0 6px #a8ecc9); }
+  .gh-cut{ position:absolute; left:0; right:0; bottom:-1px; width:100%; height:30px; }
+  .gh-cut path{ fill:var(--bg); }
+
+  /* Paso de rol */
+  .gate-box{ max-width:440px; margin:0 auto; padding:14px 16px 20px; width:100%; }
+  .gate-box p{ color:var(--dim); font-size:14px; margin:4px 2px 12px; }
+  .role-cards{ display:flex; gap:12px; margin-bottom:12px; }
+  .role-card{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 12px 14px; box-shadow:0 4px 14px rgba(15,60,70,.06); }
+  .ic{ width:58px; height:58px; border-radius:16px; display:grid; place-items:center; margin-bottom:10px; color:#fff; }
+  .ic.doc{ background:linear-gradient(#5aaef5,#1d78d2); }
+  .ic.stu{ background:linear-gradient(#2f7ccf,#1d5fa8); }
+  .ic svg{ width:32px; height:32px; }
+  .role-num{ font-size:10px; font-weight:700; letter-spacing:.08em; color:var(--dim); }
+  .name{ font-size:17px; font-weight:800; margin-top:2px; }
+  .desc{ font-size:12.5px; color:var(--dim); margin:6px 0 12px; line-height:1.4; }
+  .rc-btn{ font-size:13px; font-weight:700; padding:7px 14px; border-radius:10px; background:var(--pri2); color:var(--pri); }
+  .role-card.stu .rc-btn{ background:var(--stu2); color:var(--stu); }
+  .note{ font-size:12.5px; color:var(--dim); background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; line-height:1.45; display:flex; gap:8px; }
+  .note b{ color:var(--ink); }
+
+  .legend{ margin-top:18px; font-size:13px; line-height:1.55; }
+  .legend li{ margin:3px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">Maqueta · no aplicada</span>
+  <h1>Pantalla de inicio completa</h1>
+  <p class="lead">Así quedaría la entrada con el nombre P•SINUSAL y el ECG sinusal recorriendo la cabecera. Es una maqueta de referencia para móvil.</p>
+
+  <div class="phone">
+    <div id="gate">
+      <div class="gate-hero" id="hero">
+        <div class="gh-in">
+          <div class="gh-t" id="wm">P<span class="u">•SINUSAL</span></div>
+          <div class="gh-s" id="sub">Simulación clínica de urgencias</div>
+        </div>
+        <svg class="gh-ecg" id="ecg" aria-hidden="true">
+          <path class="trace" id="trace" d=""/>
+          <path class="glow" id="glow" d=""/>
+          <circle class="dot" id="dot" r="4" cx="0" cy="0"/>
+        </svg>
+        <svg class="gh-cut" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 V20 H400 V30z"/></svg>
+      </div>
+
+      <div class="gate-box">
+        <p>Elige cómo vas a participar.</p>
+        <div class="role-cards">
+          <div class="role-card">
+            <div class="ic doc">
+              <svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="30" height="22" rx="3"/><path d="M5 22h7l3-6 4 10 3-6h13"/><path d="M14 35h12M20 29v6"/></svg>
+            </div>
+            <div class="role-num">ROL 01</div>
+            <div class="name">Docente</div>
+            <div class="desc">Controla constantes, ritmos, casos y preguntas</div>
+            <span class="rc-btn">Acceder ›</span>
+          </div>
+          <div class="role-card stu">
+            <div class="ic stu">
+              <svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="30" height="22" rx="3"/><path d="M5 22h7l3-6 4 10 3-6h13"/><path d="M14 35h12M20 29v6"/></svg>
+            </div>
+            <div class="role-num">ROL 02</div>
+            <div class="name">Estudiante</div>
+            <div class="desc">Ve el monitor del paciente y responde</div>
+            <span class="rc-btn">Acceder ›</span>
+          </div>
+        </div>
+        <div class="note"><span>ⓘ</span><span>Para entrar como estudiante necesitas el código de sala que te dé quien dirige la sesión.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="legend">
+    <li>La cabecera conserva el color del tema y el nombre P•SINUSAL, con «•SINUSAL» en verde claro.</li>
+    <li>La línea ECG está dentro de la cabecera. La R queda a la altura del subtítulo, 0,5 cm a su derecha, y un punto recorre la línea de un extremo al otro.</li>
+    <li>Los dos roles y el texto de ayuda son los actuales; solo cambian el nombre y la línea ECG.</li>
+  </ul>
+</div>
+
+<script>
+(function(){
+  const hero = document.getElementById('hero');
+  const sub = document.getElementById('sub');
+  const trace = document.getElementById('trace');
+  const glow = document.getElementById('glow');
+  const dot = document.getElementById('dot');
+  const cmPx = 96 / 2.54;
+
+  // Latido sinusal: 160 unidades de ancho, línea base en y=60
+  // P 20-34 · PR 34-48 · Q 48-52 · R 52-56 (pico y=8) · S 56-60 · ST 64-78 · T 78-102 (pico y=22)
+  function beat(bx, s, baseY){
+    const X = x => bx + x*s, Y = y => baseY - (60 - y)*s;
+    return ` L ${X(20)} ${Y(60)} Q ${X(27)} ${Y(44)} ${X(34)} ${Y(60)}`
+         + ` L ${X(48)} ${Y(60)} L ${X(52)} ${Y(66)} L ${X(56)} ${Y(8)} L ${X(60)} ${Y(74)} L ${X(64)} ${Y(60)}`
+         + ` L ${X(78)} ${Y(60)} Q ${X(90)} ${Y(22)} ${X(102)} ${Y(60)} L ${X(160)} ${Y(60)}`;
+  }
+
+  function build(){
+    const hr = hero.getBoundingClientRect();
+    const W = hr.width, H = hr.height;
+    const sr = sub.getBoundingClientRect();
+    const subEndX = sr.right - hr.left;
+    const subCY = sr.top + sr.height/2 - hr.top;
+
+    const baseY = H - 14;
+    const s = (baseY - subCY) / 52;             // R llega a la altura del subtítulo
+    const period = 160 * s;
+    const targetX = subEndX + 0.5*cmPx;         // R a 0,5 cm a la derecha del final de «urgencias»
+    const off = (((targetX - 56*s) % period) + period) % period;
+    const start = off - 2*period;
+
+    let d = `M ${start} ${baseY}`;
+    for (let bx = start; bx < W + period; bx += period) d += beat(bx, s, baseY);
+    trace.setAttribute('d', d);
+    glow.setAttribute('d', d);
+
+    const len = trace.getTotalLength();
+    const dur = Math.max(3, len / 260);
+    const seg = Math.max(60, period*0.9);
+    glow.setAttribute('stroke-dasharray', `${seg} ${len}`);
+    glow.innerHTML = `<animate attributeName="stroke-dashoffset" from="${seg}" to="${-len}" dur="${dur}s" repeatCount="indefinite"/>`;
+    dot.innerHTML = `<animateMotion dur="${dur}s" repeatCount="indefinite" path="${d}"/>`;
+  }
+
+  new ResizeObserver(build).observe(hero);
+  build();
+})();
+</script>
+</body>
+</html>
