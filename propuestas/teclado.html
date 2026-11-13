@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Maqueta · Constantes con el teclado (docente)</title>
+<style>
+  :root{ --bg:#f5f8f9; --card:#fff; --ink:#1b2a2e; --mut:#5d6f74; --line:#dbe4e7; --green:#0f5c4a; --tint:#e3f3ee; --key:#f3f6f7; --keyb:#c9d5d9; }
+  @media (prefers-color-scheme:dark){ :root{ --bg:#0c1517; --card:#132024; --ink:#e6eef0; --mut:#93a6ab; --line:#22363b; --green:#7fe0b8; --tint:#173a31; --key:#1a2a2e; --keyb:#2c4146; } }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .doc{ max-width:1040px; margin:0 auto; padding:20px 16px 60px; }
+  h1{ font-size:22px; margin:6px 0 4px; } h2{ font-size:16px; margin:28px 0 8px; }
+  p,li{ font-size:14px; line-height:1.55; }
+  .tag{ display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--tint); color:var(--green); }
+  kbd{ display:inline-block; min-width:1.7em; text-align:center; font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace; padding:4px 6px; border-radius:6px;
+    background:var(--key); border:1px solid var(--keyb); border-bottom-width:2px; color:var(--ink); }
+
+  /* ---- tablet simulada ---- */
+  .tab{ border-radius:22px; background:#0b1113; padding:12px; box-shadow:0 18px 50px rgba(10,40,50,.25); }
+  .scr{ border-radius:14px; overflow:hidden; background:var(--bg); display:grid; grid-template-columns:1.3fr 1fr; gap:8px; padding:8px; position:relative; }
+  .left{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .mon{ height:250px; background:#05080a; border-radius:10px; position:relative; overflow:hidden; }
+  .mon canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .cards{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+  .c{ position:relative; background:var(--card); border:1px solid var(--line); border-top:4px solid var(--cc); border-radius:10px; padding:6px 8px 8px; transition:box-shadow .12s, transform .12s; }
+  .c .n{ font-size:11px; font-weight:700; color:var(--mut); display:flex; align-items:center; gap:6px; }
+  .c .n kbd{ margin-left:auto; font-size:10.5px; padding:2px 5px; min-width:1.5em; }
+  .c .v{ font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif; font-size:26px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:2px; white-space:nowrap; }
+  .c .v .sub{ display:inline-block; border-radius:5px; padding:0 2px; }
+  .c .v .sub.on{ background:color-mix(in srgb, var(--cc) 22%, transparent); }
+  .c .b{ display:flex; gap:4px; margin-top:4px; }
+  .c .b span{ flex:1; text-align:center; font-size:13px; border:1px solid var(--line); background:var(--key); border-radius:7px; padding:3px 0; color:var(--mut); }
+  .c.act{ box-shadow:0 0 0 3px color-mix(in srgb, var(--cc) 45%, transparent); transform:translateY(-1px); }
+  #k-fc{ --cc:#35c46b; } #k-spo2{ --cc:#21b4ea; } #k-fr{ --cc:#e2b400; } #k-ta{ --cc:#ff6e6e; } #k-t{ --cc:#9aa9ad; }
+  .side{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:12px; color:var(--mut); display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .side .tb{ display:flex; gap:12px; font-weight:700; letter-spacing:.04em; font-size:11px; border-bottom:1px solid var(--line); padding-bottom:7px; }
+  .side .tb .on{ color:var(--green); }
+  .side textarea{ width:100%; min-height:70px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); font:inherit; font-size:12.5px; padding:7px; resize:vertical; }
+  .chip{ position:absolute; left:50%; bottom:28px; transform:translateX(-50%); background:#0b1113; color:#fff; border-radius:999px; padding:7px 14px; font-size:13px; display:none; align-items:center; gap:8px; box-shadow:0 8px 24px rgba(0,0,0,.3); white-space:nowrap; z-index:5; }
+  .chip.on{ display:flex; } .chip b{ font-size:16px; font-variant-numeric:tabular-nums; } .chip kbd{ background:#1f2b2e; color:#fff; border-color:#3a4b4f; }
+  .kbHint{ position:absolute; left:10px; top:8px; font-size:11px; color:#9fb; background:rgba(5,8,10,.7); border-radius:6px; padding:3px 7px; z-index:3; }
+
+  /* ---- teclado virtual (para probar sin teclado físico) ---- */
+  .vk{ margin-top:14px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; }
+  .vk button{ font:600 14px ui-monospace,monospace; min-width:42px; height:40px; border-radius:8px; border:1px solid var(--keyb); border-bottom-width:3px; background:var(--key); color:var(--ink); cursor:pointer; padding:0 10px; }
+  .vk button.down{ background:var(--tint); border-color:var(--green); color:var(--green); transform:translateY(1px); }
+  .vk .sep{ width:14px; }
+  .note{ font-size:12.5px; color:var(--mut); }
+  table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+  td,th{ border-bottom:1px solid var(--line); padding:7px 8px; text-align:left; vertical-align:top; }
+  th{ font-size:12px; color:var(--mut); font-weight:700; }
+  .cfg{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-top:14px; font-size:13px; }
+  .cfg .r{ display:flex; gap:10px; align-items:center; margin:6px 0; flex-wrap:wrap; }
+  .cfg label{ min-width:150px; font-weight:600; }
+  .seg{ display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+  .seg button{ border:0; background:var(--card); color:var(--ink); padding:6px 12px; font:inherit; font-size:12.5px; cursor:pointer; }
+  .seg button.on{ background:var(--green); color:var(--bg); }
+  .log{ font:12px ui-monospace,monospace; color:var(--mut); min-height:1.4em; text-align:center; margin-top:6px; }
+  @media (max-width:760px){ .scr{ grid-template-columns:1fr; } .cards{ grid-template-columns:repeat(3,1fr); } .mon{ height:180px; } }
+</style>
+</head>
+<body>
+<div class="doc">
+  <span class="tag">Propuesta · maqueta, no aplicada</span>
+  <h1>Constantes con el teclado (docente en ordenador o tablet con teclado)</h1>
+  <p>Cada constante tiene una tecla. <b>Manteniéndola pulsada</b>, las flechas <kbd>↑</kbd> <kbd>↓</kbd> suben o bajan ese valor. Si se mantienen las flechas, el cambio se acelera. Pruébalo con el teclado del ordenador: haz clic en la maqueta y mantén <kbd>F</kbd> mientras pulsas <kbd>↑</kbd>. En el móvil puedes usar el teclado virtual de abajo.</p>
+
+  <div class="tab"><div class="scr" id="scr" tabindex="0">
+    <div class="left">
+      <div class="mon"><canvas id="cv"></canvas><span class="kbHint">⌨ teclado activo · <b>?</b> ayuda</span><div class="chip" id="chip"></div></div>
+      <div class="cards">
+        <div class="c" id="k-ta"><div class="n">TA <kbd>A</kbd><kbd style="margin-left:2px">B</kbd></div><div class="v"><span class="sub" id="v-sis">120</span>/<span class="sub" id="v-dia">80</span></div><div class="b"><span>−</span><span>+</span><span>−</span><span>+</span></div></div>
+        <div class="c" id="k-fc"><div class="n">FC <kbd>F</kbd></div><div class="v" id="v-fc">80</div><div class="b"><span>−</span><span>+</span></div></div>
+        <div class="c" id="k-spo2"><div class="n">SpO₂ <kbd>S</kbd></div><div class="v" id="v-spo2">98</div><div class="b"><span>−</span><span>+</span></div></div>
+        <div class="c" id="k-fr"><div class="n">FR <kbd>R</kbd></div><div class="v" id="v-fr">16</div><div class="b"><span>−</span><span>+</span></div></div>
+        <div class="c" id="k-t"><div class="n">Tª <kbd>T</kbd></div><div class="v" id="v-t">36,8</div><div class="b"><span>−</span><span>+</span></div></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="tb"><span class="on">RITMO</span><span>CASO CLÍNICO</span><span>PREGUNTAS</span></div>
+      Nota para el caso (aquí escribir NO cambia constantes):
+      <textarea placeholder="Escribe aquí: «Fiebre de 3 días…». Las letras se escriben con normalidad."></textarea>
+      <span class="note">Los atajos solo funcionan cuando no se está escribiendo en un campo de texto.</span>
+    </div>
+  </div></div>
+
+  <div class="vk" id="vk">
+    <button data-k="a">A</button><button data-k="b">B</button><button data-k="p">P</button><button data-k="f">F</button><button data-k="s">S</button><button data-k="r">R</button><button data-k="t">T</button>
+    <span class="sep"></span><button data-k="shift">⇧ Mayús</button><span class="sep"></span>
+    <button data-k="up">↑</button><button data-k="down">↓</button><span class="sep"></span><button data-k="esc">Esc</button>
+  </div>
+  <div class="note" style="text-align:center">Teclado virtual: toca una letra (queda «pulsada»), luego ↑/↓; vuelve a tocarla para soltarla.</div>
+  <div class="log" id="log"></div>
+
+  <div class="cfg">
+    <b>☰ › General › Teclado</b> <span class="note">(así podría quedar en Configuración; solo en el docente)</span>
+    <div class="r"><label>Atajos de teclado</label><span class="seg" id="optOn"><button class="on" data-v="1">Activados</button><button data-v="0">Desactivados</button></span></div>
+    <div class="r"><label>Forma de usarlos</label><span class="seg" id="optMode"><button class="on" data-v="hold">Mantener letra + flechas</button><button data-v="tap">Letra y después flechas</button></span></div>
+    <div class="r note" id="modeHelp"></div>
+  </div>
+
+  <h2>Teclas propuestas</h2>
+  <table>
+    <tr><th>Tecla</th><th>Constante</th><th>Con ↑ / ↓</th><th>Con <kbd>⇧</kbd> + ↑ / ↓</th></tr>
+    <tr><td><kbd>F</kbd></td><td>FC (frecuencia cardiaca)</td><td>±1 lpm</td><td>±5 lpm</td></tr>
+    <tr><td><kbd>S</kbd></td><td>SpO₂</td><td>±1 %</td><td>±5 %</td></tr>
+    <tr><td><kbd>R</kbd></td><td>FR (frecuencia respiratoria)</td><td>±1 rpm</td><td>±5 rpm</td></tr>
+    <tr><td><kbd>T</kbd></td><td>Temperatura</td><td>±0,1 °C</td><td>±0,5 °C</td></tr>
+    <tr><td><kbd>A</kbd></td><td>TA «alta» (sistólica)</td><td>±1 mmHg</td><td>±5 mmHg</td></tr>
+    <tr><td><kbd>B</kbd></td><td>TA «baja» (diastólica)</td><td>±1 mmHg</td><td>±5 mmHg</td></tr>
+    <tr><td><kbd>P</kbd></td><td>Presión: las dos a la vez (mantiene la diferencia)</td><td>±1 mmHg</td><td>±5 mmHg</td></tr>
+    <tr><td><kbd>F</kbd> + <kbd>1</kbd><kbd>2</kbd><kbd>0</kbd> + <kbd>Intro</kbd></td><td colspan="3">Escribir el valor directamente (vale para cualquier letra). Para la Tª, la coma o el punto: <kbd>T</kbd> 3 8 , 5 <kbd>Intro</kbd>.</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td colspan="3">Cancela la letra seleccionada o el número a medio escribir.</td></tr>
+    <tr><td><kbd>?</kbd></td><td colspan="3">Muestra u oculta la chuleta de teclas.</td></tr>
+  </table>
+
+  <h2>¿Es viable?</h2>
+  <ul>
+    <li><b>Sí, es sencillo.</b> El navegador avisa de cada tecla pulsada y soltada. Los cambios pasarían por las mismas funciones que los botones −/+, así que llegarían al estudiante igual que ahora, en su envío cada 0,4 s, sin tocar Supabase.</li>
+    <li>Funciona en ordenador (Windows, Mac, Linux), en iPad con teclado (Magic Keyboard o Bluetooth) y en tablets Android con teclado, tanto en la web como en la APK.</li>
+    <li>Se puede activar sola: con la primera tecla física pulsada aparece «⌨ teclado activo» y la letra de cada tarjeta. Sin teclado, no cambia nada.</li>
+  </ul>
+
+  <h2>Limitaciones y cómo resolverlas</h2>
+  <ul>
+    <li><b>Escribir texto:</b> mientras el cursor está en un campo (caso clínico, preguntas, nombre de la sala), las letras se escriben con normalidad y no cambian constantes. Es lo que hace la maqueta con la nota de la derecha.</li>
+    <li><b>Atajos del navegador y del sistema:</b> se usan solo letras sueltas y flechas. No se tocan <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + letra (buscar, imprimir…) ni <kbd>F5</kbd>/<kbd>F11</kbd>. Mientras hay una letra pulsada, las flechas no desplazan la página.</li>
+    <li><b>Mantener dos teclas a la vez</b> no es cómodo para todo el mundo ni con una sola mano. Por eso existe la opción «Letra y después flechas»: pulsas <kbd>F</kbd>, la tarjeta queda marcada y usas las flechas hasta pulsar <kbd>Esc</kbd>, otra letra o dejar de tocar 4 segundos.</li>
+    <li><b>Repetición de teclas:</b> al mantener una tecla, el sistema la repite. La app ignora la repetición de la letra y aprovecha la de las flechas para acelerar. La velocidad de repetición depende del sistema (en el iPad es algo más lenta).</li>
+    <li><b>Distribuciones de teclado:</b> se usa la letra que se ve en la tecla (F, S…), así que sirve en español, en inglés o en francés (AZERTY). En teclados sin flechas (algunos de iPad), sirven también <kbd>+</kbd> y <kbd>−</kbd>.</li>
+    <li><b>Lectores de pantalla</b> (VoiceOver, NVDA) usan letras sueltas para moverse. Por eso conviene poder desactivar los atajos en Configuración.</li>
+    <li><b>Caso clínico en marcha:</b> las constantes las marca el caso, así que las teclas avisan y no cambian nada, igual que los botones.</li>
+    <li><b>Teclado en pantalla del móvil:</b> no sirve, porque solo aparece al escribir en un campo. En el móvil siguen los pulsadores deslizantes.</li>
+    <li><b>Teclados baratos o inalámbricos:</b> algunos no registran bien varias teclas a la vez. Con una letra y una flecha casi nunca es un problema, y la opción «Letra y después flechas» lo evita del todo.</li>
+  </ul>
+
+  <h2>Ampliaciones posibles</h2>
+  <ul>
+    <li>Rueda del ratón: con el puntero sobre una tarjeta, girar la rueda sube o baja el valor.</li>
+    <li>Atajos para el resto del panel: <kbd>1</kbd>–<kbd>9</kbd> para los ritmos favoritos, <kbd>Espacio</kbd> para pulso sí/no en la parada, o <kbd>E</kbd> para enviar el ECG elegido.</li>
+    <li>Teclas configurables por el docente, guardadas en el dispositivo.</li>
+  </ul>
+</div>
+
+<script>
+const V={ fc:80, spo2:98, fr:16, t:36.8, sis:120, dia:80 };
+const R={ fc:[0,260,1], spo2:[50,100,1], fr:[0,60,1], t:[30,43,0.1], sis:[0,300,1], dia:[0,200,1] };
+const KEY={ f:'fc', s:'spo2', r:'fr', t:'t', a:'sis', b:'dia', p:'ta' };
+const NAME={ fc:'FC', spo2:'SpO₂', fr:'FR', t:'Tª', sis:'TA alta (sistólica)', dia:'TA baja (diastólica)', ta:'TA (las dos)' };
+const CARD={ fc:'k-fc', spo2:'k-spo2', fr:'k-fr', t:'k-t', sis:'k-ta', dia:'k-ta', ta:'k-ta' };
+const $=id=>document.getElementById(id);
+let mode='hold', enabled=true, held=null, sel=null, selTimer=null, typed='', shift=false, rep=0;
+const fmt=(k)=> k==='t' ? V.t.toFixed(1).replace('.',',') : k==='ta' ? V.sis+'/'+V.dia : String(V[k]);
+function clamp(k,v){ const [a,b]=R[k]; return Math.min(b,Math.max(a,v)); }
+function step(k,n){
+  if(k==='ta'){ const m=Math.max(Math.min(n, R.sis[1]-V.sis, R.dia[1]-V.dia), -V.sis, -V.dia); V.sis+=m; V.dia+=m; return; }
+  V[k]=clamp(k, Math.round((V[k]+n*R[k][2])*10)/10);
+}
+function paint(){ $('v-fc').textContent=V.fc; $('v-spo2').textContent=V.spo2; $('v-fr').textContent=V.fr; $('v-t').textContent=fmt('t'); $('v-sis').textContent=V.sis; $('v-dia').textContent=V.dia; }
+function active(){ return held || sel; }
+function mark(){
+  const k=active();
+  document.querySelectorAll('.c').forEach(c=>c.classList.toggle('act', !!k && c.id===CARD[k]));
+  $('v-sis').classList.toggle('on', k==='sis'||k==='ta'); $('v-dia').classList.toggle('on', k==='dia'||k==='ta');
+  const chip=$('chip');
+  if(!k){ chip.classList.remove('on'); return; }
+  chip.innerHTML = '<kbd>'+Object.keys(KEY).find(x=>KEY[x]===k).toUpperCase()+'</kbd> '+NAME[k]+' <b>'+(typed ? typed.replace('.',',')+'▏' : fmt(k))+'</b>'
+    + (typed ? ' <span style="opacity:.7">Intro para fijar · Esc</span>' : ' <span style="opacity:.7">↑ ↓ · ⇧ ×5 · cifras + Intro</span>');
+  chip.classList.add('on');
+}
+function log(t){ $('log').textContent=t; }
+function armSel(){ clearTimeout(selTimer); if(mode==='tap') selTimer=setTimeout(()=>{ sel=null; typed=''; mark(); }, 4000); }
+function isTyping(e){ const t=e.target; return t && (t.tagName==='TEXTAREA' || (t.tagName==='INPUT' && !/^(button|range|checkbox|radio)$/.test(t.type)) || t.isContentEditable); }
+
+function onDown(key, ev){
+  if(!enabled) return false;
+  const l=key.toLowerCase();
+  if(l==='?'){ log('Aquí se abriría la chuleta de teclas.'); return true; }
+  if(l==='escape'){ held=null; sel=null; typed=''; mark(); log('Cancelado'); return true; }
+  if(KEY[l]){
+    if(ev && ev.repeat) return true;                      // se ignora la repetición de la letra
+    typed='';
+    if(mode==='hold'){ held=KEY[l]; } else { sel = sel===KEY[l] ? null : KEY[l]; armSel(); }
+    mark(); return true;
+  }
+  const k=active(); if(!k) return false;
+  if(l==='arrowup' || l==='arrowdown' || l==='+' || l==='-'){
+    const dir = (l==='arrowup'||l==='+') ? 1 : -1;
+    rep = ev && ev.repeat ? rep+1 : 0;
+    const big = shift || (ev && ev.shiftKey);
+    const n = dir * (big ? 5 : 1) * (rep>12 ? 3 : rep>5 ? 2 : 1);   // si se mantiene la flecha, acelera
+    step(k,n); paint(); typed=''; mark(); armSel(); log(NAME[k]+' → '+fmt(k)); return true;
+  }
+  if(/^[0-9]$/.test(l) || ((l===','||l==='.') && k==='t')){ if(typed.length<5) typed += (l===','?'.':l); mark(); armSel(); return true; }
+  if(l==='backspace' && typed){ typed=typed.slice(0,-1); mark(); return true; }
+  if(l==='enter' && typed){
+    const v=parseFloat(typed);
+    if(!isNaN(v)){ if(k==='ta'){ const d=V.sis-V.dia; V.sis=clamp('sis',Math.round(v)); V.dia=clamp('dia',V.sis-d); } else V[k]=clamp(k, k==='t'?Math.round(v*10)/10:Math.round(v)); }
+    typed=''; paint(); mark(); log(NAME[k]+' fijada en '+fmt(k)); return true;
+  }
+  return false;
+}
+function onUp(key){ const l=key.toLowerCase(); if(mode==='hold' && KEY[l] && held===KEY[l]){ held=null; typed=''; mark(); } }
+
+document.addEventListener('keydown', e=>{
+  if(isTyping(e) || e.ctrlKey || e.metaKey || e.altKey) return;   // escribiendo o atajo del sistema: no se toca
+  if(e.key==='Shift') return;
+  if(onDown(e.key, e)) e.preventDefault();
+});
+document.addEventListener('keyup', e=>{ if(!isTyping(e)) onUp(e.key); });
+addEventListener('blur', ()=>{ held=null; mark(); });             // al cambiar de ventana se «sueltan» las teclas
+
+// teclado virtual
+const vkMap={ up:'ArrowUp', down:'ArrowDown', esc:'Escape' };
+$('vk').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return; const k=b.dataset.k;
+  if(k==='shift'){ shift=!shift; b.classList.toggle('down', shift); return; }
+  if(KEY[k]){
+    if(mode==='hold'){ const was=held===KEY[k]; document.querySelectorAll('#vk button[data-k]').forEach(x=>{ if(KEY[x.dataset.k]) x.classList.remove('down'); });
+      held = was ? null : KEY[k]; if(!was) b.classList.add('down'); typed=''; mark(); return; }
+    onDown(k); document.querySelectorAll('#vk button').forEach(x=>{ if(KEY[x.dataset.k]) x.classList.toggle('down', sel===KEY[x.dataset.k]); }); return;
+  }
+  onDown(vkMap[k]||k); if(k==='esc') document.querySelectorAll('#vk button').forEach(x=>{ if(x.dataset.k!=='shift') x.classList.remove('down'); });
+});
+
+// ajustes
+const HELP={ hold:'Mantén la letra y pulsa ↑/↓. Al soltar la letra, termina.', tap:'Pulsa la letra (la tarjeta queda marcada) y usa ↑/↓. Termina con Esc, con otra letra o tras 4 s sin tocar nada. Cómodo con una sola mano.' };
+function seg(id, fn){ $(id).addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; $(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b)); fn(b.dataset.v); }); }
+seg('optOn', v=>{ enabled = v==='1'; held=null; sel=null; mark(); document.querySelector('.kbHint').style.display = enabled?'':'none'; document.querySelectorAll('.c .n kbd').forEach(k=>k.style.display = enabled?'':'none'); });
+seg('optMode', v=>{ mode=v; held=null; sel=null; mark(); $('modeHelp').textContent=HELP[v]; });
+$('modeHelp').textContent=HELP.hold;
+paint();
+
+// monitor simulado
+const cv=$('cv'), cx=cv.getContext('2d'); let x=0, last=performance.now(), ph=0, phr=0; const prev={};
+function size(){ const r=cv.getBoundingClientRect(), d=devicePixelRatio||1; cv.width=r.width*d; cv.height=r.height*d; cx.setTransform(d,0,0,d,0,0); x=0; cx.fillStyle='#05080a'; cx.fillRect(0,0,r.width,r.height); }
+new ResizeObserver(size).observe(cv);
+function ecg(p){ if(p<.08) return Math.sin(p/.08*Math.PI)*.12; if(p>.16&&p<.18) return -.15; if(p>=.18&&p<.21) return 1; if(p>=.21&&p<.24) return -.3; if(p>.38&&p<.52) return Math.sin((p-.38)/.14*Math.PI)*.25; return 0; }
+function pleth(p){ return p<.3 ? Math.sin(p/.3*Math.PI/2) : Math.max(0, 1-(p-.3)/.7)*(1+.15*Math.sin((p-.3)*14)); }
+function tick(now){ const dt=Math.min(.05,(now-last)/1000); last=now; const W=cv.clientWidth, H=cv.clientHeight; if(!W){ requestAnimationFrame(tick); return; }
+  const colW=Math.min(96, W*.22), sp=W*.2*dt, nx=x+sp; cx.fillStyle='#05080a'; cx.fillRect(x,0,sp+6,H);
+  ph+=dt*Math.max(V.fc,1)/60; phr+=dt*Math.max(V.fr,0)/60;
+  for(const [k,a,b,c] of [['ecg',.04,.34,'#35ff6b'],['spo2',.40,.66,'#21d4fd'],['fr',.72,.96,'#ffd400']]){ const mid=(a+b)/2*H, amp=(b-a)*H*.45; let y;
+    if(k==='ecg') y=mid-ecg(ph%1)*amp; else if(k==='spo2') y=mid+amp*.6-pleth(ph%1)*amp*1.2; else y=mid-Math.sin(phr*2*Math.PI)*amp*.7;
+    if(V.fc===0 && k!=='fr') y=mid; cx.strokeStyle=c; cx.lineWidth=1.6; cx.beginPath(); cx.moveTo(x, prev[k]??y); cx.lineTo(nx,y); cx.stroke(); prev[k]=y; }
+  x=nx; if(x>W-colW){ x=0; for(const k in prev) delete prev[k]; }
+  cx.fillStyle='#05080a'; cx.fillRect(W-colW,0,colW,H);
+  for(const [n,v,c,a] of [['FC',V.fc,'#35ff6b',.04],['SpO₂',V.spo2,'#21d4fd',.40],['FR',V.fr,'#ffd400',.72]]){
+    cx.fillStyle=c; cx.font='600 11px system-ui'; cx.textAlign='left'; cx.fillText(n, W-colW+6, a*H+13);
+    cx.font='500 '+Math.round(H*.16)+'px "Arial Narrow",system-ui'; cx.textAlign='right'; cx.fillText(v, W-8, a*H+H*.2); }
+  cx.fillStyle='#05080a'; cx.fillRect(0,H-20,W-colW,20);
+  cx.fillStyle='#ff6e6e'; cx.font='600 11px system-ui'; cx.textAlign='left'; cx.fillText('TA '+V.sis+'/'+V.dia+'   Tª '+fmt('t')+'°', 8, H-7);
+  requestAnimationFrame(tick); }
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
