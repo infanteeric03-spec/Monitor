@@ -101,7 +101,7 @@
 
   <ul class="legend">
     <li>La cabecera conserva el color del tema y el nombre P•SINUSAL, con «•SINUSAL» en verde claro.</li>
-    <li>La línea ECG está dentro de la cabecera. La R queda a la altura del subtítulo, 2 cm a la derecha del final del texto, y un punto recorre la línea de un extremo al otro.</li>
+    <li>La línea ECG está dentro de la cabecera. La R queda a la altura del subtítulo, 1 cm a la derecha del final del texto, y un punto recorre la línea de un extremo al otro.</li>
     <li>Los dos roles y el texto de ayuda son los actuales; solo cambian el nombre y la línea ECG.</li>
   </ul>
 </div>
@@ -117,7 +117,7 @@
 
   // Latido sinusal según el boceto: P pequeña, Q leve, R alta, S profunda, T pequeña.
   // Unidades: 160 de ancho, línea base en y=60; R llega a y=0 (60 u); S baja a y=96 (36 u).
-  const CM_R = 2.0;            // distancia de la R al final de «urgencias» (ajustable)
+  const CM_R = 1.0;            // distancia de la R al final de «urgencias» (ajustable)
   const R_H = 60, S_D = 36;    // altura de la R y profundidad de la S, en unidades
   function beat(bx, s, baseY){
     const X = x => bx + x*s, Y = y => baseY - (60 - y)*s;
