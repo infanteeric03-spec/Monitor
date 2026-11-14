@@ -9223,6 +9223,7 @@ async function ceRestore(id){
 /* ---- Crear caso con IA (Gemini, vía función de Supabase «case-ai»; solo administrador) ---- */
 var caseAiDraft = null;   // { reviewed:false } mientras el borrador generado no se haya revisado
 function caseAiOpen(){
+  if(!document.body.classList.contains('ecg-admin') || !adminPin()){ showToast('Esta función es solo para el administrador. Inicia sesión.'); return; }
   document.getElementById('caseAiErr').textContent = '';
   const b = document.getElementById('caseAiGo'); b.disabled = false; b.textContent = '✦ Generar borrador';
   document.getElementById('caseAiOverlay').classList.add('open');
@@ -9283,7 +9284,7 @@ function ceCaseEdit(id){
     + '<h3>'+(own ? 'Editar caso' : src ? 'Duplicar caso predefinido' : 'Nuevo caso')+'</h3>'
     + (src && !own ? '<p class="mn-note">Los casos predefinidos no se modifican: al guardar se crea una copia propia que podrás editar.</p>' : '')
     + (own ? '<div class="kf-actions n2" style="margin:0 0 12px"><button class="casebtn" onclick="ceCaseEdit(null); ceCaseDup(\''+id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg> Duplicar</button><button class="casebtn ce-del" onclick="ceCaseDelete(\''+id+'\')"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Eliminar caso</button></div>' : '')
-    + '<button type="button" class="ai-btn" onclick="caseAiOpen()"><span aria-hidden="true">✦</span> Crear con IA</button><div id="caseAiBanner"></div>'
+    + '<button type="button" class="ai-btn admin-only" onclick="caseAiOpen()"><span aria-hidden="true">✦</span> Crear con IA</button><div id="caseAiBanner"></div>'
     + '<div id="ceCaseHost"></div></section>';
   body.scrollTop = 0;
   const cb = document.getElementById('caseBuilder');
