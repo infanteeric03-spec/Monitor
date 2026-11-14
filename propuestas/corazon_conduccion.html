@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maqueta · Corazón con nodo y haces de conducción en la cabecera (tablet y ordenador, no aplicada)</title>
+<style>
+  :root{ --bg:#f5f8f9; --hero:#0f5c4a; --mint:#a8f0cd; --trace:#4c967d; --ink:#14232b; --dim:#5c6e76; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#e8eef0; color:var(--ink); font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; padding:18px; }
+  h1{ font-size:18px; margin:0 0 4px; } h2{ font-size:14px; margin:20px 0 6px; }
+  .sub{ color:var(--dim); font-size:13px; line-height:1.55; max-width:820px; margin:0 0 6px; }
+  .frame{ width:min(100%,1000px); background:var(--bg); border:1px solid #c9d5d8; border-radius:14px; overflow:hidden; }
+  .hero{ position:relative; background:var(--hero); color:#fff; padding:46px 22px; z-index:0; }
+  .hin{ width:660px; max-width:100%; margin:0 auto; padding:0 16px; position:relative; }
+  .t{ font-size:34px; font-weight:800; letter-spacing:.14em; line-height:1.1; white-space:nowrap; }
+  .t .u{ color:var(--mint); } .t .gh{ color:transparent; } .t .bl{ display:inline-block; width:0; height:0; }
+  .s{ font-size:15px; color:#cfe8e1; margin-top:3px; }
+  .ecg{ position:absolute; left:0; top:0; width:100%; height:calc(100% + 70px); overflow:visible; pointer-events:none; z-index:2; }
+  .body{ position:relative; z-index:1; padding:30px 0 24px; } .bin{ width:660px; max-width:100%; margin:0 auto; padding:0 16px; }
+  .body p{ margin:0 0 12px; color:var(--dim); font-size:15px; }
+  .cards{ display:flex; gap:20px; } .card{ flex:1; height:150px; background:#fff; border:1px solid #dbe4e7; border-radius:26px; }
+  .nw{ position:absolute; inset:0; overflow:hidden; z-index:1; pointer-events:none; }
+  .cor{ position:absolute; overflow:visible; }
+  .A .cor{ left:calc(50% + 330px - 190px); top:8px; width:128px; }
+  .nw .vc,.nw .ao,.nw .cu{ stroke-linejoin:round; }
+  /* A: línea sobre el verde */
+  .A .vc,.A .ao,.A .cu{ fill:var(--hero); stroke:#4c967d; stroke-width:2.2; } .A .vc2{ fill:none; stroke:#4c967d; stroke-width:1.6; }
+  .A .sep{ fill:none; stroke:#4c967d; stroke-width:1.3; opacity:.5; }
+  .A .hz{ stroke:#a8f0cd; } .A .nd,.A .av{ fill:#a8f0cd; } .A .aro{ stroke:#a8f0cd; }
+  /* B: colores de ilustración, apagados para no gritar sobre el verde */
+  .B .cor{ left:calc(50% + 330px - 196px); top:6px; width:132px; }
+  .B .vc,.B .ao,.B .cu{ fill:#e9b9b6; stroke:#1d2b2a; stroke-width:2.4; } .B .vc2{ fill:#c97b8d; stroke:#1d2b2a; stroke-width:1.4; }
+  .B .sep{ fill:none; stroke:#fff; stroke-width:1.5; opacity:.8; }
+  .B .hz{ stroke:#6bb3da; stroke-width:4.4; } .B .pk{ stroke:#d99a9a; } .B .nd,.B .av{ fill:#8ff0e6; stroke:#1d2b2a; stroke-width:1.4; } .B .aro{ stroke:#8ff0e6; }
+  .hz{ fill:none; stroke-width:3; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:1; animation:cond 3.2s ease-in-out infinite; }
+  .A .hz{ stroke-width:2.6; } .hz:nth-of-type(2){ animation-delay:.1s; } .hz:nth-of-type(3){ animation-delay:.2s; } .pk{ animation-delay:.9s; } .pk + .pk{ animation-delay:.95s; }
+  @keyframes cond{ 0%{ stroke-dashoffset:1; opacity:1; } 35%{ stroke-dashoffset:0; opacity:1; } 80%{ stroke-dashoffset:0; opacity:.9; } 100%{ stroke-dashoffset:0; opacity:0; } }
+  .aro{ fill:none; stroke-width:1.5; transform-box:fill-box; transform-origin:center; animation:pulso 1.6s ease-out infinite; opacity:0; } .a2{ animation-delay:.8s; }
+  @keyframes pulso{ 0%{ transform:scale(1); opacity:.9; } 100%{ transform:scale(3.2); opacity:0; } }
+  .cap{ font-size:12px; color:var(--dim); margin:6px 2px 0; max-width:820px; line-height:1.45; }
+</style></head><body>
+<h1>Corazón con nodo y haces de conducción</h1>
+<p class="sub">Maqueta sin aplicar, solo para tablet, iPad y ordenador y sin texto. A partir de tu ilustración, dibujo propio y simplificado: vena cava arriba a la izquierda, aorta, el nódulo sinusal en su unión con la aurícula, los haces internodales que se «encienden» hacia el nódulo auriculoventricular y, desde ahí, las fibras que bajan a los ventrículos. En bucle.</p>
+<h2>A · Línea del mismo verde de la cabecera, haces en menta</h2><div class="frame"><div class="hero A"><div class="hin"><div class="t"><span>P</span><span class="u">•<span class="eS">S</span><span class="gh">I</span><span class="bl"></span><span class="eN">N</span>USAL</span></div><div class="s">Simulación clínica de urgencias</div></div><div class="nw"><svg class="cor" viewBox="0 0 220 240" aria-hidden="true">
+  <path class="vc" d="M50 80 L50 18 C50 6 78 6 78 18 L78 80 Z"/><ellipse class="vc2" cx="64" cy="17" rx="10" ry="4"/>
+  <path class="ao" d="M102 66 C98 26 146 10 164 44 L148 52 C140 36 120 38 118 66 Z"/>
+  <path class="cu" d="M54 74 C40 104 28 152 50 192 C72 228 130 236 158 214 C198 184 206 122 178 88 C162 68 142 60 124 64 C112 58 88 60 78 74 Z"/>
+  <path class="sep" d="M82 96 C96 132 96 176 112 214"/><path class="sep" d="M128 78 C142 106 168 128 176 164"/>
+  <g class="ha">
+    <path class="hz" pathLength="1" d="M66 82 C54 108 56 140 82 156"/>
+    <path class="hz" pathLength="1" d="M72 78 C98 70 122 70 146 84"/>
+    <path class="hz" pathLength="1" d="M74 84 C98 96 108 122 102 156"/>
+    <circle class="av" cx="96" cy="160" r="4.5"/>
+    <path class="hz pk" pathLength="1" d="M99 164 C108 186 106 206 96 220"/><path class="hz pk" pathLength="1" d="M102 164 C122 180 142 186 158 178"/>
+  </g>
+  <g class="nodo"><circle class="aro" cx="65" cy="76" r="7"/><circle class="aro a2" cx="65" cy="76" r="7"/><ellipse class="nd" cx="65" cy="76" rx="10" ry="7.5" transform="rotate(-25 65 76)"/></g>
+</svg></div><svg class="ecg"></svg></div><div class="body"><div class="bin"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div><p class="cap">Sobrio: encaja con el resto de la cabecera y los haces se dibujan solos desde el nódulo.</p><h2>B · Con los colores de la ilustración (rosa, azul y turquesa)</h2><div class="frame"><div class="hero B"><div class="hin"><div class="t"><span>P</span><span class="u">•<span class="eS">S</span><span class="gh">I</span><span class="bl"></span><span class="eN">N</span>USAL</span></div><div class="s">Simulación clínica de urgencias</div></div><div class="nw"><svg class="cor" viewBox="0 0 220 240" aria-hidden="true">
+  <path class="vc" d="M50 80 L50 18 C50 6 78 6 78 18 L78 80 Z"/><ellipse class="vc2" cx="64" cy="17" rx="10" ry="4"/>
+  <path class="ao" d="M102 66 C98 26 146 10 164 44 L148 52 C140 36 120 38 118 66 Z"/>
+  <path class="cu" d="M54 74 C40 104 28 152 50 192 C72 228 130 236 158 214 C198 184 206 122 178 88 C162 68 142 60 124 64 C112 58 88 60 78 74 Z"/>
+  <path class="sep" d="M82 96 C96 132 96 176 112 214"/><path class="sep" d="M128 78 C142 106 168 128 176 164"/>
+  <g class="ha">
+    <path class="hz" pathLength="1" d="M66 82 C54 108 56 140 82 156"/>
+    <path class="hz" pathLength="1" d="M72 78 C98 70 122 70 146 84"/>
+    <path class="hz" pathLength="1" d="M74 84 C98 96 108 122 102 156"/>
+    <circle class="av" cx="96" cy="160" r="4.5"/>
+    <path class="hz pk" pathLength="1" d="M99 164 C108 186 106 206 96 220"/><path class="hz pk" pathLength="1" d="M102 164 C122 180 142 186 158 178"/>
+  </g>
+  <g class="nodo"><circle class="aro" cx="65" cy="76" r="7"/><circle class="aro a2" cx="65" cy="76" r="7"/><ellipse class="nd" cx="65" cy="76" rx="10" ry="7.5" transform="rotate(-25 65 76)"/></g>
+</svg></div><svg class="ecg"></svg></div><div class="body"><div class="bin"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div><p class="cap">Más didáctico y reconocible, pero introduce colores nuevos en la cabecera.</p><script>
+var S = 1.0417;
+function beat(bx, s, baseY, period, rTop){
+  var X = function(x){ return bx + x*s; }, Y = function(y){ return baseY - (60 - y)*s; };
+  return ' L '+X(20)+' '+Y(60)+' Q '+X(27)+' '+Y(48)+' '+X(34)+' '+Y(60)
+    + ' L '+X(48)+' '+Y(60)+' L '+X(52)+' '+Y(66)+' L '+X(56)+' '+(rTop!=null?rTop:Y(0))+' L '+X(60)+' '+Y(96)+' L '+X(64)+' '+Y(60)
+    + ' L '+X(78)+' '+Y(60)+' Q '+X(87)+' '+Y(40)+' '+X(100)+' '+Y(60)+' L '+(bx+period)+' '+Y(60);
+}
+function draw(hero){
+  var svg = hero.querySelector('svg.ecg'), hr = hero.getBoundingClientRect(), W = hr.width;
+  var a = hero.querySelector('.eS').getBoundingClientRect(), c = hero.querySelector('.eN').getBoundingClientRect(), bl = hero.querySelector('.bl').getBoundingClientRect();
+  var sub = hero.querySelector('.s').getBoundingClientRect(), baseY = sub.bottom - hr.top + 32.5;
+  var xI = (a.right + c.left)/2 - hr.left, capTop = bl.bottom - hr.top - 0.72*34;
+  var period = Math.min(300, Math.max(210, W/4.5)), bx0 = xI - 56*S, start = bx0 - (Math.ceil(bx0/period)+1)*period;
+  var d = 'M '+start+' '+baseY;
+  for(var bx = start; bx < W + period; bx += period) d += beat(bx, S, baseY, period, Math.abs(bx-bx0)<1 ? capTop : null);
+  svg.setAttribute('viewBox','0 0 '+W+' '+(hr.height+70));
+  svg.innerHTML = '<path d="'+d+'" fill="none" stroke="#4c967d" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+xI+'" cy="'+(capTop-9)+'" r="3.6" fill="#4c967d"/>';
+}
+function all(){ document.querySelectorAll('.hero').forEach(draw); }
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(all); addEventListener('load', all); addEventListener('resize', all); all();
+</script></body></html>
