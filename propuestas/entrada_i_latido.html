@@ -29,17 +29,15 @@
 </head>
 <body>
 <h1>La «I» de SINUSAL como latido</h1>
-<p class="sub">Maqueta sin aplicar. Se quita la «I»: el primer latido sube y su R ocupa su lugar, con el trayecto de la R del mismo color que el texto y un punto encima, como el punto de la «i». El resto de latidos siguen igual (color de la onda). Dos variantes del trazo.</p>
+<p class="sub">Maqueta sin aplicar (variante A). Se quita la «i»: el primer latido sube y su R ocupa su lugar, con el mismo color de la onda en todo el trayecto, y un punto encima como punto de la «i». El resto de latidos siguen igual.</p>
 
-<h2>A · Trayecto fino de la R, color del texto, con punto</h2>
+<h2>Móvil: la R del latido sustituye a la «i», con su punto</h2>
 <div class="row">
   <div><div class="frame phone"><div class="hero" data-v="A"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div>
-  <div><h2 style="margin-top:0">B · Palo grueso en la zona de la letra, con punto</h2>
-  <div class="frame phone"><div class="hero" data-v="B"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div>
 </div>
 
-<h2>Tablet y ordenador (variante B)</h2>
-<div class="frame wide"><div class="hero" data-v="B" data-wide="1"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div>
+<h2>Tablet y ordenador</h2>
+<div class="frame wide"><div class="hero" data-v="A" data-wide="1"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div>
 <p class="cap">En la app real el latido seguiría animado (un punto brillante recorre la línea). La «I» sería siempre la primera R; la onda no cambia de altura ni de posición.</p>
 
 <script>
@@ -67,9 +65,7 @@ function draw(hero){
   }
   var h = '<path d="'+d+'" fill="none" stroke="#4c967d" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
   // el trayecto de la R (la que sustituye a la «I») toma el color del texto, y un punto encima hace de punto de la «i»
-  h += '<clipPath id="hc'+(wide?'w':hero.dataset.v)+'"><rect x="0" y="-20" width="'+W+'" height="'+(hr.height+20)+'"/></clipPath>';   // el color del texto solo dentro del verde; fuera, el tono de la onda
-  h += '<path clip-path="url(#hc'+(wide?'w':hero.dataset.v)+')" d="M '+(xI-1)+' '+(baseY-4)+' L '+xI+' '+capTop+' L '+(xI+2.5)+' '+(baseY+S_D*S)+'" fill="none" stroke="#a8f0cd" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
-  h += '<circle cx="'+xI+'" cy="'+(capTop-9)+'" r="3.6" fill="#a8f0cd"/>';
+  h += '<circle cx="'+xI+'" cy="'+(capTop-9)+'" r="3.6" fill="#4c967d"/>';
   if(hero.dataset.v === 'B'){   // palo grueso en la zona de la letra, como un trazo de la tipografía
     h += '<path d="M '+(xI-3.2)+' '+titleBase+' L '+(xI-3.2)+' '+capTop+' L '+(xI+3.2)+' '+capTop+' L '+(xI+3.2)+' '+titleBase+' Z" fill="#a8f0cd"/>';
   } else {
