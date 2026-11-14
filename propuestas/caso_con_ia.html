@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maqueta · Crear casos clínicos con IA (no aplicada)</title>
+<style>
+  :root{ --bg:#0c1517; --panel:#132024; --line:#22353a; --txt:#e3eef0; --dim:#8fa3a8; --ecg:#38b98a; --on:#03140d;
+         --warn:#e0b23a; --bad:#ff7a7a; --ai:#9b8cff; --ai-bg:rgba(155,140,255,.13); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#06090a; color:var(--txt); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; padding:18px; }
+  h1{ font-size:18px; margin:0 0 4px; } h2{ font-size:15px; margin:0 0 8px; }
+  .sub{ color:var(--dim); font-size:13px; line-height:1.55; margin:0 0 16px; max-width:760px; }
+  .layout{ display:flex; flex-wrap:wrap; gap:28px; align-items:flex-start; }
+  .steps{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; max-width:392px; }
+  .steps button{ flex:1 1 auto; background:var(--panel); border:1px solid var(--line); color:var(--dim); border-radius:999px; padding:7px 10px; font:inherit; font-size:12px; cursor:pointer; }
+  .steps button.on{ color:var(--on); background:var(--ecg); border-color:var(--ecg); font-weight:700; }
+  .phone{ width:392px; height:760px; background:#000; border:2px solid #1d2a2d; border-radius:36px; padding:12px; }
+  .scr{ width:100%; height:100%; background:var(--bg); border-radius:26px; overflow:hidden; display:flex; flex-direction:column; position:relative; }
+  .bar{ display:flex; align-items:center; gap:8px; padding:14px 14px 10px; border-bottom:1px solid var(--line); }
+  .bar b{ font-size:15px; } .bar .x{ margin-left:auto; color:var(--dim); font-size:18px; }
+  .body{ flex:1; overflow:auto; padding:12px 14px 14px; }
+  .foot{ padding:10px 14px 14px; border-top:1px solid var(--line); display:flex; gap:8px; }
+  label.l{ display:block; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--dim); margin:10px 0 4px; }
+  .in, .ta, .sel{ width:100%; background:var(--panel); color:var(--txt); border:1px solid var(--line); border-radius:10px; padding:9px 10px; font:inherit; font-size:14px; }
+  .ta{ min-height:120px; resize:none; line-height:1.45; }
+  .btn{ border:1px solid var(--line); background:var(--panel); color:var(--txt); border-radius:10px; padding:10px 14px; font:inherit; font-size:14px; cursor:pointer; }
+  .btn.p{ background:var(--ecg); color:var(--on); border-color:var(--ecg); font-weight:700; flex:1; }
+  .btn.ai{ background:var(--ai-bg); border-color:color-mix(in srgb,var(--ai) 55%,transparent); color:#d9d3ff; font-weight:600; width:100%; display:flex; gap:8px; align-items:center; justify-content:center; }
+  .btn[disabled]{ opacity:.45; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .chip{ border:1px solid var(--line); border-radius:999px; padding:5px 10px; font-size:12px; color:var(--dim); background:var(--panel); cursor:pointer; }
+  .chip.on{ color:#d9d3ff; border-color:var(--ai); background:var(--ai-bg); }
+  .note{ font-size:12px; color:var(--dim); line-height:1.5; margin:8px 0 0; }
+  .banner{ border:1px solid color-mix(in srgb,var(--warn) 60%,transparent); background:rgba(224,178,58,.1); color:#f1dca0; border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.45; margin-bottom:10px; }
+  .banner b{ color:#ffe9b0; }
+  .kf{ border:1px solid var(--line); border-radius:12px; background:var(--panel); margin-bottom:8px; overflow:hidden; }
+  .kf-h{ display:flex; align-items:center; gap:8px; padding:9px 10px; font-size:13px; }
+  .kf-h .sum{ color:var(--dim); font-size:12px; margin-left:auto; }
+  .tag{ font-size:10px; font-weight:700; letter-spacing:.04em; color:#d9d3ff; background:var(--ai-bg); border:1px solid color-mix(in srgb,var(--ai) 45%,transparent); border-radius:999px; padding:2px 7px; }
+  .kf-b{ border-top:1px solid var(--line); padding:8px 10px 10px; }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .f label{ display:block; font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+  .f div{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:6px 7px; font-size:13px; font-variant-numeric:tabular-nums; }
+  .f.span2{ grid-column:span 2; } .f.span4{ grid-column:span 4; }
+  .f div.chg{ border-color:var(--ai); background:var(--ai-bg); }
+  .f div.warn{ border-color:var(--warn); color:#f1dca0; }
+  .narr{ font-size:12.5px; color:#cbd8db; line-height:1.45; margin-top:8px; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px; }
+  .flag{ font-size:11.5px; color:#f1dca0; margin-top:6px; }
+  .spin{ display:grid; place-items:center; height:100%; text-align:center; color:var(--dim); font-size:13px; gap:12px; }
+  .ring{ width:42px; height:42px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--ai); animation:r 1s linear infinite; margin:0 auto; }
+  @keyframes r{ to{ transform:rotate(360deg); } }
+  .chk{ display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.45; margin-top:12px; }
+  .chk input{ margin-top:3px; width:18px; height:18px; accent-color:var(--ecg); }
+  .scr > .view{ display:none; flex-direction:column; flex:1; min-height:0; } .scr > .view.on{ display:flex; }
+  .side{ max-width:440px; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  .card h3{ margin:0 0 6px; font-size:13.5px; }
+  .card ul{ margin:0; padding-left:18px; color:#c3d1d4; font-size:12.5px; line-height:1.55; }
+  .flow{ display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:#c3d1d4; }
+  .flow div{ border:1px solid var(--line); border-radius:8px; padding:7px 9px; background:var(--bg); }
+  .flow i{ color:var(--dim); text-align:center; font-style:normal; }
+</style>
+</head>
+<body>
+  <h1>Maqueta · Casos clínicos con ayuda de IA <span style="color:var(--dim);font-weight:400">(no aplicada)</span></h1>
+  <p class="sub">El administrador describe la idea del caso en lenguaje natural y la IA (propuesta: Google Gemini) rellena las fases con tiempos, ritmo, constantes y narrativa. El resultado es un <b>borrador</b>: no se puede guardar sin que el docente lo revise y lo confirme. Pulsa los pasos para recorrer el flujo.</p>
+
+  <div class="layout">
+    <div>
+      <div class="steps" id="steps">
+        <button class="on" data-v="v1">1 · Editor</button>
+        <button data-v="v2">2 · Describir</button>
+        <button data-v="v3">3 · Generando</button>
+        <button data-v="v4">4 · Revisar</button>
+        <button data-v="v5">5 · Guardar</button>
+      </div>
+      <div class="phone"><div class="scr">
+
+        <!-- 1 Editor -->
+        <div class="view on" id="v1">
+          <div class="bar"><span style="font-size:18px">✎</span><b>Nuevo caso</b><span class="x">✕</span></div>
+          <div class="body">
+            <button class="btn ai" onclick="go('v2')"><span>✦</span> Crear con IA</button>
+            <p class="note" style="text-align:center;margin-top:6px">Describe el caso y se rellenan las fases. Después lo revisas.</p>
+            <label class="l">Título del caso</label>
+            <input class="in" placeholder="Ej.: Dolor torácico con parada" disabled>
+            <label class="l">Fases</label>
+            <div class="kf"><div class="kf-h"><b>Fase 1</b><span class="sum">NSR · 80 lpm</span></div></div>
+            <div class="kf"><div class="kf-h"><b>Fase 2</b><span class="sum">NSR · 80 lpm</span></div></div>
+            <button class="btn" style="width:100%">＋ Añadir fase</button>
+          </div>
+          <div class="foot"><button class="btn" style="flex:1">Cancelar</button><button class="btn p" disabled>Guardar caso</button></div>
+        </div>
+
+        <!-- 2 Describir -->
+        <div class="view" id="v2">
+          <div class="bar"><span style="color:var(--ai);font-size:18px">✦</span><b>Crear con IA</b><span class="x" onclick="go('v1')">✕</span></div>
+          <div class="body">
+            <label class="l" style="margin-top:0">Idea del caso</label>
+            <textarea class="ta" id="idea">Varón de 58 años con dolor torácico opresivo y sudoración. Evoluciona a taquicardia ventricular, pierde el pulso y entra en fibrilación ventricular. Tras descargas y RCP recupera circulación espontánea.</textarea>
+            <div class="note">Sin nombres ni datos reales de pacientes. <span id="cnt">203</span>/800</div>
+            <div class="row2">
+              <div><label class="l">Duración total</label><select class="sel"><option>3 min</option><option selected>5 min</option><option>8 min</option><option>10 min</option></select></div>
+              <div><label class="l">Nº de fases</label><select class="sel"><option>Automático</option><option>4</option><option selected>6</option><option>8</option></select></div>
+            </div>
+            <label class="l">Nivel</label>
+            <div class="chips"><span class="chip">Básico</span><span class="chip on">Intermedio</span><span class="chip">Avanzado</span></div>
+            <label class="l">Incluir</label>
+            <div class="chips"><span class="chip on">Narrativa por fase</span><span class="chip on">Parada cardiaca (PCR)</span><span class="chip">Solo ritmos del simulador</span></div>
+            <p class="note">La IA solo puede elegir ritmos que el simulador ya tiene (sinusal, FA, BAV, TV, FV, asistolia…).</p>
+          </div>
+          <div class="foot"><button class="btn" onclick="go('v1')">Cancelar</button><button class="btn p" onclick="gen()">✦ Generar borrador</button></div>
+        </div>
+
+        <!-- 3 Generando -->
+        <div class="view" id="v3">
+          <div class="bar"><span style="color:var(--ai);font-size:18px">✦</span><b>Generando borrador…</b></div>
+          <div class="body"><div class="spin"><div><div class="ring"></div><p style="margin:14px 0 0">Creando fases, constantes y narrativa.<br>Suele tardar unos segundos.</p></div></div></div>
+          <div class="foot"><button class="btn" style="flex:1" onclick="go('v2')">Cancelar</button></div>
+        </div>
+
+        <!-- 4 Revisar -->
+        <div class="view" id="v4">
+          <div class="bar"><b>Borrador de IA</b><span class="tag">REVISAR</span><span class="x" onclick="go('v1')">✕</span></div>
+          <div class="body">
+            <div class="banner"><b>Revisa el caso antes de guardarlo.</b> La IA puede equivocarse en constantes, ritmos o tiempos. Comprueba cada fase; lo marcado en violeta lo ha puesto la IA y en ámbar, lo que conviene mirar.</div>
+            <label class="l" style="margin-top:0">Título</label>
+            <input class="in" value="Dolor torácico que evoluciona a FV">
+
+            <div class="kf"><div class="kf-h"><b>Fase 1</b><span class="tag">IA</span><span class="sum">0 s · NSR</span></div>
+              <div class="kf-b"><div class="grid">
+                <div class="f"><label>Inicio</label><div class="chg">0</div></div><div class="f span2"><label>Ritmo</label><div class="chg">Sinusal normal</div></div><div class="f"><label>FC</label><div class="chg">98</div></div>
+                <div class="f"><label>SpO₂</label><div class="chg">95</div></div><div class="f"><label>FR</label><div class="chg">20</div></div><div class="f"><label>Tª</label><div class="chg">36.8</div></div><div class="f"><label>TA</label><div class="chg">142/88</div></div>
+              </div><div class="narr">Varón, 58 años. Dolor torácico opresivo irradiado a brazo izquierdo, sudoración profusa. Consciente y ansioso.</div></div></div>
+
+            <div class="kf"><div class="kf-h"><b>Fase 2</b><span class="tag">IA</span><span class="sum">45 s · TV</span></div>
+              <div class="kf-b"><div class="grid">
+                <div class="f"><label>Inicio</label><div class="chg">45</div></div><div class="f span2"><label>Ritmo</label><div class="chg">TV monomorfa</div></div><div class="f"><label>FC</label><div class="chg">182</div></div>
+                <div class="f"><label>SpO₂</label><div class="chg">89</div></div><div class="f"><label>FR</label><div class="chg">26</div></div><div class="f"><label>Tª</label><div class="chg">36.8</div></div><div class="f"><label>TA</label><div class="chg">78/48</div></div>
+              </div><div class="narr">Mareo intenso y palidez. Hipotensión con taquicardia de QRS ancho.</div></div></div>
+
+            <div class="kf"><div class="kf-h"><b>Fase 3</b><span class="tag">IA</span><span class="sum">95 s · FV</span></div>
+              <div class="kf-b"><div class="grid">
+                <div class="f"><label>Inicio</label><div class="chg">95</div></div><div class="f span2"><label>Ritmo</label><div class="chg">Fibrilación ventricular</div></div><div class="f"><label>FC</label><div class="chg">0</div></div>
+                <div class="f"><label>SpO₂</label><div class="chg warn">0</div></div><div class="f"><label>FR</label><div class="chg">0</div></div><div class="f"><label>Tª</label><div class="chg">36.7</div></div><div class="f"><label>TA</label><div class="chg">0/0</div></div>
+              </div><label class="chk" style="margin:8px 0 0;font-size:12px"><input type="checkbox" checked disabled> Sin pulso en esta fase</label>
+              <div class="flag">⚠ SpO₂ en 0 con parada: lo habitual es que no se registre. Revísalo.</div></div></div>
+
+            <div class="kf"><div class="kf-h"><b>Fases 4 a 6</b><span class="tag">IA</span><span class="sum">Toca para ver</span></div></div>
+            <button class="btn" style="width:100%;margin-top:4px">✦ Regenerar con otra indicación</button>
+          </div>
+          <div class="foot"><button class="btn" onclick="go('v2')">Cambiar idea</button><button class="btn p" onclick="go('v5')">Continuar</button></div>
+        </div>
+
+        <!-- 5 Guardar -->
+        <div class="view" id="v5">
+          <div class="bar"><b>Guardar el caso</b><span class="x" onclick="go('v4')">✕</span></div>
+          <div class="body">
+            <div class="banner"><b>Este caso lo ha generado una IA.</b> Antes de guardarlo y usarlo con estudiantes, comprueba que ritmos, constantes y tiempos son clínicamente correctos.</div>
+            <label class="chk"><input type="checkbox" id="ok" onchange="document.getElementById('sv').disabled=!this.checked"> He revisado todas las fases y el caso es correcto.</label>
+            <p class="note">Al guardar, el caso queda marcado como «generado con IA» y se puede editar como cualquier otro caso propio.</p>
+          </div>
+          <div class="foot"><button class="btn" onclick="go('v4')">Volver a revisar</button><button class="btn p" id="sv" disabled>Guardar caso</button></div>
+        </div>
+
+      </div></div>
+    </div>
+
+    <div class="side">
+      <div class="card"><h3>Cómo funcionaría</h3>
+        <div class="flow">
+          <div>1 · El administrador pulsa «Crear con IA» en el editor de casos</div><i>↓</i>
+          <div>2 · Describe la idea (y opcionalmente duración, nº de fases y nivel)</div><i>↓</i>
+          <div>3 · La app llama a una función de Supabase, que guarda la clave y llama a Gemini</div><i>↓</i>
+          <div>4 · La función devuelve fases en JSON y la app las valida (ritmos y rangos)</div><i>↓</i>
+          <div>5 · Se rellena el editor como borrador, con aviso de revisión</div><i>↓</i>
+          <div>6 · No se puede guardar sin marcar «He revisado el caso»</div>
+        </div></div>
+      <div class="card"><h3>Qué rellena la IA</h3>
+        <ul><li>Título, fases y tiempo de inicio de cada una</li><li>Ritmo (solo de la lista del simulador), FC, TA, SpO₂, FR y Tª</li><li>Pulso presente o no, y la narrativa de cada fase</li></ul></div>
+      <div class="card"><h3>Salvaguardas</h3>
+        <ul><li><b>Clave fuera de la app:</b> la clave de Gemini va como secreto de la función, nunca en el navegador.</li>
+          <li><b>Solo administrador</b>, con límite de usos por día.</li>
+          <li><b>Salida estructurada:</b> JSON con esquema fijo; lo que no cuadre se corrige o se marca en ámbar.</li>
+          <li><b>Validación en la app:</b> ritmos permitidos, rangos (FC 0–260, SpO₂ 0–100…), tiempos crecientes y coherencia con «sin pulso».</li>
+          <li><b>Revisión obligatoria</b> y etiqueta «generado con IA» en el caso.</li>
+          <li><b>Sin datos de pacientes:</b> aviso en el cuadro de texto.</li></ul></div>
+      <div class="card"><h3>Con Gemini: a decidir</h3>
+        <ul><li><b>Modelo:</b> uno de la familia Flash suele bastar y es barato; confirmar el vigente al implantarlo.</li>
+          <li><b>Coste y privacidad:</b> revisar las condiciones de Google; en el nivel gratuito pueden usarse los textos para mejorar sus productos y el de pago es lo habitual para uso educativo.</li>
+          <li><b>Aviso clínico:</b> sigue siendo un simulador formativo; la IA no sustituye la revisión del docente.</li></ul></div>
+    </div>
+  </div>
+
+<script>
+  const views = ['v1','v2','v3','v4','v5'];
+  function go(id){
+    views.forEach(v=>document.getElementById(v).classList.toggle('on', v===id));
+    document.querySelectorAll('#steps button').forEach(b=>b.classList.toggle('on', b.dataset.v===id));
+  }
+  document.querySelectorAll('#steps button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.v)));
+  function gen(){ go('v3'); setTimeout(()=>{ if(document.getElementById('v3').classList.contains('on')) go('v4'); }, 2200); }
+  const idea = document.getElementById('idea'), cnt = document.getElementById('cnt');
+  idea.addEventListener('input', ()=>{ cnt.textContent = idea.value.length; });
+  document.querySelectorAll('.chips').forEach(g=>g.addEventListener('click', e=>{
+    const c = e.target.closest('.chip'); if(!c) return;
+    const single = g.previousElementSibling && /Nivel/.test(g.previousElementSibling.textContent);
+    if(single) g.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on', x===c)); else c.classList.toggle('on');
+  }));
+</script>
+</body>
+</html>
