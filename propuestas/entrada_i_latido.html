@@ -33,11 +33,11 @@
 
 <h2>Móvil: la R del latido sustituye a la «i», con su punto</h2>
 <div class="row">
-  <div><div class="frame phone"><div class="hero" data-v="A"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div>
+  <div><div class="frame phone"><div class="hero" data-v="A"><div class="hin"><div class="t"><span>P</span><span class="u">•<span class="eS">S</span><span class="gh">I</span><span class="bl"></span><span class="eN">N</span>USAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div></div>
 </div>
 
 <h2>Tablet y ordenador</h2>
-<div class="frame wide"><div class="hero" data-v="A" data-wide="1"><div class="hin"><div class="t"><span>P</span><span class="u">•S<span class="gh">I</span><span class="bl"></span>NUSAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div>
+<div class="frame wide"><div class="hero" data-v="A" data-wide="1"><div class="hin"><div class="t"><span>P</span><span class="u">•<span class="eS">S</span><span class="gh">I</span><span class="bl"></span><span class="eN">N</span>USAL</span></div><div class="s">Simulación clínica de urgencias</div></div><svg></svg></div><div class="body"><p>Elige cómo vas a participar.</p><div class="cards"><div class="card"></div><div class="card"></div></div></div></div>
 <p class="cap">En la app real el latido seguiría animado (un punto brillante recorre la línea). La «I» sería siempre la primera R; la onda no cambia de altura ni de posición.</p>
 
 <script>
@@ -53,7 +53,8 @@ function draw(hero){
   var gh = hero.querySelector('.gh').getBoundingClientRect(), bl = hero.querySelector('.bl').getBoundingClientRect();
   var sub = hero.querySelector('.s').getBoundingClientRect();
   var subBottom = sub.bottom - hr.top, baseY = subBottom + 32.5;
-  var xI = gh.left + gh.width/2 - hr.left;                    // centro de la «I»
+  var eS = hero.querySelector('.eS').getBoundingClientRect(), eN = hero.querySelector('.eN').getBoundingClientRect();
+  var xI = (eS.right + eN.left)/2 - hr.left;                   // justo en medio entre la S y la N
   var titleBase = bl.bottom - hr.top;                          // línea base del título
   var capTop = titleBase - 0.72*30;                            // altura de mayúscula
   var wide = hero.dataset.wide, period = wide ? Math.max(160*S, W/3) : 160*S;
@@ -61,7 +62,7 @@ function draw(hero){
   var bx0 = xI - 56*S;
   var d = 'M '+(bx0 - 3*period)+' '+baseY;
   for(var bx = bx0 - 3*period; bx < W + period; bx += period){
-    d += (Math.abs(bx - bx0) < 1) ? beat(bx, S, baseY, period).replace(/L (\S+) (\S+) L (\S+) (\S+) L (\S+) (\S+) L (\S+) (\S+)/, function(m, a1,a2,b1,b2,c1,c2,d1,d2){ return 'L '+a1+' '+a2+' L '+(xI-1)+' '+(baseY-4)+' L '+xI+' '+capTop+' L '+(xI+2.5)+' '+(baseY+S_D*S)+' L '+d1+' '+d2; }) : beat(bx, S, baseY, period);
+    d += (Math.abs(bx - bx0) < 1) ? beat(bx, S, baseY, period).replace(/L (\S+) (\S+) L (\S+) (\S+) L (\S+) (\S+) L (\S+) (\S+)/, function(m, a1,a2,b1,b2,c1,c2,d1,d2){ return 'L '+a1+' '+a2+' L '+b1+' '+b2+' L '+c1+' '+capTop+' L '+d1+' '+d2; }) : beat(bx, S, baseY, period);
   }
   var h = '<path d="'+d+'" fill="none" stroke="#4c967d" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
   // el trayecto de la R (la que sustituye a la «I») toma el color del texto, y un punto encima hace de punto de la «i»
