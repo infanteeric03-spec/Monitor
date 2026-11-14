@@ -90,6 +90,29 @@
   .ph .m{ font-size:12px; padding:5px 8px; } .ph .ch{ padding:6px 10px; } .ph .in{ padding:6px 10px 8px; } .ph .msgs{ padding:6px 10px; }
   .ph .to{ padding-top:5px; }
 
+  /* modo discreto: botón pequeño y atenuado, pero con el contador visible */
+  .fab{ transition:transform .15s, width .2s, height .2s, opacity .2s; }
+  .fab .bd.zero{ display:none; }
+  body.disc .fab{ opacity:.5; box-shadow:none; }
+  body.disc .fab:hover, body.disc .fab:focus-visible{ opacity:1; }
+  body.disc .pv .fab, body.disc .ph .fab{ width:32px; height:32px; }
+  body.disc .pv .fab{ right:10px; bottom:12px; } body.disc .ph .fab{ right:8px; bottom:8px; }
+  body.disc .pc .fab{ width:20px; height:60px; gap:0; }
+  body.disc .fab svg{ width:16px; height:16px; }
+  body.disc .fab .bd{ min-width:17px; height:17px; font-size:10px; padding:0 4px; top:-6px; right:-6px; }
+  body.disc .pc .fab .bd{ top:4px; left:-8px; right:auto; }
+  body.disc .fab.ping{ opacity:1; animation:ping .9s ease-out 2; }
+  @keyframes ping{ 0%{ box-shadow:0 0 0 0 rgba(255,93,93,.7); } 100%{ box-shadow:0 0 0 12px rgba(255,93,93,0); } }
+  .ch .dsc{ margin-left:auto; display:flex; align-items:center; gap:5px; border:1px solid var(--line); background:var(--panel2); color:var(--dim); border-radius:999px; padding:5px 9px; font:inherit; font-size:11px; cursor:pointer; }
+  .ch .dsc.on{ color:var(--on); background:var(--ecg); border-color:var(--ecg); font-weight:700; }
+  .ch .dsc + .x{ margin-left:0; }
+  .opt{ display:flex; align-items:center; gap:8px; margin:6px 12px 0; font-size:11.5px; color:var(--dim); cursor:pointer; }
+  .opt i{ width:30px; height:17px; border-radius:9px; background:var(--line); position:relative; flex:none; transition:background .15s; }
+  .opt i::after{ content:""; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:#fff; transition:left .15s; }
+  .opt.on i{ background:var(--ecg); } .opt.on i::after{ left:15px; }
+  .in.off input{ opacity:.55; }
+  .in.off button{ opacity:.35; pointer-events:none; }
+  .to span small{ color:#ff8d8d; font-size:10px; font-weight:700; margin-left:3px; }
   ul.n{ color:var(--dim); font-size:13px; line-height:1.6; max-width:780px; padding-left:18px; }
   ul.n b{ color:var(--txt); }
   .vsel{ display:flex; gap:6px; margin-bottom:10px; }
@@ -100,7 +123,7 @@
 <body>
 <h1>Chat entre docente y alumnos conectados</h1>
 <p class="sub">Maqueta sin aplicar. Toca el botón de chat de cada pantalla para abrirlo; se cierra con la X o tocando fuera. Arriba puedes cambiar entre la vista del <b>docente</b> (elige destinatario) y la del <b>alumno</b> (escribe al docente y ve los avisos para todos).</p>
-<div class="vsel"><button class="on" data-v="doc" onclick="setView('doc')">Vista docente</button><button data-v="al" onclick="setView('al')">Vista alumno</button></div>
+<div class="vsel"><button class="on" data-v="doc" onclick="setView('doc')">Vista docente</button><button data-v="al" onclick="setView('al')">Vista alumno</button><button id="discSw" onclick="toggleDisc()">Modo discreto</button><button onclick="simulate()">+ Simular mensaje nuevo</button></div>
 
 <h2>1 · Móvil vertical</h2>
 <p class="tag">Botón flotante abajo a la derecha, siempre visible aunque se haga scroll. El chat sube desde abajo y ocupa 3/4 de la pantalla.</p>
@@ -164,8 +187,9 @@
 
 <h2>Cómo funcionaría</h2>
 <ul class="n">
-  <li><b>Docente:</b> elige destinatario con las pestañas: «Todos» (aviso general a la sala) o un alumno concreto (mensaje privado).</li>
-  <li><b>Alumno:</b> solo escribe al docente; ve los avisos «Para todos» y las respuestas del docente. No ve los mensajes de otros alumnos.</li>
+  <li><b>Sala general:</b> pestaña «Sala» donde escriben y leen todos (docente y alumnos). El docente puede cerrarla a los alumnos con el interruptor «Los alumnos pueden escribir en la sala»: entonces se convierte en canal de avisos.</li>
+  <li><b>Mensajes privados:</b> el docente tiene una pestaña por alumno; el alumno tiene la pestaña «Docente». Los alumnos no ven los privados de otros.</li>
+  <li><b>Modo discreto:</b> botón «Discreto» en la cabecera del chat (o en Ajustes). El acceso se hace pequeño y semitransparente, pero conserva el contador rojo, que además late un momento cuando llega un mensaje. Al tocarlo se abre el chat completo. Pulsa «+ Simular mensaje nuevo» arriba para verlo.</li>
   <li><b>Aviso de mensajes nuevos:</b> contador rojo sobre el botón y vibración corta en el móvil. El contador se pone a cero al abrir el chat.</li>
   <li><b>Sin guardar historial:</b> el chat vive solo mientras la sala está abierta y se borra al cerrarla (nada de datos en la base de datos).</li>
   <li><b>Moderación:</b> el docente puede silenciar el chat de la sala (los alumnos lo ven en gris con «Chat desactivado»).</li>
@@ -176,36 +200,63 @@
 var VIEW = 'doc';
 var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
 var SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+var TAB = 'sala', ROOM_OPEN = true, DISC = false, UNREAD = 2;
+var MSGS = {
+  sala: '<div class="sys">Sala general · todos pueden leer y escribir</div>'
+    + '<div class="m doc"><span class="n">Docente</span>Recordad verbalizar cada decisión.<span class="t">10:38</span></div>'
+    + '<div class="m"><span class="n">Marta</span>Yo cojo vía y monitor, ¿vale?<span class="t">10:39</span></div>'
+    + '<div class="m"><span class="n">Pablo</span>Vale, yo la vía aérea.<span class="t">10:39</span></div>',
+  Ana: '<div class="m"><span class="n">Ana</span>¿Pongo ya el parche del DEA?<span class="t">10:41</span></div><div class="m me"><span class="n">Tú → Ana</span>Sí, y pide análisis de ritmo.<span class="t">10:41</span></div>',
+  Luis: '<div class="m"><span class="n">Luis</span>Doctor, ¿la TA es la del brazo derecho?<span class="t">10:42</span></div>',
+  Marta: '<div class="sys">Aún no hay mensajes privados con Marta</div>',
+  Pablo: '<div class="sys">Aún no hay mensajes privados con Pablo</div>',
+  docente: '<div class="sys">Mensajes privados con el docente</div><div class="m me"><span class="n">Tú</span>¿Pongo ya el parche del DEA?<span class="t">10:41</span></div><div class="m doc"><span class="n">Docente → ti</span>Sí, y pide análisis de ritmo.<span class="t">10:41</span></div>'
+};
+function tabsHtml(doc){
+  var names = doc ? ['sala','Ana','Luis','Marta','Pablo'] : ['sala','docente'];
+  return '<div class="to">' + names.map(function(k){
+    var lab = k === 'sala' ? 'Sala' : k === 'docente' ? 'Docente' : k;
+    var dot = (k === 'Luis' && TAB !== 'Luis') ? '<small>●</small>' : '';
+    return '<span class="' + (TAB === k ? 'on' : '') + '" onclick="setTab(\'' + k + '\')">' + lab + dot + '</span>';
+  }).join('') + '</div>';
+}
 function chatHtml(n){
   var doc = VIEW === 'doc';
-  var to = doc ? '<div class="to"><span class="on">Todos</span><span>Ana</span><span>Luis</span><span>Marta</span><span>Pablo</span></div>' : '';
-  var msgs = doc
-    ? '<div class="sys">Hoy · sala 4821 · 4 conectados</div>'
-      + '<div class="m"><span class="n">Ana</span>¿Pongo ya el parche del DEA?<span class="t">10:41</span></div>'
-      + '<div class="m me"><span class="n">Tú → Ana</span>Sí, y pide análisis de ritmo.<span class="t">10:41</span></div>'
-      + '<div class="m"><span class="n">Luis</span>Doctor, ¿la TA es la del brazo derecho?<span class="t">10:42</span></div>'
-    : '<div class="sys">Sala 4821 · chat con el docente</div>'
-      + '<div class="m doc"><span class="n">Docente · para todos</span>Recordad verbalizar cada decisión.<span class="t">10:38</span></div>'
-      + '<div class="m me"><span class="n">Tú</span>¿Pongo ya el parche del DEA?<span class="t">10:41</span></div>'
-      + '<div class="m doc"><span class="n">Docente → ti</span>Sí, y pide análisis de ritmo.<span class="t">10:41</span></div>';
-  return '<div class="grab"></div><div class="ch"><div><b>Chat de la sala</b><small>' + (doc ? '4 alumnos conectados' : 'Docente conectado') + '</small></div><button class="x" onclick="closeChat('+n+')" aria-label="Cerrar">✕</button></div>'
-    + to + '<div class="msgs">' + msgs + '</div>'
-    + '<div class="in"><input placeholder="' + (doc ? 'Mensaje para todos…' : 'Escribe al docente…') + '"><button aria-label="Enviar">' + SEND + '</button></div>';
+  if(!doc && TAB !== 'sala' && TAB !== 'docente') TAB = 'sala';
+  if(doc && TAB === 'docente') TAB = 'sala';
+  var isRoom = TAB === 'sala';
+  var canWrite = doc || !isRoom || ROOM_OPEN;
+  var opt = (doc && isRoom) ? '<div class="opt ' + (ROOM_OPEN ? 'on' : '') + '" onclick="toggleRoom()"><i></i>Los alumnos pueden escribir en la sala</div>' : '';
+  var ph = !canWrite ? 'Solo el docente puede escribir en la sala' : isRoom ? 'Mensaje para toda la sala…' : (doc ? 'Mensaje privado a ' + TAB + '…' : 'Escribe al docente…');
+  var sub = doc ? '4 alumnos conectados' : 'Docente y 3 compañeros conectados';
+  return '<div class="grab"></div><div class="ch"><div><b>Chat de la sala</b><small>' + sub + '</small></div>'
+    + '<button class="dsc ' + (DISC ? 'on' : '') + '" onclick="toggleDisc()" aria-label="Modo discreto">' + (DISC ? 'Discreto: sí' : 'Discreto: no') + '</button>'
+    + '<button class="x" onclick="closeChat('+n+')" aria-label="Cerrar">✕</button></div>'
+    + tabsHtml(doc) + opt + '<div class="msgs">' + MSGS[TAB] + '</div>'
+    + '<div class="in ' + (canWrite ? '' : 'off') + '"><input placeholder="' + ph + '"' + (canWrite ? '' : ' disabled') + '><button aria-label="Enviar">' + SEND + '</button></div>';
+}
+function setTab(k){ TAB = k; render(); }
+function toggleRoom(){ ROOM_OPEN = !ROOM_OPEN; render(); }
+function toggleDisc(){ DISC = !DISC; document.body.classList.toggle('disc', DISC); var c = document.getElementById('discSw'); if(c) c.classList.toggle('on', DISC); render(); }
+function badges(){ document.querySelectorAll('.fab .bd').forEach(function(e){ e.textContent = UNREAD; e.classList.toggle('zero', !UNREAD); }); }
+function simulate(){
+  UNREAD++; badges();
+  document.querySelectorAll('.fab:not(.hide)').forEach(function(f){ f.classList.remove('ping'); void f.offsetWidth; f.classList.add('ping'); });
 }
 function render(){ for(var n=1;n<=3;n++){ document.getElementById('c'+n).innerHTML = chatHtml(n); } document.querySelectorAll('.fab .ic').forEach(function(e){ e.innerHTML = ICON; }); }
 function openChat(n){
   document.getElementById('c'+n).classList.add('open');
   var s = document.getElementById('s'+n); var b = s.querySelector('.back'); if(b) b.classList.add('open');
-  s.querySelector('.fab').classList.add('hide'); var bd = s.querySelector('.fab .bd'); if(bd) bd.style.display = 'none';
+  s.querySelector('.fab').classList.add('hide'); UNREAD = 0; badges();
 }
 function closeChat(n){
   document.getElementById('c'+n).classList.remove('open');
   var s = document.getElementById('s'+n); var b = s.querySelector('.back'); if(b) b.classList.remove('open');
   s.querySelector('.fab').classList.remove('hide');
 }
-function setView(v){ VIEW = v; document.querySelectorAll('.vsel button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === v); }); render(); }
+function setView(v){ VIEW = v; TAB = 'sala'; document.querySelectorAll('.vsel button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === v); }); render(); }
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ [1,2,3].forEach(closeChat); } });
-render();
+render(); badges();
 </script>
 </body>
 </html>
